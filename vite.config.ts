@@ -74,8 +74,6 @@ function loadPages(): Set<string> {
 
 const PAGES = loadPages();
 const PAPERBRIDGE_INPUT_NAMES = new Set(['main', 'create-assignment']);
-const DEFAULT_DEV_HOST = '0.0.0.0';
-const DEFAULT_PREVIEW_HOST = '0.0.0.0';
 
 function selectBuildInputs(
   inputs: Record<string, string>
@@ -107,23 +105,6 @@ function applyModeEnv(mode: string): void {
   for (const [key, value] of Object.entries(env)) {
     process.env[key] ??= value;
   }
-}
-
-function parseConfiguredPort(envName: string, fallback: number): number {
-  const rawValue = process.env[envName]?.trim();
-
-  if (!rawValue) {
-    return fallback;
-  }
-
-  const port = Number(rawValue);
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
-    throw new Error(
-      `[vite] ${envName} must be an integer between 1 and 65535. Received: ${rawValue}`
-    );
-  }
-
-  return port;
 }
 
 function getBasePath(): string {
@@ -567,20 +548,6 @@ function rewriteHtmlPathsPlugin(): Plugin {
 export default defineConfig(({ mode }) => {
   applyModeEnv(mode);
 
-  // Local port overrides:
-  // - VITE_DEV_HOST controls the Vite dev server bind host.
-  // - VITE_PREVIEW_HOST controls the Vite preview server bind host.
-  //   Both default to 0.0.0.0 so forwarded devcontainer ports are reachable
-  //   from the host machine without extra CLI flags.
-  // - VITE_DEV_PORT controls the Vite dev server port (default: 5173).
-  // - VITE_PREVIEW_PORT controls the Vite preview server port (default: 4173).
-  //   Preview is pinned to 4173 unless explicitly overridden so local preview
-  //   runs consistently on a predictable URL.
-  const devPort = parseConfiguredPort('VITE_DEV_PORT', 5173);
-  const previewPort = parseConfiguredPort('VITE_PREVIEW_PORT', 4173);
-  const enableDependencyOptimizer =
-    process.env.VITE_ENABLE_DEP_OPTIMIZER === 'true';
-
   const USE_CDN = process.env.VITE_USE_CDN === 'true';
 
   if (USE_CDN) {
@@ -666,36 +633,18 @@ export default defineConfig(({ mode }) => {
         zlib: 'browserify-zlib',
       },
     },
-    optimizeDeps: enableDependencyOptimizer
-      ? {
-          entries: ['index.html', 'create-assignment.html'],
-          include: [
-            'pdfkit',
-            'blob-stream',
-            'jszip',
-            'sortablejs',
-            'node-forge',
-          ],
-          exclude: ['coherentpdf', 'wasm-vips'],
-        }
-      : {
-          noDiscovery: true,
-          include: ['jszip'],
-          exclude: ['coherentpdf', 'wasm-vips'],
-        },
+    optimizeDeps: {
+      include: ['pdfkit', 'blob-stream'],
+      exclude: ['coherentpdf', 'wasm-vips'],
+    },
     server: {
-      host: process.env.VITE_DEV_HOST || DEFAULT_DEV_HOST,
-      port: devPort,
-      strictPort: true,
+      host: process.env.VITE_DEV_HOST || 'localhost',
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'require-corp',
       },
     },
     preview: {
-      host: process.env.VITE_PREVIEW_HOST || DEFAULT_PREVIEW_HOST,
-      port: previewPort,
-      strictPort: true,
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'require-corp',

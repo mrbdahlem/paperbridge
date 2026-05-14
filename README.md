@@ -20,13 +20,6 @@ npm install
 npm run dev
 ```
 
-By default, `npm run dev` serves on `http://localhost:5173` and `npm run preview` serves on `http://localhost:4173`.
-Both bind to `0.0.0.0` so forwarded devcontainer ports are reachable from the host machine.
-Set `VITE_DEV_PORT` in your shell or `.env.development.local` if you need a different dev server port.
-Set `VITE_PREVIEW_PORT` in your shell, `.env.local`, or `.env.production.local` if you need a different preview server port.
-Dependency discovery and broad pre-bundling are disabled by default to keep local startup memory low; JSZip remains pre-bundled for the PaperBridge assignment flow.
-Set `VITE_ENABLE_DEP_OPTIMIZER=true` to opt into broader Vite pre-bundling for heavier tool-page development.
-
 Useful scripts:
 
 - `npm run ci:paperbridge` runs lint, typecheck, tests, and build for the PaperBridge slice.

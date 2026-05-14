@@ -40,8 +40,8 @@ Extra metadata can be stored in image alt text when possible:
 
 Fallbacks:
 
-Decode or resolve the QR URL.  
- Look for a nearby visible marker.  
+Decode or resolve the QR URL.
+ Look for a nearby visible marker.
  Ask the user to relink the Doc manually.
 
 Do not rely on Google exposing “this Doc was copied from that Doc.” Instead, store assignment identity in the marker that gets copied with the document.
@@ -114,44 +114,44 @@ PaperBridge
 
 Teacher direct print:
 
-Create Doc.  
- Insert QR marker.  
- Print from Google Docs.  
- Students write names and submit scans or photos.  
+Create Doc.
+ Insert QR marker.
+ Print from Google Docs.
+ Students write names and submit scans or photos.
  System routes by assignment or document copy only.
 
 Teacher packet build:
 
-Create Doc.  
- Insert QR marker.  
- Choose Build Anonymous Packets.  
- PaperBridge exports Doc as PDF.  
- PaperBridge finds the placeholder QR on each page.  
- PaperBridge replaces it with packet and page specific QR codes.  
+Create Doc.
+ Insert QR marker.
+ Choose Build Anonymous Packets.
+ PaperBridge exports Doc as PDF.
+ PaperBridge finds the placeholder QR on each page.
+ PaperBridge replaces it with packet and page specific QR codes.
  Teacher prints the generated packet PDF.
 
 Student copy print:
 
-Student opens copied Doc.  
- Marker identifies assignment.  
- Add-on may register current Doc ID as a document copy.  
+Student opens copied Doc.
+ Marker identifies assignment.
+ Add-on may register current Doc ID as a document copy.
  Student prints, completes, then submits pages in order.
 
 ## **Validation**
 
 PaperBridge should check:
 
-QR marker exists.  
- QR marker is detectable after PDF export.  
- Marker appears on every page.  
- Marker is large enough to scan.  
+QR marker exists.
+ QR marker is detectable after PDF export.
+ Marker appears on every page.
+ Marker is large enough to scan.
  Generated QR fully covers the placeholder.
 
 ## **First prototype test**
 
-Insert QR into Google Docs header.  
- Move it manually.  
- Export to PDF.  
- Detect QR location on each page.  
- Cover placeholder with generated QR.  
+Insert QR into Google Docs header.
+ Move it manually.
+ Export to PDF.
+ Detect QR location on each page.
+ Cover placeholder with generated QR.
  Print, scan, and verify QR detection.

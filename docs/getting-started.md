@@ -23,13 +23,6 @@ npm run dev
 ```
 
 The app is available at `http://localhost:5173` by default.
-`npm run preview` uses `http://localhost:4173` by default.
-Both commands bind to `0.0.0.0` so forwarded devcontainer ports are reachable from the host machine.
-
-If you need a different dev server port, set `VITE_DEV_PORT` in your shell or `.env.development.local` before starting Vite.
-If you need a different preview server port, set `VITE_PREVIEW_PORT` in your shell, `.env.local`, or `.env.production.local` before starting Vite preview.
-Dependency discovery and broad pre-bundling are disabled by default to keep local startup memory low; JSZip remains pre-bundled for the PaperBridge assignment flow.
-Set `VITE_ENABLE_DEP_OPTIMIZER=true` to opt into broader Vite pre-bundling for heavier tool-page development.
 
 ## Validation Commands
 
