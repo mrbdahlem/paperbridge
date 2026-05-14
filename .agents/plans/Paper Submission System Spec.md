@@ -280,7 +280,7 @@ Example hidden metadata behind the QR token:
 {
 "assignmentId": "ex10-relays",
 "templateVersion": 1,
-"packetId": "7KQ4M",
+"packetId": "9X7K2VBM",
 "pageNumber": 2,
 "studentId": null
 }
@@ -326,7 +326,7 @@ Example hidden metadata behind the QR token:
 {
 "assignmentId": "ex10-relays",
 "templateVersion": 1,
-"packetId": "7KQ4M",
+"packetId": "9X7K2VBM",
 "pageNumber": 2,
 "studentId": "student_928174"
 }
@@ -339,9 +339,15 @@ The QR code should preferably contain a URL, not raw JSON.
 
 Example:
 
-https://bits.mycode.run/p/7KQ4M2
+https://bits.mycode.run/p/9X7K2VBM-P2
 
 The token resolves server side to the real metadata.
+
+Generated packet and assignment codes should use an 8-character QR-safe alphabet without vowels or ambiguous `0` and `1` characters:
+
+```
+23456789BCDFGHJKLMNPQRSTVWXYZ
+```
 
 Reasons to use a URL:
 
@@ -359,7 +365,7 @@ A damaged or old QR can show a helpful fallback page.
 
 The printed page should also include a human-readable fallback near the QR code:
 
-Packet: 7KQ4M  
+Packet: 9X7K2VBM
 Page: 2 of 4
 
 For generic assignment mode:
@@ -371,7 +377,7 @@ For roster mode later:
 
 Name: Maya Rodriguez  
 Period: 4  
-Packet: 7KQ4M  
+Packet: 9X7K2VBM
 Page: 2 of 4
 
 ## **MVP 0 assignment creation workflow**
@@ -596,8 +602,8 @@ Extracted AcroForm values, later
 Example MVP 0 output structure:
 
 EX10 Relays/  
- packet-7KQ4M/  
- submission.pdf  
+ packet-9X7K2VBM/
+submission.pdf  
  metadata.json  
  pages/  
  page-1-preview.jpg  
@@ -606,8 +612,8 @@ EX10 Relays/
 Example later output structure with answer crops:
 
 EX10 Relays/  
- packet-7KQ4M/  
- submission.pdf  
+ packet-9X7K2VBM/
+submission.pdf  
  metadata.json  
  pages/  
  page-1-original.jpg  
@@ -705,7 +711,7 @@ For duplicates, the app should allow replacement.
 
 Example:
 
-Packet 7KQ4M already has page 2. Replace it with this newly detected page?
+Packet 9X7K2VBM already has page 2. Replace it with this newly detected page?
 
 ## **Teacher review dashboard**
 
@@ -743,7 +749,7 @@ For anonymous packet mode, MVP 0 identifies submissions by packet code. Manual s
 
 Example:
 
-Packet 7KQ4M  
+Packet 9X7K2VBM
 Pages found: 1, 2, 3, 4  
 Status: Complete
 
@@ -762,19 +768,19 @@ Example Drive structure:
 Paper Submissions/  
  EX10 Relays/  
  Complete/  
- packet-7KQ4M.pdf  
- packet-J82PA.pdf  
- Needs Review/  
- packet-X92KD.pdf  
- Metadata/  
+ packet-9X7K2VBM.pdf
+packet-J82PZ6RC.pdf
+Needs Review/  
+ packet-X92KD7TM.pdf
+Metadata/  
  submissions.csv
 
 A later detailed export option:
 
 Paper Submissions/  
  EX10 Relays/  
- packet-7KQ4M/  
- submission.pdf  
+ packet-9X7K2VBM/
+submission.pdf  
  metadata.json  
  q01.prediction.png  
  q02.explanation.png
@@ -902,9 +908,9 @@ The teacher-facing product should use normal assignment and submission screens. 
 ### **Packet**
 
 {
-"id": "packet_7KQ4M",
+"id": "packet_9X7K2VBM",
 "assignmentId": "assign_123",
-"packetCode": "7KQ4M",
+"packetCode": "9X7K2VBM",
 "studentId": null,
 "mode": "anonymous",
 "createdAt": "2026-05-12T19:10:00Z"
@@ -913,10 +919,10 @@ The teacher-facing product should use normal assignment and submission screens. 
 ### **QR token**
 
 {
-"token": "7KQ4M2",
+"token": "9X7K2VBM-P2",
 "assignmentId": "assign_123",
 "templateVersion": 1,
-"packetId": "packet_7KQ4M",
+"packetId": "packet_9X7K2VBM",
 "pageNumber": 2,
 "expiresAt": null
 }
@@ -936,7 +942,7 @@ The teacher-facing product should use normal assignment and submission screens. 
 {
 "id": "sub_abc123",
 "assignmentId": "assign_123",
-"packetId": "packet_7KQ4M",
+"packetId": "packet_9X7K2VBM",
 "status": "complete",
 "source": "teacher-scan",
 "createdAt": "2026-05-12T20:15:00Z",
@@ -1014,7 +1020,7 @@ Teacher sees grouped results.
 
 For anonymous packet mode:
 
-Packet 7KQ4M  
+Packet 9X7K2VBM
 Pages found: 1, 2, 3, 4  
 Status: Complete
 
@@ -1105,7 +1111,7 @@ How good can automatic QR placement be before manual movement is needed?
 
 In Phase 1, should the system add a name/period/ID marking area automatically, or let the teacher opt in?
 
-Should anonymous packet codes be short and human-readable, like `7KQ4M`, or longer and more collision resistant?
+Should anonymous packet codes remain 8 QR-safe characters, or should production use a longer code plus collision checks?
 
 Should uploaded originals be deleted immediately after processing, or retained for a limited time?
 

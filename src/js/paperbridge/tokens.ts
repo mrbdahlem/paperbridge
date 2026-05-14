@@ -1,25 +1,33 @@
 import type { Packet, QRToken } from './store.js';
 
-const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+export const QR_CODE_ALPHABET = '23456789BCDFGHJKLMNPQRSTVWXYZ';
+export const QR_CODE_LENGTH = 8;
 
-export function generatePacketCode(): string {
+function generateSafeCode(length: number): string {
   let code = '';
-  const array = new Uint8Array(5);
-  crypto.getRandomValues(array);
-  for (const byte of array) {
-    code += CHARS[byte % CHARS.length];
+  const maxUnbiasedValue =
+    Math.floor(256 / QR_CODE_ALPHABET.length) * QR_CODE_ALPHABET.length;
+
+  while (code.length < length) {
+    const array = new Uint8Array(length - code.length);
+    crypto.getRandomValues(array);
+
+    for (const byte of array) {
+      if (byte >= maxUnbiasedValue) continue;
+      code += QR_CODE_ALPHABET[byte % QR_CODE_ALPHABET.length];
+      if (code.length === length) break;
+    }
   }
+
   return code;
 }
 
+export function generatePacketCode(): string {
+  return generateSafeCode(QR_CODE_LENGTH);
+}
+
 export function generateAssignmentCode(): string {
-  let code = '';
-  const array = new Uint8Array(6);
-  crypto.getRandomValues(array);
-  for (const byte of array) {
-    code += CHARS[byte % CHARS.length];
-  }
-  return code;
+  return generateSafeCode(QR_CODE_LENGTH);
 }
 
 export function generateId(prefix: string): string {
@@ -39,14 +47,14 @@ export function buildTokenForPacketPage(
   packetCode: string,
   pageNumber: number
 ): string {
-  return `${packetCode}${pageNumber}`;
+  return `${packetCode}-P${pageNumber}`;
 }
 
 export function buildTokenForGenericPage(
   assignmentCode: string,
   pageNumber: number
 ): string {
-  return `${assignmentCode}P${pageNumber}`;
+  return `${assignmentCode}-P${pageNumber}`;
 }
 
 export function buildPacketTokens(
