@@ -10,6 +10,8 @@ Google Docs direct printing does not create per page QR codes.
 
 The header repeats the same QR on every page, so direct printing can only identify the assignment or document copy. Per page codes only exist after PaperBridge processes the exported PDF.
 
+Google Docs copies also cannot carry reliable per page QR codes. A copied Doc can be linked to an assignment or packet, but the page number must be generated later by PaperBridge when it exports the Doc to PDF and replaces the repeated placeholder QR on each exported page.
+
 ## **QR marker**
 
 PaperBridge inserts a QR code into the Google Docs header.
@@ -81,6 +83,8 @@ Limitations: no page sorting, no packet grouping, no automatic student identity.
 ### **Direct print from student copy**
 
 If a student receives a copied Google Doc, the copied marker can identify the assignment. The add-on may combine that marker with the current Google Doc ID to register a document copy.
+
+If PaperBridge treats the student copy as a packet, the marker may be refreshed to identify the assignment and packet. It still must not claim page identity inside Google Docs because the same header marker appears on every page.
 
 Good for: absent students printing at home.
 
@@ -156,8 +160,17 @@ Student copy print:
 
 Student opens copied Doc.
 Marker identifies assignment.
-Add-on may register current Doc ID as a document copy.
+Add-on may register current Doc ID as a document copy or student packet.
+If a packet is created, PaperBridge refreshes the copied marker with assignment and packet identity only.
 Student prints, completes, then submits pages in order.
+
+Student copy PDF build:
+
+Student or instructor opens a registered student Doc copy.
+PaperBridge exports the Doc to PDF.
+PaperBridge finds the repeated assignment or packet placeholder QR on each page.
+PaperBridge replaces each placeholder with a generated QR that adds the page number.
+The generated PDF can then support assignment, packet, and page recovery.
 
 Instructor copy or colleague handoff:
 
