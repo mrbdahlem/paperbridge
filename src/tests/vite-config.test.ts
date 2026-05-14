@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import type { UserConfig } from 'vite';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import viteConfig from '../../vite.config';
@@ -49,14 +50,18 @@ describe('Vite devcontainer host binding', () => {
     expect(config.preview?.host).toBe('localhost');
   });
 
-  it('keeps development mode loopback-only with checked-in env defaults', () => {
-    delete process.env.VITE_DEV_HOST;
-    delete process.env.VITE_PREVIEW_HOST;
-
+  it('keeps development mode loopback-only with controlled host env', () => {
     const config = loadConfig('development');
 
     expect(config.server?.host).toBe('localhost');
     expect(config.preview?.host).toBe('localhost');
+  });
+
+  it('does not check in development host overrides', () => {
+    const developmentEnv = readFileSync('.env.development', 'utf8');
+
+    expect(developmentEnv).not.toMatch(/^VITE_DEV_HOST\s*=/m);
+    expect(developmentEnv).not.toMatch(/^VITE_PREVIEW_HOST\s*=/m);
   });
 
   it('allows devcontainer host overrides for forwarded port access', () => {
