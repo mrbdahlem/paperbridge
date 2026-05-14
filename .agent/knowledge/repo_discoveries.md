@@ -14,5 +14,5 @@ Durable notes about repository structure and migration decisions.
 - Vite preview defaults to port 4173 and runs in production mode by default, so `VITE_PREVIEW_PORT` belongs in the shell, `.env.local`, or `.env.production.local`.
 - Dependency discovery and broad pre-bundling are disabled by default in `vite.config.ts` to keep local startup memory low; set `VITE_ENABLE_DEP_OPTIMIZER=true` to opt into broader pre-bundling for heavier tool-page development.
 - Default dev optimization still includes `jszip` because PaperBridge `create-assignment.html` imports it directly and needs browser ESM conversion even when dependency discovery is disabled.
-- Vite dev and preview bind to `0.0.0.0` by default so forwarded devcontainer ports are reachable from the host machine. Use `VITE_DEV_HOST=localhost` or `VITE_PREVIEW_HOST=localhost` for loopback-only serving.
+- Vite dev and preview bind to `localhost` by default outside devcontainers. Devcontainer config sets `VITE_DEV_HOST=0.0.0.0` and `VITE_PREVIEW_HOST=0.0.0.0` so forwarded ports are reachable from the host machine.
 - `docs/.vitepress/dist/**` is generated docs output and is ignored by ESLint; source docs remain linted where applicable.

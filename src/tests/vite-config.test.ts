@@ -42,23 +42,23 @@ afterEach(() => {
 });
 
 describe('Vite devcontainer host binding', () => {
-  it('binds dev and preview servers to all interfaces by default', () => {
-    const config = loadConfig();
-
-    expect(config.server?.host).toBe('0.0.0.0');
-    expect(config.preview?.host).toBe('0.0.0.0');
-  });
-
-  it('allows host overrides for loopback-only development', () => {
-    resetViteConfigEnv({
-      VITE_DEV_HOST: 'localhost',
-      VITE_PREVIEW_HOST: 'localhost',
-    });
-
+  it('binds dev and preview servers to localhost by default', () => {
     const config = loadConfig();
 
     expect(config.server?.host).toBe('localhost');
     expect(config.preview?.host).toBe('localhost');
+  });
+
+  it('allows devcontainer host overrides for forwarded port access', () => {
+    resetViteConfigEnv({
+      VITE_DEV_HOST: '0.0.0.0',
+      VITE_PREVIEW_HOST: '0.0.0.0',
+    });
+
+    const config = loadConfig();
+
+    expect(config.server?.host).toBe('0.0.0.0');
+    expect(config.preview?.host).toBe('0.0.0.0');
   });
 });
 

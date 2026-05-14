@@ -74,8 +74,8 @@ function loadPages(): Set<string> {
 
 const PAGES = loadPages();
 const PAPERBRIDGE_INPUT_NAMES = new Set(['main', 'create-assignment']);
-const DEFAULT_DEV_HOST = '0.0.0.0';
-const DEFAULT_PREVIEW_HOST = '0.0.0.0';
+const DEFAULT_DEV_HOST = 'localhost';
+const DEFAULT_PREVIEW_HOST = 'localhost';
 
 function selectBuildInputs(
   inputs: Record<string, string>
@@ -570,8 +570,8 @@ export default defineConfig(({ mode }) => {
   // Local port overrides:
   // - VITE_DEV_HOST controls the Vite dev server bind host.
   // - VITE_PREVIEW_HOST controls the Vite preview server bind host.
-  //   Both default to 0.0.0.0 so forwarded devcontainer ports are reachable
-  //   from the host machine without extra CLI flags.
+  //   Both default to localhost. Devcontainers set these to 0.0.0.0 so
+  //   forwarded ports are reachable from the host machine.
   // - VITE_DEV_PORT controls the Vite dev server port (default: 5173).
   // - VITE_PREVIEW_PORT controls the Vite preview server port (default: 4173).
   //   Preview is pinned to 4173 unless explicitly overridden so local preview
