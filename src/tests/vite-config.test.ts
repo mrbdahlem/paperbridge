@@ -11,14 +11,14 @@ const VITE_CONFIG_ENV_KEYS = [
   'VITE_ENABLE_DEP_OPTIMIZER',
 ] as const;
 
-function loadConfig(): UserConfig {
+function loadConfig(mode = 'test'): UserConfig {
   if (typeof viteConfig !== 'function') {
     throw new Error('Expected Vite config to export a config factory');
   }
 
   return viteConfig({
     command: 'serve',
-    mode: 'test',
+    mode,
     isPreview: false,
     isSsrBuild: false,
   });
@@ -44,6 +44,16 @@ afterEach(() => {
 describe('Vite devcontainer host binding', () => {
   it('binds dev and preview servers to localhost by default', () => {
     const config = loadConfig();
+
+    expect(config.server?.host).toBe('localhost');
+    expect(config.preview?.host).toBe('localhost');
+  });
+
+  it('keeps development mode loopback-only with checked-in env defaults', () => {
+    delete process.env.VITE_DEV_HOST;
+    delete process.env.VITE_PREVIEW_HOST;
+
+    const config = loadConfig('development');
 
     expect(config.server?.host).toBe('localhost');
     expect(config.preview?.host).toBe('localhost');
