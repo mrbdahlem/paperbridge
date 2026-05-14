@@ -7,3 +7,9 @@ Durable notes about repository structure and migration decisions.
 - PaperBridge is the primary project identity for repository workflow, CI, issue templates, security notes, and maintainer-facing docs.
 - BentoPDF references remain valid when they describe the bundled PDF tools surface, tool-specific docs, upstream package names, or runtime components used by those tools.
 - Legacy BentoPDF deployment artifacts were removed from the active repository surface: Docker/Helm release workflows, Helm chart files, Docker Compose/Unraid descriptors, container entrypoint/nginx files, and the air-gapped deployment script.
+
+## 2026-05-14 Google Docs Authoring Copies
+
+- Google Docs assignment markers can be copied with the document, so the marker `assignmentId` can point to an assignment whose registered Google document ID differs from the currently opened Doc.
+- The add-on should treat this mismatch as a copied or shared derivative and ask the signed-in instructor whether to create a new PaperBridge assignment from the current Doc before changing assignment linkage.
+- PaperBridge must not silently attach a copied Google document ID to an assignment owned by another instructor.

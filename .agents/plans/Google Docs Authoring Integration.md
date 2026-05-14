@@ -41,10 +41,32 @@ Extra metadata can be stored in image alt text when possible:
 Fallbacks:
 
 Decode or resolve the QR URL.
- Look for a nearby visible marker.
- Ask the user to relink the Doc manually.
+Look for a nearby visible marker.
+Ask the user to relink the Doc manually.
 
 Do not rely on Google exposing “this Doc was copied from that Doc.” Instead, store assignment identity in the marker that gets copied with the document.
+
+## **Copied document detection**
+
+When the add-on opens or validates a Google Doc, compare the current Google document ID with the document ID registered for the marker's `assignmentId`.
+
+If the marker's assignment exists but the current document ID does not match the registered assignment document ID, treat the Doc as a copied or shared derivative. This can happen when the original instructor makes a personal copy, shares a copy with a colleague, or a colleague opens a copied assignment with their own PaperBridge account.
+
+Before changing any assignment linkage, ask the signed-in instructor what to do:
+
+```
+This Google Doc contains a PaperBridge marker for an existing assignment, but this Doc is a different copy.
+
+Create a new PaperBridge assignment from this copy?
+```
+
+Primary action: create a new assignment on PaperBridge, bind it to the current Google document ID, and replace the copied marker with a marker for the new `assignmentId`.
+
+Secondary action: keep linked to the existing assignment only when the instructor has permission to use that assignment and explicitly chooses to relink this document copy.
+
+Cancel action: leave the marker unchanged and do not register the current document ID.
+
+Never silently attach a new Google document ID to an existing assignment owned by another instructor.
 
 ## **Modes**
 
@@ -115,43 +137,52 @@ PaperBridge
 Teacher direct print:
 
 Create Doc.
- Insert QR marker.
- Print from Google Docs.
- Students write names and submit scans or photos.
- System routes by assignment or document copy only.
+Insert QR marker.
+Print from Google Docs.
+Students write names and submit scans or photos.
+System routes by assignment or document copy only.
 
 Teacher packet build:
 
 Create Doc.
- Insert QR marker.
- Choose Build Anonymous Packets.
- PaperBridge exports Doc as PDF.
- PaperBridge finds the placeholder QR on each page.
- PaperBridge replaces it with packet and page specific QR codes.
- Teacher prints the generated packet PDF.
+Insert QR marker.
+Choose Build Anonymous Packets.
+PaperBridge exports Doc as PDF.
+PaperBridge finds the placeholder QR on each page.
+PaperBridge replaces it with packet and page specific QR codes.
+Teacher prints the generated packet PDF.
 
 Student copy print:
 
 Student opens copied Doc.
- Marker identifies assignment.
- Add-on may register current Doc ID as a document copy.
- Student prints, completes, then submits pages in order.
+Marker identifies assignment.
+Add-on may register current Doc ID as a document copy.
+Student prints, completes, then submits pages in order.
+
+Instructor copy or colleague handoff:
+
+Instructor opens a copied Doc whose marker points to an existing assignment.
+Add-on detects that the current Google document ID differs from the assignment's registered document ID.
+PaperBridge asks whether to create a new assignment from this copy.
+If confirmed, PaperBridge creates the new assignment and refreshes the marker.
+If canceled, PaperBridge leaves the copied marker untouched.
 
 ## **Validation**
 
 PaperBridge should check:
 
 QR marker exists.
- QR marker is detectable after PDF export.
- Marker appears on every page.
- Marker is large enough to scan.
- Generated QR fully covers the placeholder.
+QR marker is detectable after PDF export.
+Current Google document ID matches the registered assignment document ID, or the instructor has chosen how to handle the copied Doc.
+Marker appears on every page.
+Marker is large enough to scan.
+Generated QR fully covers the placeholder.
 
 ## **First prototype test**
 
 Insert QR into Google Docs header.
- Move it manually.
- Export to PDF.
- Detect QR location on each page.
- Cover placeholder with generated QR.
- Print, scan, and verify QR detection.
+Move it manually.
+Export to PDF.
+Detect QR location on each page.
+Cover placeholder with generated QR.
+Print, scan, and verify QR detection.
