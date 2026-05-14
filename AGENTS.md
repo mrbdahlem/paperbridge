@@ -28,6 +28,22 @@
 - Never expose, log, or commit secrets, API keys, or other sensitive information.
 - Plans should be iterative and include checklists of steps for the plan. Checklists must be updated as tasks are created and completed.
 
+## Configuration and Documentation Alignment
+
+When changing runtime, build, development-server, environment-variable, CI, or devcontainer behavior:
+
+1. Identify every source of truth before editing:
+   - implementation/config files such as `vite.config.ts`, `package.json`, `.devcontainer/**`, workflow files, and scripts
+   - environment templates such as `.env.example` and checked-in mode-specific env files
+   - contributor docs such as `README.md`, `docs/getting-started.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, and `DEPLOYMENT.md` when present
+   - tests that assert the behavior
+   - durable notes under `.agents/knowledge/`
+2. Keep all affected sources consistent in the same change. Do not update docs to describe behavior that is only intended, experimental, or temporarily true.
+3. If a config value changes during review, re-check the docs, env examples, tests, and knowledge notes before committing.
+4. Remove abandoned config experiments from the branch before review. Do not leave stale env variables, ports, flags, scripts, comments, or docs for approaches that were tried and reverted.
+5. Prefer documenting the externally visible contract over implementation details. Include defaults, override variables, supported env files/modes, and devcontainer differences when they affect contributor workflows.
+6. If a required doc named in this file is missing, note that it is absent in validation instead of inventing a replacement doc.
+
 ## Preflight Checklist
 
 Before making code changes:
@@ -86,23 +102,23 @@ If a change affects runtime, build, or deployment behavior:
 
 Use these logs to keep work auditable:
 
-1. `.agent/knowledge/repo_discoveries.md`
+1. `.agents/knowledge/repo_discoveries.md`
    - Durable notes/discoveries for future work.
-2. `.agent/knowledge/react-best-practices.md`
+2. `.agents/knowledge/react-best-practices.md`
    - React patterns, optimizations, and accessibility guidance.
-3. `.agent/knowledge/testing-patterns.md`
+3. `.agents/knowledge/testing-patterns.md`
    - Shared testing setups, failure patterns, and reliability guidance.
-4. `.agent/knowledge/deployment-notes.md`
+4. `.agents/knowledge/deployment-notes.md`
    - Environment/runtime deployment constraints and operational learnings.
-5. `.agent/knowledge/data-contracts.md`
+5. `.agents/knowledge/data-contracts.md`
    - API contracts, payload assumptions, and compatibility expectations.
-6. `.agent/knowledge/performance-notes.md`
+6. `.agents/knowledge/performance-notes.md`
    - Profiling findings, bottlenecks, and optimization tradeoffs.
-7. `.agent/knowledge/security-notes.md`
+7. `.agents/knowledge/security-notes.md`
    - Security boundaries, validation rules, and sensitive-data handling guidance.
 
 If a log file is missing, create it when first needed.
-If a discovery does not fit an existing knowledge file, create a new `.agent/knowledge/<category>.md` file and define its purpose at the top. Prefer extending an existing category first; create a new category only when the topic is durable and likely to be reused.
+If a discovery does not fit an existing knowledge file, create a new `.agents/knowledge/<category>.md` file and define its purpose at the top. Prefer extending an existing category first; create a new category only when the topic is durable and likely to be reused.
 
 ## Definition of Done (General)
 
