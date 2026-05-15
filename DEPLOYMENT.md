@@ -21,6 +21,7 @@ Required or expected Render variables:
 - `NODE_ENV=production`
 - `NODE_VERSION=24`
 - `LOG_LEVEL=info`
+- `SITE_URL=https://scribbled.page`
 - `VITE_QR_BASE_URL`: configured in Render when QR links should use a deployed base URL
 - `DATABASE_URL`: configured in Render when backend persistence is added
 
@@ -39,6 +40,8 @@ HTML is revalidated so deploys can update references to the current hashed Vite 
 ## Localized Pages
 
 Production builds generate localized HTML and sitemap entries for the active ScribbledPage translation set: `en`, `de`, `es`, `fr`, `ja`, and `pt`.
+
+Generated canonical URLs, localized page URLs, and sitemap entries use `SITE_URL`, which defaults to `https://scribbled.page`.
 
 The build language list defaults to locale folders that contain `scribbledpage.json`. To run a one-off build with a different subset, set `I18N_BUILD_LANGUAGES` to a comma-separated list such as `en,es,fr`.
 

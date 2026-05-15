@@ -4,6 +4,10 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { getI18nBuildLanguages } from '../../scripts/i18n-language-config.mjs';
 import { processFileForLanguage } from '../../scripts/generate-i18n-pages.mjs';
+import {
+  DEFAULT_SITE_URL,
+  getSiteUrl,
+} from '../../scripts/site-url-config.mjs';
 
 describe('generate i18n pages', () => {
   let tempDir;
@@ -91,6 +95,14 @@ describe('generate i18n pages', () => {
 
     expect(() => getI18nBuildLanguages(tempDir)).toThrow(
       `Default i18n build language "en" is missing from ${tempDir}`
+    );
+  });
+
+  it('uses ScribbledPage as the default generated site URL', () => {
+    expect(DEFAULT_SITE_URL).toBe('https://scribbled.page');
+    expect(getSiteUrl({})).toBe('https://scribbled.page');
+    expect(getSiteUrl({ SITE_URL: 'https://example.test/' })).toBe(
+      'https://example.test'
     );
   });
 });
