@@ -16,20 +16,37 @@ describe('BentoPDF tool chrome branding', () => {
     'simple-index.html',
   ];
 
+  const deprecatedBrandingExpressions = [
+    '{{#if brandName}}',
+    '{{brandName}}',
+    '{{#if brandLogo}}',
+    '{{brandLogo}}',
+    '{{#if footerText}}',
+    '{{#unless footerText}}',
+    '{{footerText}}',
+  ];
+
   it('does not use ScribbledPage deployment branding in BentoPDF chrome', () => {
     for (const file of toolChromeFiles) {
       const content = readRepoFile(file);
 
-      expect(content, `${file} should not use VITE_BRAND_NAME`).not.toContain(
-        'brandName'
-      );
-      expect(content, `${file} should not use VITE_BRAND_LOGO`).not.toContain(
-        'brandLogo'
-      );
-      expect(content, `${file} should not use VITE_FOOTER_TEXT`).not.toContain(
-        'footerText'
-      );
+      for (const expression of deprecatedBrandingExpressions) {
+        expect(
+          content,
+          `${file} should not use deprecated Handlebars branding expression ${expression}`
+        ).not.toContain(expression);
+      }
     }
+  });
+
+  it('does not define dead deployment branding env vars', () => {
+    const deploymentConfig = `${readRepoFile('render.yaml')}\n${readRepoFile(
+      '.env.example'
+    )}`;
+
+    expect(deploymentConfig).not.toContain('VITE_BRAND_NAME');
+    expect(deploymentConfig).not.toContain('VITE_BRAND_LOGO');
+    expect(deploymentConfig).not.toContain('VITE_FOOTER_TEXT');
   });
 
   it('links tool GitHub chrome to the upstream BentoPDF repository', () => {
