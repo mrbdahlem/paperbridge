@@ -4,8 +4,12 @@
   "version": "0.0.1",
   "license": "AGPL-3.0-only",
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "vite",
+    "start": "node server/index.js",
     "typecheck": "tsc --noEmit",
     "typecheck:paperbridge": "tsc -p tsconfig.paperbridge.json --noEmit",
     "typecheck:tools": "tsc -p tsconfig.tools.json --noEmit",
@@ -26,7 +30,8 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
     "format": "prettier --write .",
-    "serve": "npm run build && npm run preview",
+    "serve": "npm run build && npm start",
+    "preview:vite": "vite preview",
     "package": "node scripts/package-dist.js",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
@@ -73,6 +78,8 @@
     "vue": "^3.5.29"
   },
   "dependencies": {
+    "@fastify/sensible": "^6.0.4",
+    "@fastify/static": "^9.1.3",
     "@fontsource/cedarville-cursive": "^5.2.7",
     "@fontsource/dancing-script": "^5.2.8",
     "@fontsource/dm-sans": "^5.2.8",
@@ -98,6 +105,7 @@
     "dompurify": "^3.4.0",
     "embedpdf-snippet": "file:vendor/embedpdf/embedpdf-snippet-2.9.1.tgz",
     "fast-xml-parser": "^5.7.1",
+    "fastify": "^5.8.5",
     "heic2any": "^0.0.4",
     "highlight.js": "^11.11.1",
     "i18next": "^26.1.0",

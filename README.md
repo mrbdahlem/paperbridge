@@ -33,6 +33,20 @@ Useful scripts:
 - `npm run ci:tools` runs lint, typecheck, tests, and build for the bundled PDF tools surface.
 - `npm test -- --run` runs the full repository test suite.
 - `npm run docs:dev` starts the docs site.
+- `npm start` serves the production `dist/` build through the Fastify server.
+
+## Deployment
+
+ScribbledPage is deployed as a Render Node web service so the app can serve the frontend and own backend API/database access from the same runtime.
+
+Render uses `render.yaml` as the deployment source of truth:
+
+- Build command: `npm ci && npm run build:paperbridge`
+- Start command: `npm start`
+- Health check path: `/healthz`
+- Publish/runtime server: Fastify serving `dist/`
+
+Set `DATABASE_URL` in Render from Neon when backend persistence is added. Keep this value server-only; do not put database credentials in any `VITE_*` variable. For deployed runtime, prefer Neon's pooled connection string. For development and preview workflows, Neon branches can provide isolated Postgres databases without sharing a mutable development database.
 
 ## Documentation
 
