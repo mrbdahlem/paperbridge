@@ -36,6 +36,12 @@ The Fastify server sets cache headers for generated frontend files:
 
 HTML is revalidated so deploys can update references to the current hashed Vite assets. Hashed assets are immutable because their filenames change when their contents change.
 
+## Localized Pages
+
+Production builds generate localized HTML and sitemap entries for the active ScribbledPage translation set: `en`, `de`, `es`, `fr`, `ja`, and `pt`.
+
+The build language list defaults to locale folders that contain `scribbledpage.json`. To run a one-off build with a different subset, set `I18N_BUILD_LANGUAGES` to a comma-separated list such as `en,es,fr`.
+
 ## Validation
 
 Before changing deployment, runtime, build, or server behavior, run:

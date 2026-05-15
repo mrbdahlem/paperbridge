@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getLanguageFromUrl } from '@/js/i18n/i18n';
+import { getLanguageFromUrl, supportedLanguages } from '@/js/i18n/i18n';
+
+const SCRIBBLEDPAGE_LANGUAGES = ['en', 'de', 'es', 'fr', 'ja', 'pt'];
 
 describe('getLanguageFromUrl', () => {
   const originalLocation = window.location;
@@ -57,17 +59,17 @@ describe('getLanguageFromUrl', () => {
 
   it('should return language from localStorage if URL has no language', () => {
     window.location.pathname = '/about';
-    localStorage.setItem('i18nextLng', 'it');
-    expect(getLanguageFromUrl()).toBe('it');
+    localStorage.setItem('i18nextLng', 'pt');
+    expect(getLanguageFromUrl()).toBe('pt');
   });
 
   it('should return exact match from navigator.languages', () => {
     window.location.pathname = '/';
     Object.defineProperty(window.navigator, 'languages', {
-      value: ['zh-TW', 'en-US', 'en'],
+      value: ['ja', 'en-US', 'en'],
       configurable: true,
     });
-    expect(getLanguageFromUrl()).toBe('zh-TW');
+    expect(getLanguageFromUrl()).toBe('ja');
   });
 
   it('should return primary language match from navigator.languages', () => {
@@ -104,8 +106,8 @@ describe('getLanguageFromUrl', () => {
       value: ['xx'],
       configurable: true,
     }); // unsupported
-    vi.stubEnv('VITE_DEFAULT_LANGUAGE', 'vi');
-    expect(getLanguageFromUrl()).toBe('vi');
+    vi.stubEnv('VITE_DEFAULT_LANGUAGE', 'ja');
+    expect(getLanguageFromUrl()).toBe('ja');
   });
 
   it('should fallback to en if everything else fails', () => {
@@ -125,5 +127,9 @@ describe('getLanguageFromUrl', () => {
       writable: true,
     });
     expect(getLanguageFromUrl()).toBe('en');
+  });
+
+  it('limits supported languages to the current ScribbledPage translation set', () => {
+    expect([...supportedLanguages]).toEqual(SCRIBBLEDPAGE_LANGUAGES);
   });
 });

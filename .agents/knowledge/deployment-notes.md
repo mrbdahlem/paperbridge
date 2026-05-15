@@ -10,5 +10,6 @@ Durable deployment, runtime, and hosting notes for ScribbledPage.
 - Render uses the full production build so the ScribbledPage dashboard, assignment flow, PDF tools index, and individual PDF tool pages are all available from the same deployed service.
 - Render builds with `HUSKY=0 npm ci --include=dev && npm run build` so hosted installs skip local Git hook setup while still installing the devDependencies required by Vite and TypeScript under `NODE_ENV=production`.
 - Fastify marks generated HTML as `Cache-Control: no-cache` and hashed files under `/assets/` as `public, max-age=31536000, immutable` to avoid stale HTML pointing at missing Vite asset hashes after deploys.
+- Production i18n page and sitemap generation defaults to locale folders with `scribbledpage.json`, currently `en`, `de`, `es`, `fr`, `ja`, and `pt`; `I18N_BUILD_LANGUAGES` can override this for one-off builds.
 - Neon credentials must stay server-side in `DATABASE_URL`; browser-facing `VITE_*` variables must not contain database credentials.
 - Neon development databases should use branches rather than a shared mutable development database when testing schema/data changes.
