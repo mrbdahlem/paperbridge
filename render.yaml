@@ -2,7 +2,7 @@ services:
   - type: web
     name: scribbledpage
     runtime: node
-    buildCommand: npm ci && npm run build:scribbledpage
+    buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /healthz
     autoDeploy: true
@@ -10,7 +10,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
-        value: "24"
+        value: '24'
       - key: LOG_LEVEL
         value: info
       - key: VITE_BRAND_NAME
