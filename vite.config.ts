@@ -673,6 +673,7 @@ export default defineConfig(({ mode }) => {
             'pdfkit',
             'blob-stream',
             'jszip',
+            'pako',
             'sortablejs',
             'node-forge',
           ],
@@ -680,7 +681,7 @@ export default defineConfig(({ mode }) => {
         }
       : {
           noDiscovery: true,
-          include: ['jszip'],
+          include: ['jszip', 'pako'],
           exclude: ['coherentpdf', 'wasm-vips'],
         },
     server: {
