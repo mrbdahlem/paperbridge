@@ -2,52 +2,56 @@ import i18next from 'i18next';
 import HttpBackend from 'i18next-http-backend';
 
 // Supported languages
-export const supportedLanguages = [
-  'en',
-  'ar',
-  'be',
-  'ru',
-  'fr',
-  'de',
-  'es',
-  'zh',
-  'zh-TW',
-  'vi',
-  'tr',
-  'id',
-  'it',
-  'pt',
-  'nl',
-  'da',
-  'sv',
-  'ko',
-  'ja',
-  'uk',
-] as const;
+export const supportedLanguages = ['en', 'de', 'es', 'fr', 'ja', 'pt'] as const;
 export type SupportedLanguage = (typeof supportedLanguages)[number];
 
 export const languageNames: Record<SupportedLanguage, string> = {
   en: 'English',
-  ar: 'العربية',
-  be: 'Беларуская',
-  ru: 'Русский',
-  fr: 'Français',
   de: 'Deutsch',
   es: 'Español',
-  zh: '中文',
-  'zh-TW': '繁體中文（台灣）',
-  vi: 'Tiếng Việt',
-  tr: 'Türkçe',
-  id: 'Bahasa Indonesia',
-  it: 'Italiano',
-  pt: 'Português',
-  nl: 'Nederlands',
-  da: 'Dansk',
-  sv: 'Svenska',
-  ko: '한국어',
+  fr: 'Français',
   ja: '日本語',
-  uk: 'Українська',
+  pt: 'Português',
 };
+
+function isSupportedLanguage(value: string): value is SupportedLanguage {
+  return supportedLanguages.includes(value as SupportedLanguage);
+}
+
+function getLeadingLanguageSegment(path: string): SupportedLanguage | null {
+  const segment = path.split('/').find(Boolean);
+  return segment && isSupportedLanguage(segment) ? segment : null;
+}
+
+function stripBasePathPrefix(pathValue: string, basePath: string): string {
+  const pathOnly = pathValue.split(/[?#]/, 1)[0] || '/';
+  const pathWithLeadingSlash = pathOnly.startsWith('/')
+    ? pathOnly
+    : `/${pathOnly}`;
+
+  if (!basePath || basePath === '/') return pathWithLeadingSlash;
+
+  const basePathWithLeadingSlash = basePath.startsWith('/')
+    ? basePath
+    : `/${basePath}`;
+
+  if (pathWithLeadingSlash === basePathWithLeadingSlash) return '/';
+
+  if (pathWithLeadingSlash.startsWith(`${basePathWithLeadingSlash}/`)) {
+    return pathWithLeadingSlash.slice(basePathWithLeadingSlash.length) || '/';
+  }
+
+  return pathWithLeadingSlash;
+}
+
+function hasSupportedLanguagePrefix(
+  pathValue: string,
+  basePath: string
+): boolean {
+  return (
+    getLeadingLanguageSegment(stripBasePathPrefix(pathValue, basePath)) !== null
+  );
+}
 
 export const getLanguageFromUrl = (): SupportedLanguage => {
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -61,41 +65,31 @@ export const getLanguageFromUrl = (): SupportedLanguage => {
     path = '/' + path;
   }
 
-  const langMatch = path.match(
-    /^\/(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru|ja|uk)(?:\/|$)/
-  );
-  if (
-    langMatch &&
-    supportedLanguages.includes(langMatch[1] as SupportedLanguage)
-  ) {
-    return langMatch[1] as SupportedLanguage;
-  }
+  const urlLanguage = getLeadingLanguageSegment(path);
+  if (urlLanguage) return urlLanguage;
 
   const storedLang = localStorage.getItem('i18nextLng');
-  if (
-    storedLang &&
-    supportedLanguages.includes(storedLang as SupportedLanguage)
-  ) {
-    return storedLang as SupportedLanguage;
+  if (storedLang && isSupportedLanguage(storedLang)) {
+    return storedLang;
   }
 
   // Check browser language preferences
   if (typeof navigator !== 'undefined' && navigator.languages) {
     for (const lang of navigator.languages) {
-      if (supportedLanguages.includes(lang as SupportedLanguage)) {
-        return lang as SupportedLanguage;
+      if (isSupportedLanguage(lang)) {
+        return lang;
       }
 
       const primaryLang = lang.split('-')[0];
-      if (supportedLanguages.includes(primaryLang as SupportedLanguage)) {
-        return primaryLang as SupportedLanguage;
+      if (isSupportedLanguage(primaryLang)) {
+        return primaryLang;
       }
     }
   }
 
   const envLang = import.meta.env?.VITE_DEFAULT_LANGUAGE;
-  if (envLang && supportedLanguages.includes(envLang as SupportedLanguage)) {
-    return envLang as SupportedLanguage;
+  if (envLang && isSupportedLanguage(envLang)) {
+    return envLang;
   }
 
   return 'en';
@@ -136,7 +130,7 @@ export const t = (key: string, options?: Record<string, unknown>): string => {
 };
 
 export const changeLanguage = (lang: SupportedLanguage): void => {
-  if (!supportedLanguages.includes(lang)) return;
+  if (!isSupportedLanguage(lang)) return;
   localStorage.setItem('i18nextLng', lang);
 
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -151,11 +145,10 @@ export const changeLanguage = (lang: SupportedLanguage): void => {
   }
 
   let pagePathWithoutLang = relativePath;
-  const langPrefixMatch = relativePath.match(
-    /^\/(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru|ja|uk)(\/.*)?$/
-  );
-  if (langPrefixMatch) {
-    pagePathWithoutLang = langPrefixMatch[2] || '/';
+  const leadingLanguage = getLeadingLanguageSegment(relativePath);
+  if (leadingLanguage) {
+    pagePathWithoutLang =
+      '/' + relativePath.split('/').filter(Boolean).slice(1).join('/');
   }
 
   if (!pagePathWithoutLang.startsWith('/')) {
@@ -246,10 +239,7 @@ export const rewriteLinks = (): void => {
       return;
     }
 
-    const langPrefixRegex = new RegExp(
-      `^(${basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})?/?(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru|ja|uk)(/|$)`
-    );
-    if (langPrefixRegex.test(href)) {
+    if (hasSupportedLanguagePrefix(href, basePath)) {
       return;
     }
 
