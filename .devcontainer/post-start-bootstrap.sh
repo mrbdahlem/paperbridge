@@ -13,14 +13,14 @@ done
 # Broad sudo is disabled by default. Opt in only when nested sandbox tooling
 # must launch processes as arbitrary target users.
 broad_sudo_enabled=0
-if [[ "${PAPERBRIDGE_ENABLE_BROAD_SUDO:-0}" == "1" ]]; then
+if [[ "${SCRIBBLEDPAGE_ENABLE_BROAD_SUDO:-0}" == "1" ]]; then
   broad_sudo_enabled=1
 fi
 if [[ -f "$workspace_folder/.devcontainer/privileged/enable-broad-sudo.local" ]]; then
   broad_sudo_enabled=1
 fi
 
-echo "Running PaperBridge post-start bootstrap..."
+echo "Running ScribbledPage post-start bootstrap..."
 
 # In the privileged devcontainer, broad sudo is opt-in only. This avoids
 # unnecessarily granting full root escalation to every process in the container.
@@ -49,7 +49,7 @@ if [[ "$privileged_mode" -eq 1 ]] && command -v sudo >/dev/null 2>&1 && id -un |
     fi
   elif [ -f "$sudoers_file" ]; then
     sudo rm -f "$sudoers_file" || echo "Could not remove broad sudo rule at $sudoers_file."
-    echo "Broad sudo disabled. To opt in for nested sandbox tooling, set PAPERBRIDGE_ENABLE_BROAD_SUDO=1 or create .devcontainer/privileged/enable-broad-sudo.local."
+    echo "Broad sudo disabled. To opt in for nested sandbox tooling, set SCRIBBLEDPAGE_ENABLE_BROAD_SUDO=1 or create .devcontainer/privileged/enable-broad-sudo.local."
   fi
 fi
 

@@ -2,7 +2,7 @@
   "name": "ScribbledPage",
   "dockerComposeFile": "./docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspaces/paperbridge",
+  "workspaceFolder": "/workspaces/scribbledpage",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "24"
