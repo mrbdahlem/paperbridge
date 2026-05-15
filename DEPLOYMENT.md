@@ -21,7 +21,6 @@ Required or expected Render variables:
 - `NODE_ENV=production`
 - `NODE_VERSION=24`
 - `LOG_LEVEL=info`
-- `VITE_BRAND_NAME=ScribbledPage`
 - `VITE_QR_BASE_URL`: configured in Render when QR links should use a deployed base URL
 - `DATABASE_URL`: configured in Render when backend persistence is added
 
