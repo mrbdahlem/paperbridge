@@ -39,24 +39,15 @@ Useful scripts:
 
 ## Deployment
 
-ScribbledPage is deployed as a Render Node web service so the app can serve the frontend and own backend API/database access from the same runtime.
+ScribbledPage deploys as a Render Node web service using `render.yaml`. The Fastify runtime serves the full `dist/` app, including ScribbledPage and PDF tools pages, and exposes `/healthz` for service health checks.
 
-Render uses `render.yaml` as the deployment source of truth:
-
-- Build command: `HUSKY=0 npm ci --include=dev && npm run build`
-- Start command: `npm start`
-- Health check path: `/healthz`
-- Publish/runtime server: Fastify serving the full `dist/` app, including ScribbledPage and PDF tools pages
-- Node runtime: 24 or newer
-
-The Render build installs dev dependencies even with `NODE_ENV=production` because the Vite/TypeScript build toolchain is kept in `devDependencies`. `HUSKY=0` disables local Git hook setup during the hosted install.
-
-Set `DATABASE_URL` in Render from Neon when backend persistence is added. Keep this value server-only; do not put database credentials in any `VITE_*` variable. For deployed runtime, prefer Neon's pooled connection string. For development and preview workflows, Neon branches can provide isolated Postgres databases without sharing a mutable development database.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the Render blueprint, environment variables, cache policy, and validation steps.
 
 ## Documentation
 
 - [docs/getting-started.md](docs/getting-started.md) covers local repository setup.
 - [docs/contributing.md](docs/contributing.md) covers the lightweight project workflow.
+- [DEPLOYMENT.md](DEPLOYMENT.md) covers Render deployment and runtime behavior.
 - [docs/licensing.md](docs/licensing.md) and [licensing.html](licensing.html) summarize the repository license notices.
 
 ## Project Workflow

@@ -7,6 +7,20 @@ import fastifyStatic from '@fastify/static';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DIST_DIR = path.resolve(__dirname, '..', 'dist');
+const HTML_CACHE_CONTROL = 'no-cache';
+const IMMUTABLE_ASSET_CACHE_CONTROL = 'public, max-age=31536000, immutable';
+
+function getStaticCacheControl(filePath) {
+  if (path.extname(filePath) === '.html') {
+    return HTML_CACHE_CONTROL;
+  }
+
+  if (filePath.split(path.sep).includes('assets')) {
+    return IMMUTABLE_ASSET_CACHE_CONTROL;
+  }
+
+  return undefined;
+}
 
 export function buildServer(options = {}) {
   const distDir = options.distDir ?? DEFAULT_DIST_DIR;
@@ -61,6 +75,13 @@ export function buildServer(options = {}) {
     root: distDir,
     index: 'index.html',
     wildcard: false,
+    cacheControl: false,
+    setHeaders(response, filePath) {
+      const cacheControl = getStaticCacheControl(filePath);
+      if (cacheControl) {
+        response.setHeader('Cache-Control', cacheControl);
+      }
+    },
   });
 
   app.get('/p/:token', async (_request, reply) => {
