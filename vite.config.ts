@@ -3,7 +3,7 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import http from 'http';
 import https from 'https';
 import { loadEnv } from 'vite';
-import type { Connect, Plugin, ViteDevServer } from 'vite';
+import type { Connect, Plugin, UserConfig, ViteDevServer } from 'vite';
 // import basicSsl from '@vitejs/plugin-basic-ssl';
 import tailwindcss from '@tailwindcss/vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
@@ -76,6 +76,7 @@ const PAGES = loadPages();
 const SCRIBBLEDPAGE_INPUT_NAMES = new Set(['main', 'create-assignment']);
 const DEFAULT_DEV_HOST = 'localhost';
 const DEFAULT_PREVIEW_HOST = 'localhost';
+type ViteConfigFragment = Omit<UserConfig, 'plugins'> | null | void;
 
 function selectBuildInputs(
   inputs: Record<string, string>
@@ -124,6 +125,47 @@ function parseConfiguredPort(envName: string, fallback: number): number {
   }
 
   return port;
+}
+
+function stripNoopBuildEsbuildConfig(
+  config: ViteConfigFragment
+): ViteConfigFragment {
+  if (!config || !('esbuild' in config)) return config;
+
+  // vite-plugin-node-polyfills emits a top-level esbuild config object even for
+  // production builds where its banner is undefined. Vite 8 warns about plugin
+  // esbuild config, so strip that build-only no-op while keeping aliases and
+  // Rollup polyfills intact.
+  const { esbuild: _esbuild, ...rest } = config;
+  return rest;
+}
+
+function nodePolyfillsWithoutBuildEsbuildWarning(): Plugin {
+  const plugin = nodePolyfills({
+    include: ['buffer', 'stream', 'util', 'zlib', 'process'],
+    globals: {
+      Buffer: true,
+      global: false,
+      process: true,
+    },
+  });
+  const originalConfig = plugin.config;
+
+  return {
+    ...plugin,
+    config(config, env) {
+      if (typeof originalConfig !== 'function') return undefined;
+
+      const result = originalConfig.call(this, config, env);
+      if (env.command !== 'build') return result;
+
+      if (result && typeof result === 'object' && 'then' in result) {
+        return result.then(stripNoopBuildEsbuildConfig);
+      }
+
+      return stripNoopBuildEsbuildConfig(result);
+    },
+  };
 }
 
 function getBasePath(): string {
@@ -615,14 +657,7 @@ export default defineConfig(({ mode }) => {
       flattenPagesPlugin(),
       rewriteHtmlPathsPlugin(),
       tailwindcss(),
-      nodePolyfills({
-        include: ['buffer', 'stream', 'util', 'zlib', 'process'],
-        globals: {
-          Buffer: true,
-          global: false,
-          process: true,
-        },
-      }),
+      nodePolyfillsWithoutBuildEsbuildWarning(),
       viteStaticCopy({
         targets: staticCopyTargets,
       }),
