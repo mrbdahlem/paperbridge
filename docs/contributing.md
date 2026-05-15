@@ -1,6 +1,6 @@
 # Project Workflow
 
-This docs page covers the repository workflow for PaperBridge.
+This docs page covers the repository workflow for ScribbledPage.
 
 ## Setup
 
@@ -13,13 +13,13 @@ npm run dev
 
 ## Validation
 
-- `npm run ci:paperbridge` for PaperBridge-specific changes
+- `npm run ci:paperbridge` for ScribbledPage-specific changes
 - `npm run ci:tools` for the bundled BentoPDF tools surface
 - `npm test -- --run` for the full repository suite
 
 ## Project Areas
 
-- `src/js/paperbridge/` for PaperBridge workflows
+- `src/js/paperbridge/` for ScribbledPage workflows
 - `src/js/logic/` and `src/pages/` for the BentoPDF tools surface
 - `src/tests/` for tests
 - `docs/` for repository documentation

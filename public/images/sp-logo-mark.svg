@@ -1,0 +1,15 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Back page (depth shadow) -->
+  <rect x="5" y="3.5" width="8.5" height="10.5" rx="1.5" fill="white" opacity=".32"/>
+  <!-- Main page with dog-ear fold at top-right -->
+  <path d="M2 2 L10 2 L13.5 5.5 L13.5 14 L2 14 Z" fill="white" opacity=".92"/>
+  <!-- Dog-ear crease -->
+  <path d="M10 2 L10 5.5 L13.5 5.5" stroke="white" stroke-width=".6" stroke-linejoin="round" opacity=".4"/>
+  <!-- Scribble: flowing wavy stroke — the ScribbledPage brand signature -->
+  <path d="M4 7.5 Q5.5 5.5 7 7.5 Q8.5 9.5 10.5 7.5"
+        stroke="white" stroke-width="1.35" fill="none"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Ruled lines below the scribble -->
+  <line x1="4" y1="10" x2="11" y2="10" stroke="white" stroke-width=".65" opacity=".32" stroke-linecap="round"/>
+  <line x1="4" y1="12" x2="8.5" y2="12" stroke="white" stroke-width=".65" opacity=".32" stroke-linecap="round"/>
+</svg>

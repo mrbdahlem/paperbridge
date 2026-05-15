@@ -1,13 +1,13 @@
 <p align="center"><img src="public/images/favicon-no-bg.svg" width="80"></p>
-<h1 align="center">PaperBridge</h1>
+<h1 align="center">ScribbledPage</h1>
 
-PaperBridge is the primary project in this repository. It focuses on printable PDF assignments, QR-stamped packet generation, and submission workflows for paper-first classrooms.
+ScribbledPage is the primary project in this repository. It focuses on printable PDF assignments, QR-stamped packet generation, and submission workflows for paper-first classrooms.
 
 This repository also still ships the BentoPDF tool surface as a secondary capability. Public tool pages can remain BentoPDF-branded where they describe those PDF utilities.
 
 ## Repository Scope
 
-- PaperBridge application code lives under `src/js/paperbridge/`.
+- ScribbledPage application code lives under `src/js/paperbridge/`.
 - Shared tool pages and PDF utilities remain available in the broader app.
 - Repository documentation now focuses on development and maintenance, not commercial terms, deployment recipes, or external agreement processes.
 
@@ -24,12 +24,12 @@ By default, `npm run dev` serves on `http://localhost:5173` and `npm run preview
 Outside devcontainers both bind to `localhost`; devcontainers set `VITE_DEV_HOST=0.0.0.0` and `VITE_PREVIEW_HOST=0.0.0.0` so forwarded ports are reachable from the host machine.
 Set `VITE_DEV_PORT` in your shell or `.env.development.local` if you need a different dev server port.
 Set `VITE_PREVIEW_PORT` in your shell, `.env.local`, or `.env.production.local` if you need a different preview server port.
-Dependency discovery and broad pre-bundling are disabled by default to keep local startup memory low; JSZip remains pre-bundled for the PaperBridge assignment flow.
+Dependency discovery and broad pre-bundling are disabled by default to keep local startup memory low; JSZip remains pre-bundled for the ScribbledPage assignment flow.
 Set `VITE_ENABLE_DEP_OPTIMIZER=true` to opt into broader Vite pre-bundling for heavier tool-page development.
 
 Useful scripts:
 
-- `npm run ci:paperbridge` runs lint, typecheck, tests, and build for the PaperBridge slice.
+- `npm run ci:paperbridge` runs lint, typecheck, tests, and build for the ScribbledPage slice.
 - `npm run ci:tools` runs lint, typecheck, tests, and build for the bundled PDF tools surface.
 - `npm test -- --run` runs the full repository test suite.
 - `npm run docs:dev` starts the docs site.

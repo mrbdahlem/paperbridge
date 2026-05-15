@@ -1,5 +1,5 @@
 {
-  "name": "PaperBridge (Privileged Dev Container)",
+  "name": "ScribbledPage (Privileged Dev Container)",
   "dockerComposeFile": [
     "../docker-compose.yml",
     "../docker-compose.privileged.yml"

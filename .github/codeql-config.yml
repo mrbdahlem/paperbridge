@@ -1,4 +1,4 @@
-name: PaperBridge CodeQL config
+name: ScribbledPage CodeQL config
 
 paths-ignore:
   - dist

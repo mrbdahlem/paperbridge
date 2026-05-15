@@ -1,4 +1,4 @@
-name: PaperBridge Tools CI
+name: ScribbledPage Tools CI
 
 on:
   push:

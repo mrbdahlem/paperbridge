@@ -1,4 +1,4 @@
-# PaperBridge Project Workflow
+# ScribbledPage Project Workflow
 
 This repository uses a lightweight project workflow. There is no separate external agreement process.
 
@@ -15,7 +15,7 @@ npm run dev
 
 Run the narrowest validation path that matches your change:
 
-- `npm run ci:paperbridge` for PaperBridge-specific work
+- `npm run ci:paperbridge` for ScribbledPage-specific work
 - `npm run ci:tools` for the bundled PDF tools surface
 - `npm test -- --run` for the full repository gate
 

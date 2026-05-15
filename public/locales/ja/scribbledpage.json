@@ -19,7 +19,7 @@
       "submissions": "提出数"
     },
     "empty": {
-      "title": "PaperBridgeへようこそ",
+      "title": "ScribbledPageへようこそ",
       "description": "課題を作成し、QRコード付きのパケットを生成して生徒に配布し、スキャンしたPDFをアップロードすると提出物を自動的に整理できます。",
       "cta": "最初の課題を作成する"
     },

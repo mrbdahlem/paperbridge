@@ -5,10 +5,10 @@ export { t } from '../i18n/index.js';
 
 export async function initPbI18n(): Promise<void> {
   await initI18n();
-  await i18next.loadNamespaces('paperbridge');
+  await i18next.loadNamespaces('scribbledpage');
   applyTranslations();
 }
 
 export function pt(key: string, opts?: Record<string, unknown>): string {
-  return i18next.t(`paperbridge:${key}`, { ns: 'paperbridge', ...opts });
+  return i18next.t(`scribbledpage:${key}`, { ns: 'scribbledpage', ...opts });
 }
