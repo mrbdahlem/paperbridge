@@ -524,12 +524,12 @@ async function loadPdfs(files: File[]) {
   }
 }
 
-function getCacheKey(pdfIndex: number, pageIndex: number): string {
+function _getCacheKey(pdfIndex: number, pageIndex: number): string {
   return `${pdfIndex}-${pageIndex}`;
 }
 
 // Wrapper for compatibility with updatePageDisplay
-function createPageCard(pageData: PageData, index: number) {
+function _createPageCard(pageData: PageData, index: number) {
   const pagesContainer = document.getElementById('pages-container');
   if (!pagesContainer) return;
 
@@ -1094,7 +1094,6 @@ async function downloadAll() {
 async function downloadSplitPdfs() {
   try {
     const zip = new JSZip();
-    const sortedMarkers = Array.from(splitMarkers).sort((a, b) => a - b);
 
     // Create segments based on split markers
     const segments: number[][] = [];

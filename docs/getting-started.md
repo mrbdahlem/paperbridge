@@ -10,9 +10,11 @@ This guide is for working on the ScribbledPage repository locally.
 
 ## Local Setup
 
+Use Node.js 24 or newer.
+
 ```bash
-git clone https://github.com/mrbdahlem/paperbridge.git
-cd paperbridge
+git clone https://github.com/mrbdahlem/scribbledpage.git
+cd scribbledpage
 npm install
 ```
 

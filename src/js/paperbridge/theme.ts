@@ -41,12 +41,12 @@ function updateToggleBtn(theme: Theme): void {
   const sunEl = btn.querySelector('.pb-icon-sun') as HTMLElement | null;
   const moonEl = btn.querySelector('.pb-icon-moon') as HTMLElement | null;
   if (theme === 'dark') {
-    sunEl?.style && (sunEl.style.display = 'flex');
-    moonEl?.style && (moonEl.style.display = 'none');
+    if (sunEl) sunEl.style.display = 'flex';
+    if (moonEl) moonEl.style.display = 'none';
     btn.title = 'Switch to light mode';
   } else {
-    sunEl?.style && (sunEl.style.display = 'none');
-    moonEl?.style && (moonEl.style.display = 'flex');
+    if (sunEl) sunEl.style.display = 'none';
+    if (moonEl) moonEl.style.display = 'flex';
     btn.title = 'Switch to dark mode';
   }
 }

@@ -117,6 +117,8 @@ function render(): void {
   if (statAssignments) statAssignments.textContent = String(assignments.length);
   if (statPackets) statPackets.textContent = String(allPackets.length);
 
+  // Assignment fields are escaped in renderAssignmentCard before interpolation.
+  // eslint-disable-next-line no-unsanitized/property
   listEl.innerHTML = assignments.map(renderAssignmentCard).join('');
 
   listEl

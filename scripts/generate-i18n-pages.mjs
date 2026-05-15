@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -165,7 +165,7 @@ function resolveToolName(translationKey, langTools) {
   return enEntry && enEntry.name ? enEntry.name : null;
 }
 
-function processFileForLanguage(
+export function processFileForLanguage(
   originalContent,
   file,
   lang,
@@ -303,6 +303,7 @@ function processFileForLanguage(
 
   dom.window.close();
 
+  fs.mkdirSync(langDir, { recursive: true });
   fs.writeFileSync(path.join(langDir, file), result);
 }
 
@@ -424,7 +425,9 @@ async function generateI18nPages() {
   console.log('✅ i18n pages generated successfully!');
 }
 
-generateI18nPages().catch((err) => {
-  console.error('❌ i18n page generation failed:', err);
-  process.exit(1);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  generateI18nPages().catch((err) => {
+    console.error('❌ i18n page generation failed:', err);
+    process.exit(1);
+  });
+}

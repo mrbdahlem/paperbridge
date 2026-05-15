@@ -1106,6 +1106,8 @@ const init = async () => {
           const key = e.key.toLowerCase();
           if (['control', 'shift', 'alt', 'meta'].includes(key)) {
             const currentSaved = ShortcutsManager.getShortcut(toolId);
+            input.value = formatShortcutDisplay(currentSaved || '', isMac);
+            input.classList.remove('border-indigo-500', 'text-indigo-400');
           }
         };
 

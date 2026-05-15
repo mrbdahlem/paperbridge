@@ -265,7 +265,7 @@ function updatePreviewPanel() {
   createIcons({ icons });
 }
 
-function togglePageSelection(div: HTMLElement, pageIndex: number) {
+function togglePageSelection(div: HTMLElement, _pageIndex: number) {
   const isSelected = div.dataset.selected === 'true';
   const checkMark = div.querySelector('.check-mark') as HTMLElement;
 
