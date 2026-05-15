@@ -7,45 +7,55 @@ import {
   generateAssignmentCode,
   generateId,
   generatePacketCode,
+  QR_CODE_ALPHABET,
+  QR_CODE_LENGTH,
 } from '../js/paperbridge/tokens';
 
 describe('PaperBridge token helpers', () => {
-  it('generates packet and assignment codes with the expected lengths', () => {
-    expect(generatePacketCode()).toMatch(/^[A-Z2-9]{5}$/);
-    expect(generateAssignmentCode()).toMatch(/^[A-Z2-9]{6}$/);
+  const safeCodePattern = new RegExp(
+    `^[${QR_CODE_ALPHABET}]{${QR_CODE_LENGTH}}$`
+  );
+
+  it('generates packet and assignment codes with the safe QR alphabet', () => {
+    expect(generatePacketCode()).toMatch(safeCodePattern);
+    expect(generateAssignmentCode()).toMatch(safeCodePattern);
+  });
+
+  it('excludes vowels and ambiguous characters from generated QR codes', () => {
+    expect(QR_CODE_ALPHABET).not.toMatch(/[AEIOU01]/);
   });
 
   it('builds packet and generic page token strings', () => {
-    expect(buildTokenForPacketPage('7KQ4M', 2)).toBe('7KQ4M2');
-    expect(buildTokenForGenericPage('EX10R2', 3)).toBe('EX10R2P3');
+    expect(buildTokenForPacketPage('9X7K2VBM', 2)).toBe('9X7K2VBM-P2');
+    expect(buildTokenForGenericPage('M4T8Z6RC', 3)).toBe('M4T8Z6RC-P3');
   });
 
   it('creates packet-scoped QR metadata for each page', () => {
     const packet = {
       id: 'packet_1',
       assignmentId: 'assignment_1',
-      packetCode: '7KQ4M',
+      packetCode: '9X7K2VBM',
       mode: 'anonymous' as const,
       createdAt: '2026-05-13T00:00:00.000Z',
     };
 
     expect(buildPacketTokens(packet, 'assignment_1', 3)).toEqual([
       {
-        token: '7KQ4M1',
+        token: '9X7K2VBM-P1',
         assignmentId: 'assignment_1',
         templateVersion: 1,
         packetId: 'packet_1',
         pageNumber: 1,
       },
       {
-        token: '7KQ4M2',
+        token: '9X7K2VBM-P2',
         assignmentId: 'assignment_1',
         templateVersion: 1,
         packetId: 'packet_1',
         pageNumber: 2,
       },
       {
-        token: '7KQ4M3',
+        token: '9X7K2VBM-P3',
         assignmentId: 'assignment_1',
         templateVersion: 1,
         packetId: 'packet_1',
@@ -55,16 +65,16 @@ describe('PaperBridge token helpers', () => {
   });
 
   it('creates generic QR metadata without packet ids', () => {
-    expect(buildGenericTokens('EX10R2', 'assignment_1', 2)).toEqual([
+    expect(buildGenericTokens('M4T8Z6RC', 'assignment_1', 2)).toEqual([
       {
-        token: 'EX10R2P1',
+        token: 'M4T8Z6RC-P1',
         assignmentId: 'assignment_1',
         templateVersion: 1,
         packetId: null,
         pageNumber: 1,
       },
       {
-        token: 'EX10R2P2',
+        token: 'M4T8Z6RC-P2',
         assignmentId: 'assignment_1',
         templateVersion: 1,
         packetId: null,
@@ -90,13 +100,17 @@ describe('buildQRUrl', () => {
   it('uses VITE_QR_BASE_URL when set', () => {
     (import.meta.env as Record<string, unknown>).VITE_QR_BASE_URL =
       'https://scan.example.com';
-    expect(buildQRUrl('7KQ4M2')).toBe('https://scan.example.com/7KQ4M2');
+    expect(buildQRUrl('9X7K2VBM-P2')).toBe(
+      'https://scan.example.com/9X7K2VBM-P2'
+    );
   });
 
   it('strips trailing slash from VITE_QR_BASE_URL', () => {
     (import.meta.env as Record<string, unknown>).VITE_QR_BASE_URL =
       'https://scan.example.com/';
-    expect(buildQRUrl('EX10R2P1')).toBe('https://scan.example.com/EX10R2P1');
+    expect(buildQRUrl('M4T8Z6RC-P1')).toBe(
+      'https://scan.example.com/M4T8Z6RC-P1'
+    );
   });
 
   it('appends the token as the final path segment', () => {
