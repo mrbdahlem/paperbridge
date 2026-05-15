@@ -2,16 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getI18nBuildLanguages } from './i18n-language-config.mjs';
+import { getSiteUrl } from './site-url-config.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DIST_DIR = path.resolve(__dirname, '../dist');
 const LOCALES_DIR = path.resolve(__dirname, '../public/locales');
-const SITE_URL = (process.env.SITE_URL || 'https://www.bentopdf.com').replace(
-  /\/+$/,
-  ''
-);
+const SITE_URL = getSiteUrl();
 const EXCLUDED_PAGES = new Set(['404', 'wasm-settings']);
 
 const languages = getI18nBuildLanguages(LOCALES_DIR);

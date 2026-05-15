@@ -9,6 +9,7 @@ Durable deployment, runtime, and hosting notes for ScribbledPage.
 - The Render runtime serves Vite's `dist/` output through Fastify and exposes `/healthz` for service health checks.
 - Render uses the full production build so the ScribbledPage dashboard, assignment flow, PDF tools index, and individual PDF tool pages are all available from the same deployed service.
 - Render builds with `HUSKY=0 npm ci --include=dev && npm run build` so hosted installs skip local Git hook setup while still installing the devDependencies required by Vite and TypeScript under `NODE_ENV=production`.
+- Render sets `SITE_URL=https://scribbled.page`; sitemap generation, localized canonical URLs, and SEO audit checks default to that same public domain when `SITE_URL` is not set.
 - Fastify marks generated HTML, `sw.js`, `site.webmanifest`, and `*.worker.*` files as `Cache-Control: no-cache`, and hashed files under `/assets/` as `public, max-age=31536000, immutable`, to avoid stale entrypoints after deploys while keeping Vite assets cacheable.
 - Production i18n page and sitemap generation defaults to locale folders with `scribbledpage.json`, currently `en`, `de`, `es`, `fr`, `ja`, and `pt`; `I18N_BUILD_LANGUAGES` can override this for one-off builds.
 - The bundled PDF tools chrome is fixed to BentoPDF branding and should not consume Render's ScribbledPage environment variables; the Render environment no longer requires `VITE_BRAND_NAME`.
