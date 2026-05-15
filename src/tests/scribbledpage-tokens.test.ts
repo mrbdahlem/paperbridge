@@ -11,7 +11,7 @@ import {
   QR_CODE_LENGTH,
 } from '../js/paperbridge/tokens';
 
-describe('PaperBridge token helpers', () => {
+describe('ScribbledPage token helpers', () => {
   const safeCodePattern = new RegExp(
     `^[${QR_CODE_ALPHABET}]{${QR_CODE_LENGTH}}$`
   );

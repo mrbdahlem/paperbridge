@@ -1,5 +1,5 @@
 {
-  "name": "PaperBridge",
+  "name": "ScribbledPage",
   "dockerComposeFile": "./docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces/paperbridge",

@@ -121,7 +121,7 @@ describe('Vite dependency optimizer defaults', () => {
 
     expect(config.optimizeDeps).toMatchObject({
       noDiscovery: true,
-      include: ['jszip'],
+      include: ['jszip', 'pako'],
     });
   });
 
@@ -132,7 +132,14 @@ describe('Vite dependency optimizer defaults', () => {
 
     expect(config.optimizeDeps).toMatchObject({
       entries: ['index.html', 'create-assignment.html'],
-      include: ['pdfkit', 'blob-stream', 'jszip', 'sortablejs', 'node-forge'],
+      include: [
+        'pdfkit',
+        'blob-stream',
+        'jszip',
+        'pako',
+        'sortablejs',
+        'node-forge',
+      ],
       exclude: ['coherentpdf', 'wasm-vips'],
     });
   });

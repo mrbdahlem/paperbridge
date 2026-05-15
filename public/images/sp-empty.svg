@@ -1,39 +1,45 @@
-<svg width="166" height="166" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- sp-empty at 166×166 display size, same 72×72 viewBox — light mode colours -->
-
-  <!-- Back page (teal-tinted) -->
+<svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- ── Back page (teal-tinted, bottom of stack) ── -->
   <rect x="18" y="18" width="34" height="44" rx="3"
         fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.5"/>
-  <!-- Middle page -->
+
+  <!-- ── Middle page ── -->
   <rect x="14" y="14" width="34" height="44" rx="3"
         fill="#ffffff" stroke="#e5e3dc" stroke-width="1.5"/>
-  <!-- Front page -->
+
+  <!-- ── Front page ── -->
   <rect x="10" y="10" width="34" height="44" rx="3"
         fill="#ffffff" stroke="#ccc9bf" stroke-width="1.5"/>
 
-  <!-- Red margin line -->
+  <!-- Red margin line (college-ruled feel) -->
   <line x1="20" y1="13" x2="20" y2="51" stroke="#fca5a5" stroke-width="1" opacity=".7"/>
 
-  <!-- Ruled lines -->
+  <!-- Ruled horizontal lines -->
   <line x1="22" y1="20" x2="41" y2="20" stroke="#e5e3dc" stroke-width="1"/>
   <line x1="22" y1="26" x2="41" y2="26" stroke="#e5e3dc" stroke-width="1"/>
   <line x1="22" y1="32" x2="41" y2="32" stroke="#e5e3dc" stroke-width="1"/>
   <line x1="22" y1="38" x2="41" y2="38" stroke="#e5e3dc" stroke-width="1"/>
   <line x1="22" y1="44" x2="41" y2="44" stroke="#e5e3dc" stroke-width="1"/>
 
-  <!-- Scribble — the ScribbledPage brand signature -->
+  <!-- ── Scribble — the ScribbledPage brand signature ── -->
+  <!-- A flowing wave that crosses the ruled lines, like a pen writing freely -->
   <path d="M22 24 Q25 18 28 24 Q31 30 35 21 Q38 13 41 20"
         stroke="#0d9488" stroke-width="2" fill="none"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Pen tip -->
+
+  <!-- Pen tip at scribble end — a small wedge suggesting the nib -->
   <path d="M41 20 L43.5 18 L43 22 Z" fill="#0d9488" opacity=".7"/>
 
-  <!-- QR code hint -->
+  <!-- ── QR code hint ── -->
   <rect x="27" y="41" width="14" height="14" rx="1.5"
         fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5"/>
+  <!-- Top-left finder square -->
   <rect x="29.5" y="43.5" width="4" height="4" rx=".6" fill="#0d9488"/>
+  <!-- Top-right finder square -->
   <rect x="35.5" y="43.5" width="4" height="4" rx=".6" fill="#0d9488"/>
+  <!-- Bottom-left finder square -->
   <rect x="29.5" y="49.5" width="4" height="4" rx=".6" fill="#0d9488"/>
+  <!-- Data dots -->
   <rect x="35.5" y="49.5" width="1.8" height="1.8" rx=".4" fill="#0d9488"/>
   <rect x="37.7" y="47.5" width="1.8" height="1.8" rx=".4" fill="#0d9488"/>
   <rect x="33.5" y="47" width="1.8" height="1.8" rx=".4" fill="#0d9488"/>

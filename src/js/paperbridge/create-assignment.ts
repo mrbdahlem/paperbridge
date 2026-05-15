@@ -818,7 +818,10 @@ step2Next.addEventListener('click', async () => {
 // ─── Other wiring ─────────────────────────────────────────────────────────────
 browseBtn.addEventListener('click', () => pdfInput.click());
 dropZone.addEventListener('click', (e) => {
-  if (!(e.target as HTMLElement).closest('button')) pdfInput.click();
+  const t = e.target as HTMLElement;
+  // Guard: skip if click came from the button (handled above) or from pdfInput's
+  // own programmatic click bubbling up — the latter would cause a recursive double-open.
+  if (t !== pdfInput && !t.closest('button')) pdfInput.click();
 });
 pdfInput.addEventListener('change', () => {
   const f = pdfInput.files?.[0];

@@ -3,6 +3,6 @@ import baseConfig from './vitest.config';
 
 export default mergeConfig(baseConfig, {
   test: {
-    include: ['src/tests/paperbridge-*.test.ts'],
+    include: ['src/tests/scribbledpage-*.test.ts'],
   },
 });

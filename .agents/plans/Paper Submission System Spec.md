@@ -2,7 +2,7 @@
 
 ## **Working name**
 
-Possible internal name: **PaperBridge**
+Possible internal name: **ScribbledPage**
 
 Purpose: Turn printable PDF assignments into trackable, scannable, digitally organized student submissions.
 
@@ -12,7 +12,7 @@ The system is designed for teachers who still want students to work on paper, es
 
 Teachers upload or create a PDF assignment. The system stamps QR codes onto every page and generates printable packets. Students complete the work on paper or digitally. Submissions are ingested through scanned PDFs or uploaded documents. The system treats submitted pages as opaque page artifacts: it reads the QR codes, identifies the assignment, packet, and page number, sorts pages, checks completeness, and stores the result as a clean submission PDF.
 
-Longer term, PaperBridge can add visible name, period, or ID marking areas and fillable PDF form fields. Form fields can define named answer zones for crop-based review, digital field extraction, and question-level workflows. For MVP 0, these page-overlay and form-zone features are not required.
+Longer term, ScribbledPage can add visible name, period, or ID marking areas and fillable PDF form fields. Form fields can define named answer zones for crop-based review, digital field extraction, and question-level workflows. For MVP 0, these page-overlay and form-zone features are not required.
 
 The PDF is for humans. The QR and packet metadata are for the system. Form field metadata becomes important in later phases.
 
@@ -424,7 +424,7 @@ In roster mode later, it generates one packet per rostered student and optionall
 
 ## **Later assignment form-zone workflow**
 
-Teacher creates or uploads a fillable PDF using PaperBridge, BentoPDF-derived form creation tools, or another form-capable PDF tool.
+Teacher creates or uploads a fillable PDF using ScribbledPage, BentoPDF-derived form creation tools, or another form-capable PDF tool.
 
 The PDF contains visible worksheet content and form fields that mark answer zones.
 
@@ -839,7 +839,7 @@ The server does not necessarily need to permanently store every uploaded origina
 
 Frontend:
 
-Replacement PaperBridge interface  
+Replacement ScribbledPage interface  
 Teacher dashboard  
 PDF upload and assignment setup  
 QR placement preview UI  
@@ -886,7 +886,7 @@ The existing workflow builder does not need to be exposed as a teacher-facing fe
 
 Its control and dataflow model can be useful as a rapid prototyping harness for processing ideas.
 
-Potential PaperBridge prototype nodes:
+Potential ScribbledPage prototype nodes:
 
 Assignment PDF Input  
 Generate Packet Tokens  
@@ -1113,7 +1113,7 @@ Generate final PDFs from recovered pages.
 
 Keep roster mode as a later extension.
 
-Expose BentoPDF-style tools only as an optional secondary use case, not as the main PaperBridge interface.
+Expose BentoPDF-style tools only as an optional secondary use case, not as the main ScribbledPage interface.
 
 ## **Open questions**
 

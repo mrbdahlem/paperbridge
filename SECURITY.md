@@ -1,6 +1,6 @@
 # Security
 
-PaperBridge does not currently document a public deployment recipe in this repository. Treat runtime hosting, network controls, and production secrets as environment-specific concerns until a PaperBridge deployment path is defined.
+ScribbledPage does not currently document a public deployment recipe in this repository. Treat runtime hosting, network controls, and production secrets as environment-specific concerns until a ScribbledPage deployment path is defined.
 
 ## Reporting
 
