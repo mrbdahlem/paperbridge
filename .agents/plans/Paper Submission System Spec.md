@@ -775,25 +775,29 @@ MVP 0 should probably export final PDFs and a summary CSV first.
 
 Example Drive structure:
 
-Paper Submissions/  
- EX10 Relays/  
- Complete/  
- packet-9X7K2VBM.pdf
-packet-J82PZ6RC.pdf
-Needs Review/  
- packet-X92KD7TM.pdf
-Metadata/  
- submissions.csv
+```text
+Paper Submissions/
+  EX10 Relays/
+    Complete/
+      packet-9X7K2VBM.pdf
+      packet-J82PZ6RC.pdf
+    Needs Review/
+      packet-X92KD7TM.pdf
+    Metadata/
+      submissions.csv
+```
 
 A later detailed export option:
 
-Paper Submissions/  
- EX10 Relays/  
- packet-9X7K2VBM/
-submission.pdf  
- metadata.json  
- q01.prediction.png  
- q02.explanation.png
+```text
+Paper Submissions/
+  EX10 Relays/
+    packet-9X7K2VBM/
+      submission.pdf
+      metadata.json
+      q01.prediction.png
+      q02.explanation.png
+```
 
 Example MVP 0 CSV columns:
 
