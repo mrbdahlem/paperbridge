@@ -365,20 +365,26 @@ A damaged or old QR can show a helpful fallback page.
 
 The printed page should also include a human-readable fallback near the QR code:
 
+```text
 Packet: 9X7K2VBM
 Page: 2 of 4
+```
 
 For generic assignment mode:
 
-EX10 Relays  
+```text
+EX10 Relays
 Page: 2 of 4
+```
 
 For roster mode later:
 
-Name: Maya Rodriguez  
-Period: 4  
+```text
+Name: Maya Rodriguez
+Period: 4
 Packet: 9X7K2VBM
 Page: 2 of 4
+```
 
 ## **MVP 0 assignment creation workflow**
 
@@ -601,29 +607,33 @@ Extracted AcroForm values, later
 
 Example MVP 0 output structure:
 
-EX10 Relays/  
- packet-9X7K2VBM/
-submission.pdf  
- metadata.json  
- pages/  
- page-1-preview.jpg  
- page-2-preview.jpg
+```text
+EX10 Relays/
+  packet-9X7K2VBM/
+    submission.pdf
+    metadata.json
+    pages/
+      page-1-preview.jpg
+      page-2-preview.jpg
+```
 
 Example later output structure with answer crops:
 
-EX10 Relays/  
- packet-9X7K2VBM/
-submission.pdf  
- metadata.json  
- pages/  
- page-1-original.jpg  
- page-1-processed.png  
- page-2-original.jpg  
- page-2-processed.png  
- crops/  
- student.name.png  
- q01.prediction.png  
- q02.explanation.png
+```text
+EX10 Relays/
+  packet-9X7K2VBM/
+    submission.pdf
+    metadata.json
+    pages/
+      page-1-original.jpg
+      page-1-processed.png
+      page-2-original.jpg
+      page-2-processed.png
+    crops/
+      student.name.png
+      q01.prediction.png
+      q02.explanation.png
+```
 
 ## **Cropping answer zones**
 
