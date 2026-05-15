@@ -13,9 +13,11 @@ This repository also still ships the BentoPDF tool surface as a secondary capabi
 
 ## Development
 
+Use Node.js 24 or newer.
+
 ```bash
-git clone https://github.com/mrbdahlem/paperbridge.git
-cd paperbridge
+git clone https://github.com/mrbdahlem/scribbledpage.git
+cd scribbledpage
 npm install
 npm run dev
 ```
@@ -45,6 +47,7 @@ Render uses `render.yaml` as the deployment source of truth:
 - Start command: `npm start`
 - Health check path: `/healthz`
 - Publish/runtime server: Fastify serving `dist/`
+- Node runtime: 24 or newer
 
 Set `DATABASE_URL` in Render from Neon when backend persistence is added. Keep this value server-only; do not put database credentials in any `VITE_*` variable. For deployed runtime, prefer Neon's pooled connection string. For development and preview workflows, Neon branches can provide isolated Postgres databases without sharing a mutable development database.
 
