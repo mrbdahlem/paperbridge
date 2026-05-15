@@ -22,7 +22,6 @@ import {
   isToolDisabled,
   isCurrentPageDisabled,
 } from './utils/disabled-tools.js';
-declare const __BRAND_NAME__: string;
 
 const init = async () => {
   await initI18n();
@@ -61,7 +60,7 @@ const init = async () => {
       }
 
       const githubLink = document.querySelector(
-        'a[href*="github.com/mrbdahlem/paperbridge"]'
+        'a[href*="github.com/alam00000/bentopdf"]'
       );
       if (githubLink) {
         (githubLink as HTMLElement).style.display = 'none';
@@ -109,8 +108,7 @@ const init = async () => {
         (divider as HTMLElement).style.display = 'none';
       });
 
-      const brandName = __BRAND_NAME__ || 'BentoPDF';
-      document.title = `${brandName} - ${t('simpleMode.title')}`;
+      document.title = `BentoPDF - ${t('simpleMode.title')}`;
 
       const toolsHeader = document.getElementById('tools-header');
       if (toolsHeader) {
@@ -546,7 +544,7 @@ const init = async () => {
   ];
 
   if (githubStarsElements.some((el) => el) && !__SIMPLE_MODE__) {
-    fetch('https://api.github.com/repos/mrbdahlem/paperbridge')
+    fetch('https://api.github.com/repos/alam00000/bentopdf')
       .then((response) => response.json())
       .then((data) => {
         if (data.stargazers_count !== undefined) {
