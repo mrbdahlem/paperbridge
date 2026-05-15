@@ -225,7 +225,7 @@ async function proxyRequest(request, env, sourceBaseUrl, subpath, origin) {
 }
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env, _ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
     const origin = request.headers.get('Origin');

@@ -31,7 +31,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 // ─── State ───────────────────────────────────────────────────────────────────
-let currentStep = 1;
 let pdfBytes: Uint8Array | null = null;
 let pageCount = 0;
 let fileName = '';
@@ -92,7 +91,6 @@ const step3New = document.getElementById('step3-new')!;
 
 // ─── Step navigation ──────────────────────────────────────────────────────────
 function goToStep(n: number): void {
-  currentStep = n;
   document.querySelectorAll('.step-panel').forEach((el) => {
     (el as HTMLElement).style.display = 'none';
   });
@@ -771,6 +769,8 @@ step2Next.addEventListener('click', async () => {
     const packetListSection = document.getElementById('packet-list-section');
     if (!isGeneric) {
       if (packetListSection) packetListSection.style.display = '';
+      // Packet codes are generated internally and the surrounding markup is static.
+      // eslint-disable-next-line no-unsanitized/property
       packetListEl.innerHTML = generated
         .map(
           (g) => `

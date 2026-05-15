@@ -13,7 +13,6 @@ import {
 } from './utils/rotation-state.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import { t } from './i18n/i18n';
-import type { FileInputOptions } from '@/types';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -114,7 +113,7 @@ export const hideLoader = () => {
 export const showAlert = (
   title: string,
   message: string,
-  type: string = 'error',
+  _type: string = 'error',
   callback?: () => void
 ) => {
   if (dom.alertTitle) dom.alertTitle.textContent = title;
@@ -476,38 +475,4 @@ export const renderFileDisplay = (container: HTMLElement, files: File[]) => {
       container.appendChild(fileDiv);
     });
   }
-};
-
-const createFileInputHTML = (options: FileInputOptions = {}) => {
-  const multiple = options.multiple ? 'multiple' : '';
-  const acceptedFiles = options.accept || 'application/pdf';
-  const showControls = options.showControls || false;
-
-  return `
-        <div id="drop-zone" class="relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-gray-900 hover:bg-gray-700 transition-colors duration-300">
-            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                <i data-lucide="upload-cloud" class="w-10 h-10 mb-3 text-gray-400"></i>
-                <p class="mb-2 text-sm text-gray-400"><span class="font-semibold">${t('upload.clickToSelect')}</span> ${t('upload.orDragAndDrop')}</p>
-                <p class="text-xs text-gray-500">${multiple ? t('upload.pdfOrImages') : 'A single PDF file'}</p>
-                <p class="text-xs text-gray-500">${t('upload.filesNeverLeave')}</p>
-            </div>
-            <input id="file-input" type="file" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" ${multiple} accept="${acceptedFiles}">
-        </div>
-        
-        ${
-          showControls
-            ? `
-            <!-- NEW: Add control buttons for multi-file uploads -->
-            <div id="file-controls" class="hidden mt-4 flex gap-3">
-                <button id="add-more-btn" class="btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2">
-                    <i data-lucide="plus"></i> ${t('upload.addMore')}
-                </button>
-                <button id="clear-files-btn" class="btn bg-gray-700 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2">
-                    <i data-lucide="trash-2"></i> ${t('upload.clearAll')}
-                </button>
-            </div>
-        `
-            : ''
-        }
-    `;
 };
