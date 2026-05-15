@@ -29,7 +29,7 @@ Set `VITE_ENABLE_DEP_OPTIMIZER=true` to opt into broader Vite pre-bundling for h
 
 Useful scripts:
 
-- `npm run ci:paperbridge` runs lint, typecheck, tests, and build for the ScribbledPage slice.
+- `npm run ci:scribbledpage` runs lint, typecheck, tests, and build for the ScribbledPage slice.
 - `npm run ci:tools` runs lint, typecheck, tests, and build for the bundled PDF tools surface.
 - `npm test -- --run` runs the full repository test suite.
 - `npm run docs:dev` starts the docs site.
@@ -41,7 +41,7 @@ ScribbledPage is deployed as a Render Node web service so the app can serve the 
 
 Render uses `render.yaml` as the deployment source of truth:
 
-- Build command: `npm ci && npm run build:paperbridge`
+- Build command: `npm ci && npm run build:scribbledpage`
 - Start command: `npm start`
 - Health check path: `/healthz`
 - Publish/runtime server: Fastify serving `dist/`

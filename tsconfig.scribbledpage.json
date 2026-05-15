@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "include": [
-    "src/js/scribbledpage/**/*.ts",
+    "src/js/paperbridge/**/*.ts",
     "src/tests/scribbledpage-*.test.ts",
     "vitest.scribbledpage.config.ts"
   ],

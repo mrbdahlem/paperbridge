@@ -73,7 +73,7 @@ function loadPages(): Set<string> {
 }
 
 const PAGES = loadPages();
-const PAPERBRIDGE_INPUT_NAMES = new Set(['main', 'create-assignment']);
+const SCRIBBLEDPAGE_INPUT_NAMES = new Set(['main', 'create-assignment']);
 const DEFAULT_DEV_HOST = 'localhost';
 const DEFAULT_PREVIEW_HOST = 'localhost';
 
@@ -82,10 +82,10 @@ function selectBuildInputs(
 ): Record<string, string> {
   const target = process.env.BUILD_TARGET ?? 'all';
 
-  if (target === 'paperbridge') {
+  if (target === 'scribbledpage') {
     return Object.fromEntries(
       Object.entries(inputs).filter(([name]) =>
-        PAPERBRIDGE_INPUT_NAMES.has(name)
+        SCRIBBLEDPAGE_INPUT_NAMES.has(name)
       )
     );
   }
@@ -93,7 +93,7 @@ function selectBuildInputs(
   if (target === 'tools') {
     return Object.fromEntries(
       Object.entries(inputs).filter(
-        ([name]) => !PAPERBRIDGE_INPUT_NAMES.has(name)
+        ([name]) => !SCRIBBLEDPAGE_INPUT_NAMES.has(name)
       )
     );
   }

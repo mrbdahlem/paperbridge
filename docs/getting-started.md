@@ -35,7 +35,7 @@ Set `VITE_ENABLE_DEP_OPTIMIZER=true` to opt into broader Vite pre-bundling for h
 
 Use the narrowest command that matches your change:
 
-- `npm run ci:paperbridge` for ScribbledPage-specific work
+- `npm run ci:scribbledpage` for ScribbledPage-specific work
 - `npm run ci:tools` for the BentoPDF tools surface
 - `npm test -- --run` for the full repository suite
 - `npm run docs:dev` for local docs work

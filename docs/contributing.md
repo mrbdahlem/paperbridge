@@ -13,7 +13,7 @@ npm run dev
 
 ## Validation
 
-- `npm run ci:paperbridge` for ScribbledPage-specific changes
+- `npm run ci:scribbledpage` for ScribbledPage-specific changes
 - `npm run ci:tools` for the bundled BentoPDF tools surface
 - `npm test -- --run` for the full repository suite
 

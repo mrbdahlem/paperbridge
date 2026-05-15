@@ -2,7 +2,7 @@ services:
   - type: web
     name: scribbledpage
     runtime: node
-    buildCommand: npm ci && npm run build:paperbridge
+    buildCommand: npm ci && npm run build:scribbledpage
     startCommand: npm start
     healthCheckPath: /healthz
     autoDeploy: true
