@@ -15,7 +15,7 @@ npm run dev
 
 Run the narrowest validation path that matches your change:
 
-- `npm run ci:paperbridge` for ScribbledPage-specific work
+- `npm run ci:scribbledpage` for ScribbledPage-specific work
 - `npm run ci:tools` for the bundled PDF tools surface
 - `npm test -- --run` for the full repository gate
 
