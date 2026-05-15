@@ -11,12 +11,22 @@ const HTML_CACHE_CONTROL = 'no-cache';
 const IMMUTABLE_ASSET_CACHE_CONTROL = 'public, max-age=31536000, immutable';
 
 function getStaticCacheControl(filePath) {
+  const fileName = path.basename(filePath);
+
   if (path.extname(filePath) === '.html') {
     return HTML_CACHE_CONTROL;
   }
 
   if (filePath.split(path.sep).includes('assets')) {
     return IMMUTABLE_ASSET_CACHE_CONTROL;
+  }
+
+  if (
+    fileName === 'sw.js' ||
+    fileName === 'site.webmanifest' ||
+    fileName.includes('.worker.')
+  ) {
+    return HTML_CACHE_CONTROL;
   }
 
   return undefined;

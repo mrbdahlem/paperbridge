@@ -16,6 +16,13 @@ describe('Fastify server', () => {
     );
     fs.writeFileSync(path.join(distDir, '404.html'), '<h1>Not found</h1>');
     fs.writeFileSync(path.join(distDir, 'asset.txt'), 'asset body');
+    fs.writeFileSync(path.join(distDir, 'sw.js'), 'self.skipWaiting();');
+    fs.writeFileSync(path.join(distDir, 'site.webmanifest'), '{}');
+    fs.mkdirSync(path.join(distDir, 'workers'));
+    fs.writeFileSync(
+      path.join(distDir, 'workers', 'merge.worker.js'),
+      'self.onmessage = () => {};'
+    );
     fs.mkdirSync(path.join(distDir, 'assets'));
     fs.writeFileSync(
       path.join(distDir, 'assets', 'main-abc123.js'),
@@ -80,6 +87,25 @@ describe('Fastify server', () => {
     expect(response.headers['cache-control']).toBe(
       'public, max-age=31536000, immutable'
     );
+  });
+
+  it('revalidates non-hashed service worker and worker entrypoints', async () => {
+    const serviceWorker = await app.inject({ method: 'GET', url: '/sw.js' });
+    const manifest = await app.inject({
+      method: 'GET',
+      url: '/site.webmanifest',
+    });
+    const worker = await app.inject({
+      method: 'GET',
+      url: '/workers/merge.worker.js',
+    });
+
+    expect(serviceWorker.statusCode).toBe(200);
+    expect(serviceWorker.headers['cache-control']).toBe('no-cache');
+    expect(manifest.statusCode).toBe(200);
+    expect(manifest.headers['cache-control']).toBe('no-cache');
+    expect(worker.statusCode).toBe(200);
+    expect(worker.headers['cache-control']).toBe('no-cache');
   });
 
   it('serves the app shell for QR token routes', async () => {

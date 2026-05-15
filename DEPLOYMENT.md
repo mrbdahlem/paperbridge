@@ -33,6 +33,7 @@ The Fastify server sets cache headers for generated frontend files:
 
 - `*.html`: `Cache-Control: no-cache`
 - `/assets/*`: `Cache-Control: public, max-age=31536000, immutable`
+- `sw.js`, `site.webmanifest`, and `*.worker.*`: `Cache-Control: no-cache`
 
 HTML is revalidated so deploys can update references to the current hashed Vite assets. Hashed assets are immutable because their filenames change when their contents change.
 
