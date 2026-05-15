@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getLanguageFromUrl, supportedLanguages } from '@/js/i18n/i18n';
+import {
+  getLanguageFromUrl,
+  rewriteLinks,
+  supportedLanguages,
+} from '@/js/i18n/i18n';
 
 const SCRIBBLEDPAGE_LANGUAGES = ['en', 'de', 'es', 'fr', 'ja', 'pt'];
 
@@ -131,5 +135,51 @@ describe('getLanguageFromUrl', () => {
 
   it('limits supported languages to the current ScribbledPage translation set', () => {
     expect([...supportedLanguages]).toEqual(SCRIBBLEDPAGE_LANGUAGES);
+  });
+});
+
+describe('rewriteLinks', () => {
+  const originalLocation = window.location;
+
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: { ...originalLocation, pathname: '/fr/' },
+      writable: true,
+      configurable: true,
+    });
+    localStorage.clear();
+    document.body.innerHTML = '';
+    vi.stubEnv('BASE_URL', '/');
+    vi.stubEnv('VITE_DEFAULT_LANGUAGE', 'en');
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
+    document.body.innerHTML = '';
+    vi.unstubAllEnvs();
+  });
+
+  it('does not rewrite localized root links with query strings or hashes', () => {
+    document.body.innerHTML = `
+      <a id="query" href="/de?utm=campaign">German campaign</a>
+      <a id="hash" href="/de#section">German section</a>
+      <a id="plain" href="/about">About</a>
+    `;
+
+    rewriteLinks();
+
+    expect(document.getElementById('query')?.getAttribute('href')).toBe(
+      '/de?utm=campaign'
+    );
+    expect(document.getElementById('hash')?.getAttribute('href')).toBe(
+      '/de#section'
+    );
+    expect(document.getElementById('plain')?.getAttribute('href')).toBe(
+      '/fr/about'
+    );
   });
 });

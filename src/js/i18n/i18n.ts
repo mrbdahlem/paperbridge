@@ -24,9 +24,10 @@ function getLeadingLanguageSegment(path: string): SupportedLanguage | null {
 }
 
 function stripBasePathPrefix(pathValue: string, basePath: string): string {
-  const pathWithLeadingSlash = pathValue.startsWith('/')
-    ? pathValue
-    : `/${pathValue}`;
+  const pathOnly = pathValue.split(/[?#]/, 1)[0] || '/';
+  const pathWithLeadingSlash = pathOnly.startsWith('/')
+    ? pathOnly
+    : `/${pathOnly}`;
 
   if (!basePath || basePath === '/') return pathWithLeadingSlash;
 
