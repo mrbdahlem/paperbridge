@@ -72,4 +72,25 @@ describe('generate i18n pages', () => {
       getI18nBuildLanguages(tempDir, { explicitLanguages: 'fr, en, es' })
     ).toEqual(['en', 'es', 'fr']);
   });
+
+  it('de-duplicates explicit i18n build language overrides', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'i18n-locales-'));
+
+    for (const lang of ['en', 'es', 'fr']) {
+      fs.mkdirSync(path.join(tempDir, lang));
+    }
+
+    expect(
+      getI18nBuildLanguages(tempDir, { explicitLanguages: 'fr, fr, en, es' })
+    ).toEqual(['en', 'es', 'fr']);
+  });
+
+  it('throws a clear error when the default language folder is missing', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'i18n-locales-'));
+    fs.mkdirSync(path.join(tempDir, 'fr'));
+
+    expect(() => getI18nBuildLanguages(tempDir)).toThrow(
+      `Default i18n build language "en" is missing from ${tempDir}`
+    );
+  });
 });

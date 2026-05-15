@@ -23,6 +23,35 @@ function getLeadingLanguageSegment(path: string): SupportedLanguage | null {
   return segment && isSupportedLanguage(segment) ? segment : null;
 }
 
+function stripBasePathPrefix(pathValue: string, basePath: string): string {
+  const pathWithLeadingSlash = pathValue.startsWith('/')
+    ? pathValue
+    : `/${pathValue}`;
+
+  if (!basePath || basePath === '/') return pathWithLeadingSlash;
+
+  const basePathWithLeadingSlash = basePath.startsWith('/')
+    ? basePath
+    : `/${basePath}`;
+
+  if (pathWithLeadingSlash === basePathWithLeadingSlash) return '/';
+
+  if (pathWithLeadingSlash.startsWith(`${basePathWithLeadingSlash}/`)) {
+    return pathWithLeadingSlash.slice(basePathWithLeadingSlash.length) || '/';
+  }
+
+  return pathWithLeadingSlash;
+}
+
+function hasSupportedLanguagePrefix(
+  pathValue: string,
+  basePath: string
+): boolean {
+  return (
+    getLeadingLanguageSegment(stripBasePathPrefix(pathValue, basePath)) !== null
+  );
+}
+
 export const getLanguageFromUrl = (): SupportedLanguage => {
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   let path = window.location.pathname;
@@ -35,8 +64,8 @@ export const getLanguageFromUrl = (): SupportedLanguage => {
     path = '/' + path;
   }
 
-  const langMatch = path.match(/^\/(en|de|es|fr|ja|pt)(?:\/|$)/);
-  if (langMatch && isSupportedLanguage(langMatch[1])) return langMatch[1];
+  const urlLanguage = getLeadingLanguageSegment(path);
+  if (urlLanguage) return urlLanguage;
 
   const storedLang = localStorage.getItem('i18nextLng');
   if (storedLang && isSupportedLanguage(storedLang)) {
@@ -209,10 +238,7 @@ export const rewriteLinks = (): void => {
       return;
     }
 
-    const langPrefixRegex = new RegExp(
-      `^(${basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})?/?(en|de|es|fr|ja|pt)(/|$)`
-    );
-    if (langPrefixRegex.test(href)) {
+    if (hasSupportedLanguagePrefix(href, basePath)) {
       return;
     }
 

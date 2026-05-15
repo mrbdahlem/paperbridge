@@ -4,6 +4,17 @@ import path from 'path';
 export const DEFAULT_I18N_NAMESPACE = 'scribbledpage';
 export const DEFAULT_LANGUAGE = 'en';
 
+function parseExplicitLanguages(explicitLanguages) {
+  return [
+    ...new Set(
+      explicitLanguages
+        .split(',')
+        .map((lang) => lang.trim())
+        .filter(Boolean)
+    ),
+  ];
+}
+
 export function getI18nBuildLanguages(
   localesDir,
   {
@@ -15,11 +26,14 @@ export function getI18nBuildLanguages(
     .readdirSync(localesDir)
     .filter((file) => fs.statSync(path.join(localesDir, file)).isDirectory());
 
+  if (!availableLanguages.includes(DEFAULT_LANGUAGE)) {
+    throw new Error(
+      `Default i18n build language "${DEFAULT_LANGUAGE}" is missing from ${localesDir}`
+    );
+  }
+
   const languages = explicitLanguages
-    ? explicitLanguages
-        .split(',')
-        .map((lang) => lang.trim())
-        .filter(Boolean)
+    ? parseExplicitLanguages(explicitLanguages)
     : availableLanguages.filter((lang) =>
         fs.existsSync(path.join(localesDir, lang, `${namespace}.json`))
       );
