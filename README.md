@@ -43,11 +43,13 @@ ScribbledPage is deployed as a Render Node web service so the app can serve the 
 
 Render uses `render.yaml` as the deployment source of truth:
 
-- Build command: `npm ci && npm run build`
+- Build command: `HUSKY=0 npm ci --include=dev && npm run build`
 - Start command: `npm start`
 - Health check path: `/healthz`
 - Publish/runtime server: Fastify serving the full `dist/` app, including ScribbledPage and PDF tools pages
 - Node runtime: 24 or newer
+
+The Render build installs dev dependencies even with `NODE_ENV=production` because the Vite/TypeScript build toolchain is kept in `devDependencies`. `HUSKY=0` disables local Git hook setup during the hosted install.
 
 Set `DATABASE_URL` in Render from Neon when backend persistence is added. Keep this value server-only; do not put database credentials in any `VITE_*` variable. For deployed runtime, prefer Neon's pooled connection string. For development and preview workflows, Neon branches can provide isolated Postgres databases without sharing a mutable development database.
 

@@ -8,5 +8,6 @@ Durable deployment, runtime, and hosting notes for ScribbledPage.
 - Runtime environments should use Node.js 24 or newer across Render, GitHub Actions, and devcontainers.
 - The Render runtime serves Vite's `dist/` output through Fastify and exposes `/healthz` for service health checks.
 - Render uses the full production build so the ScribbledPage dashboard, assignment flow, PDF tools index, and individual PDF tool pages are all available from the same deployed service.
+- Render builds with `HUSKY=0 npm ci --include=dev && npm run build` so hosted installs skip local Git hook setup while still installing the devDependencies required by Vite and TypeScript under `NODE_ENV=production`.
 - Neon credentials must stay server-side in `DATABASE_URL`; browser-facing `VITE_*` variables must not contain database credentials.
 - Neon development databases should use branches rather than a shared mutable development database when testing schema/data changes.
