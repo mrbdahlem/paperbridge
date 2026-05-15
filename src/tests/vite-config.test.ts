@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import type { UserConfig } from 'vite';
+import type { ConfigEnv, Plugin, PluginOption, UserConfig } from 'vite';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import viteConfig from '../../vite.config';
 
@@ -12,17 +12,56 @@ const VITE_CONFIG_ENV_KEYS = [
   'VITE_ENABLE_DEP_OPTIMIZER',
 ] as const;
 
-function loadConfig(mode = 'test'): UserConfig {
+function loadConfig(
+  mode = 'test',
+  command: ConfigEnv['command'] = 'serve'
+): UserConfig {
   if (typeof viteConfig !== 'function') {
     throw new Error('Expected Vite config to export a config factory');
   }
 
   return viteConfig({
-    command: 'serve',
+    command,
     mode,
     isPreview: false,
     isSsrBuild: false,
   });
+}
+
+function flattenPlugins(plugins: PluginOption[] = []): Plugin[] {
+  return plugins.flatMap((plugin) => {
+    if (!plugin) return [];
+    if (Array.isArray(plugin)) return flattenPlugins(plugin);
+    if (typeof plugin === 'object' && 'name' in plugin) return [plugin];
+    return [];
+  });
+}
+
+function findNodePolyfillsPlugin(command: ConfigEnv['command']): Plugin {
+  const config = loadConfig(
+    command === 'build' ? 'production' : 'test',
+    command
+  );
+  const plugin = flattenPlugins(config.plugins).find(
+    (plugin) => plugin.name === 'vite-plugin-node-polyfills'
+  );
+
+  if (!plugin) {
+    throw new Error('Expected Vite config to include node polyfills plugin');
+  }
+
+  return plugin;
+}
+
+async function invokePluginConfig(
+  plugin: Plugin,
+  env: ConfigEnv
+): Promise<UserConfig> {
+  if (typeof plugin.config !== 'function') {
+    throw new Error('Expected node polyfills plugin to expose config hook');
+  }
+
+  return (await plugin.config.call({ meta: {} }, {}, env)) as UserConfig;
 }
 
 function resetViteConfigEnv(
@@ -141,6 +180,55 @@ describe('Vite dependency optimizer defaults', () => {
         'node-forge',
       ],
       exclude: ['coherentpdf', 'wasm-vips'],
+    });
+  });
+});
+
+describe('Vite node polyfills plugin wrapper', () => {
+  it('strips only the no-op build esbuild config from the polyfills plugin output', async () => {
+    const plugin = findNodePolyfillsPlugin('build');
+    const config = await invokePluginConfig(plugin, {
+      command: 'build',
+      mode: 'production',
+      isPreview: false,
+      isSsrBuild: false,
+    });
+
+    expect(config).not.toHaveProperty('esbuild');
+    expect(config.build?.rollupOptions?.onwarn).toEqual(expect.any(Function));
+    expect(config.build?.rollupOptions?.plugins).toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: 'inject' })])
+    );
+    expect(config.resolve?.alias).toMatchObject({
+      buffer: 'vite-plugin-node-polyfills/shims/buffer',
+      process: 'vite-plugin-node-polyfills/shims/process',
+    });
+    expect(config.optimizeDeps).toMatchObject({
+      esbuildOptions: {
+        define: {},
+        inject: expect.any(Array),
+        plugins: expect.any(Array),
+      },
+    });
+  });
+
+  it('keeps the dev esbuild banner config from the polyfills plugin output', async () => {
+    const plugin = findNodePolyfillsPlugin('serve');
+    const config = await invokePluginConfig(plugin, {
+      command: 'serve',
+      mode: 'test',
+      isPreview: false,
+      isSsrBuild: false,
+    });
+
+    expect(config.esbuild).toMatchObject({
+      banner: expect.stringContaining(
+        'globalThis.Buffer = globalThis.Buffer || __buffer_polyfill'
+      ),
+    });
+    expect(config.resolve?.alias).toMatchObject({
+      buffer: 'vite-plugin-node-polyfills/shims/buffer',
+      process: 'vite-plugin-node-polyfills/shims/process',
     });
   });
 });

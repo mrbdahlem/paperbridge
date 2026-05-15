@@ -136,8 +136,22 @@ function stripNoopBuildEsbuildConfig(
   // production builds where its banner is undefined. Vite 8 warns about plugin
   // esbuild config, so strip that build-only no-op while keeping aliases and
   // Rollup polyfills intact.
+  if (!isNoopBuildEsbuildConfig(config.esbuild)) return config;
+
   const { esbuild: _esbuild, ...rest } = config;
   return rest;
+}
+
+function isNoopBuildEsbuildConfig(esbuild: unknown): boolean {
+  if (!esbuild || typeof esbuild !== 'object' || Array.isArray(esbuild)) {
+    return false;
+  }
+
+  const entries = Object.entries(esbuild);
+  return (
+    entries.length === 0 ||
+    entries.every(([key, value]) => key === 'banner' && value === undefined)
+  );
 }
 
 function nodePolyfillsWithoutBuildEsbuildWarning(): Plugin {
