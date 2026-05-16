@@ -15,10 +15,13 @@ npm run dev
 
 - `npm run ci:scribbledpage` for ScribbledPage-specific changes
 - `npm run ci:tools` for the bundled BentoPDF tools surface
+- `npm run ci -w @scribbledpage/app` or `npm run ci -w @scribbledpage/tools` for direct workspace checks
 - `npm test -- --run` for the full repository suite
 
 ## Project Areas
 
+- `apps/scribbledpage/` for the ScribbledPage npm workspace package
+- `apps/tools/` for the BentoPDF tools npm workspace package
 - `src/js/scribbledpage/` for ScribbledPage workflows
 - `src/js/logic/` and `src/pages/` for the BentoPDF tools surface
 - `src/tests/` for tests

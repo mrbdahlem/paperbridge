@@ -17,6 +17,7 @@ Run the narrowest validation path that matches your change:
 
 - `npm run ci:scribbledpage` for ScribbledPage-specific work
 - `npm run ci:tools` for the bundled PDF tools surface
+- `npm run ci -w @scribbledpage/app` or `npm run ci -w @scribbledpage/tools` for direct workspace checks
 - `npm test -- --run` for the full repository gate
 
 If you changed shared code or shared docs, prefer the full test suite plus the most relevant scoped CI script.

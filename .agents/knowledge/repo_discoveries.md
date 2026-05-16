@@ -20,5 +20,5 @@ Durable notes about repository structure and migration decisions.
 ## 2026-05-16 ScribbledPage Source Naming
 
 - The primary app source directory is `src/js/scribbledpage/`; older `paperbridge` path references were removed as part of the workspace cleanup pass.
-- The first workspace cleanup intentionally keeps the root package and build pipeline intact. A later pass can introduce npm workspaces after the source split is validated.
+- The first workspace cleanup intentionally kept the root build pipeline intact. The npm workspace pass added `@scribbledpage/app` and `@scribbledpage/tools` packages that delegate to root configs while source paths remain stable.
 - `ARCHITECTURE.md` is now the source of truth for current source boundaries and the intended `apps/` plus `packages/` workspace direction.

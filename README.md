@@ -34,6 +34,7 @@ Useful scripts:
 
 - `npm run ci:scribbledpage` runs lint, typecheck, tests, and build for the ScribbledPage slice.
 - `npm run ci:tools` runs lint, typecheck, tests, and build for the bundled PDF tools surface.
+- `npm run ci -w @scribbledpage/app` and `npm run ci -w @scribbledpage/tools` run the same checks through the npm workspace packages.
 - `npm test -- --run` runs the full repository test suite.
 - `npm run docs:dev` starts the docs site.
 - `npm start` serves the production `dist/` build through the Fastify server.
