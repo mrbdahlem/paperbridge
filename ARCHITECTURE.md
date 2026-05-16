@@ -34,11 +34,11 @@ The current deployment still builds one frontend bundle set and serves one `dist
 | `scripts/`                  | Build, i18n, sitemap, packaging, and docs glue                         |
 | `public/`                   | Static assets, workers, locales, and vendored browser assets           |
 
-ScribbledPage source should not import BentoPDF page controllers from `src/js/logic/`. When ScribbledPage needs reusable PDF behavior, prefer extracting the reusable behavior out of tool-specific modules first.
+ScribbledPage source should not import BentoPDF page controllers from `src/js/logic/`. The current relationship is cohosting only: ScribbledPage links to the tools surface, but does not depend on the tools workspace for product behavior.
 
 BentoPDF tool pages may continue to use BentoPDF branding where the user-facing page is a PDF utility. Repository workflow, deployment, and contributor documentation should use ScribbledPage as the primary project identity.
 
-`@scribbledpage/tools` is a maintained fork boundary, not first-party ScribbledPage product code. Fork metadata and maintenance policy live in [apps/tools/UPSTREAM.md](apps/tools/UPSTREAM.md). ScribbledPage should consume reusable PDF behavior through a shared adapter/package rather than importing BentoPDF page controllers directly.
+`@scribbledpage/tools` is a maintained fork boundary, not first-party ScribbledPage product code. Fork metadata and maintenance policy live in [apps/tools/UPSTREAM.md](apps/tools/UPSTREAM.md). Do not introduce a ScribbledPage dependency on the tools workspace unless there is a concrete product need; if that need appears, create a narrow shared adapter/package rather than importing BentoPDF page controllers directly.
 
 ## Build And Routing
 
@@ -87,12 +87,12 @@ Recommended migration order:
 1. Keep `apps/scribbledpage/` and `apps/tools/` workspace scripts green while they point at root-level source paths.
 2. Move ScribbledPage entries, source, styles, and tests into `apps/scribbledpage/`.
 3. Move BentoPDF pages, controllers, styles, and tests into `apps/tools/`.
-4. Extract reusable PDF primitives into `packages/shared/`.
+4. Extract reusable PDF primitives into `packages/shared/` only if both surfaces have a concrete need for them.
 5. Keep `vite.config.ts`, deployment docs, env templates, lockfiles, and tests aligned with the new workspace paths in the same change.
 
 Do not move code into `packages/shared/` just because both surfaces might use it later. Shared packages should contain behavior with a concrete consumer on both sides or a clear extraction target from existing duplication.
 
-When upstream BentoPDF functionality is needed, prefer upstream `@bentopdf/*` engine/runtime packages where they expose stable APIs or assets. Keep forked UI/page code contained in `@scribbledpage/tools`.
+The cohosted tools surface may eventually be removed from this repository and replaced with a link to upstream BentoPDF or a dedicated direct fork. When upstream BentoPDF functionality is needed locally, prefer upstream `@bentopdf/*` engine/runtime packages where they expose stable APIs or assets. Keep forked UI/page code contained in `@scribbledpage/tools`.
 
 ## Documentation Sources Of Truth
 

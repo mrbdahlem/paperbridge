@@ -18,21 +18,27 @@ If an upstream remote is restored later, record the matching upstream commit her
 - Keep ScribbledPage branding for repository workflow, deployment, and the primary app.
 - Treat `@scribbledpage/tools` as forked app/UI code.
 - Do not import tool page controllers from ScribbledPage application code.
-- Prefer a shared adapter/package for reusable PDF behavior that ScribbledPage needs.
+- Do not introduce a ScribbledPage dependency on the tools workspace unless there is a concrete product need.
+- If ScribbledPage later needs behavior from the tools surface, introduce a narrow shared adapter/package instead of importing page controllers directly.
 - Prefer upstream `@bentopdf/*` engine/runtime packages where they expose stable APIs or assets.
 
 ## Future Direction
 
-The intended dependency direction is:
+The current dependency direction is cohosting only:
 
 ```text
 @scribbledpage/app
-  -> local shared PDF adapter/package
-      -> upstream @bentopdf/* engine packages where practical
+  -> no dependency on @scribbledpage/tools
 
 @scribbledpage/tools
   -> forked BentoPDF UI and tool pages
-  -> local shared PDF adapter/package where practical
 ```
 
-This keeps the fork contained while allowing ScribbledPage to depend on stable PDF capabilities instead of page-specific BentoPDF UI code.
+Possible future directions:
+
+- Keep cohosting the forked tools UI if it remains useful.
+- Excise the tools workspace and link to upstream BentoPDF.
+- Excise the tools workspace and link to a dedicated direct fork.
+- Add a narrow shared adapter only if ScribbledPage has a concrete need for reusable PDF behavior currently trapped in tool code.
+
+This keeps the fork contained while avoiding an unnecessary dependency from ScribbledPage to page-specific BentoPDF UI code.

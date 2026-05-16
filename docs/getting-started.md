@@ -5,7 +5,7 @@ This guide is for working on the ScribbledPage repository locally.
 ## What Lives Here
 
 - ScribbledPage: the classroom packet/submission workflow under `src/js/scribbledpage/`
-- BentoPDF tools: the forked PDF tool surface that is still bundled in the app as an optional convenience UI
+- BentoPDF tools: the forked PDF tool surface that is still cohosted in the app as an optional convenience UI
 - Shared infrastructure: build scripts, translations, docs, and tests used by both surfaces
 
 ## Local Setup

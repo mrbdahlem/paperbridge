@@ -8,7 +8,7 @@ This repository also still ships the BentoPDF tool surface as a secondary capabi
 ## Repository Scope
 
 - ScribbledPage application code lives under `src/js/scribbledpage/`.
-- Forked BentoPDF tool pages and PDF utilities remain available in the broader app as an optional convenience surface.
+- Forked BentoPDF tool pages remain available in the broader app as an optional cohosted convenience surface.
 - Repository documentation now focuses on development and maintenance, not commercial terms, deployment recipes, or external agreement processes.
 
 ## Development
