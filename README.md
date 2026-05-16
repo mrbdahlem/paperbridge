@@ -8,7 +8,7 @@ This repository also still ships the BentoPDF tool surface as a secondary capabi
 ## Repository Scope
 
 - ScribbledPage application code lives under `src/js/scribbledpage/`.
-- Shared tool pages and PDF utilities remain available in the broader app.
+- Forked BentoPDF tool pages remain available in the broader app as an optional cohosted convenience surface.
 - Repository documentation now focuses on development and maintenance, not commercial terms, deployment recipes, or external agreement processes.
 
 ## Development
@@ -34,6 +34,7 @@ Useful scripts:
 
 - `npm run ci:scribbledpage` runs lint, typecheck, tests, and build for the ScribbledPage slice.
 - `npm run ci:tools` runs lint, typecheck, tests, and build for the bundled PDF tools surface.
+- `npm run ci -w @scribbledpage/app` and `npm run ci -w @scribbledpage/tools` run the same checks through the npm workspace packages.
 - `npm test -- --run` runs the full repository test suite.
 - `npm run docs:dev` starts the docs site.
 - `npm start` serves the production `dist/` build through the Fastify server.
@@ -49,6 +50,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for the Render blueprint, environment variabl
 - [docs/getting-started.md](docs/getting-started.md) covers local repository setup.
 - [docs/contributing.md](docs/contributing.md) covers the lightweight project workflow.
 - [ARCHITECTURE.md](ARCHITECTURE.md) covers current source boundaries and the workspace migration direction.
+- [apps/tools/UPSTREAM.md](apps/tools/UPSTREAM.md) covers the BentoPDF fork boundary and upstream tracking notes.
 - [DEPLOYMENT.md](DEPLOYMENT.md) covers Render deployment and runtime behavior.
 - [docs/licensing.md](docs/licensing.md) and [licensing.html](licensing.html) summarize the repository license notices.
 

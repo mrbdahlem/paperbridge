@@ -5,7 +5,7 @@ This guide is for working on the ScribbledPage repository locally.
 ## What Lives Here
 
 - ScribbledPage: the classroom packet/submission workflow under `src/js/scribbledpage/`
-- BentoPDF tools: the broader PDF tool surface that is still bundled in the app
+- BentoPDF tools: the forked PDF tool surface that is still cohosted in the app as an optional convenience UI
 - Shared infrastructure: build scripts, translations, docs, and tests used by both surfaces
 
 ## Local Setup
@@ -39,6 +39,7 @@ Use the narrowest command that matches your change:
 
 - `npm run ci:scribbledpage` for ScribbledPage-specific work
 - `npm run ci:tools` for the BentoPDF tools surface
+- `npm run ci -w @scribbledpage/app` or `npm run ci -w @scribbledpage/tools` when working directly with workspace package scripts
 - `npm test -- --run` for the full repository suite
 - `npm run docs:dev` for local docs work
 
@@ -46,6 +47,8 @@ Use the narrowest command that matches your change:
 
 | Area                    | Purpose                                               |
 | ----------------------- | ----------------------------------------------------- |
+| `apps/scribbledpage/`   | ScribbledPage npm workspace package scripts           |
+| `apps/tools/`           | Forked BentoPDF tools npm workspace package scripts   |
 | `src/js/scribbledpage/` | ScribbledPage assignment, packet, and dashboard flows |
 | `src/pages/`            | Tool pages and shared entry pages                     |
 | `src/js/logic/`         | BentoPDF tool logic                                   |

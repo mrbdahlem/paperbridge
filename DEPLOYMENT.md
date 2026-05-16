@@ -14,6 +14,8 @@ ScribbledPage deploys as a Render Node web service. The service runs the Fastify
 
 Render sets `NODE_ENV=production`, but the hosted build still needs dev dependencies because Vite, TypeScript, and build-time plugins live in `devDependencies`. `HUSKY=0` skips local Git hook setup during the hosted install.
 
+The repository uses npm workspaces for the ScribbledPage and BentoPDF tools validation slices, but Render still installs and builds from the repository root. The workspace packages are not separate deployed services.
+
 ## Environment
 
 Required or expected Render variables:
