@@ -9,8 +9,8 @@ import {
   savePacket,
   savePackets,
   saveTokens,
-} from '../js/paperbridge/store';
-import type { Assignment, Packet, QRToken } from '../js/paperbridge/store';
+} from '../js/scribbledpage/store';
+import type { Assignment, Packet, QRToken } from '../js/scribbledpage/store';
 
 function makeAssignment(overrides: Partial<Assignment> = {}): Assignment {
   return {

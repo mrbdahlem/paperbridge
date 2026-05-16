@@ -1,5 +1,5 @@
 import { getAssignments, getPackets, deleteAssignment } from './store.js';
-import { initPbI18n, pt } from './pb-i18n.js';
+import { initScribbledPageI18n, pt } from './scribbledpage-i18n.js';
 import { mountThemeToggle } from './theme.js';
 
 function escHtml(s: string): string {
@@ -152,7 +152,7 @@ function mountMobileMenu(): void {
 }
 
 (async () => {
-  await initPbI18n();
+  await initScribbledPageI18n();
   mountThemeToggle();
   mountMobileMenu();
   render();

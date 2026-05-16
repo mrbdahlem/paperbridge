@@ -7,7 +7,7 @@ This repository also still ships the BentoPDF tool surface as a secondary capabi
 
 ## Repository Scope
 
-- ScribbledPage application code lives under `src/js/paperbridge/`.
+- ScribbledPage application code lives under `src/js/scribbledpage/`.
 - Shared tool pages and PDF utilities remain available in the broader app.
 - Repository documentation now focuses on development and maintenance, not commercial terms, deployment recipes, or external agreement processes.
 
@@ -48,6 +48,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for the Render blueprint, environment variabl
 
 - [docs/getting-started.md](docs/getting-started.md) covers local repository setup.
 - [docs/contributing.md](docs/contributing.md) covers the lightweight project workflow.
+- [ARCHITECTURE.md](ARCHITECTURE.md) covers current source boundaries and the workspace migration direction.
 - [DEPLOYMENT.md](DEPLOYMENT.md) covers Render deployment and runtime behavior.
 - [docs/licensing.md](docs/licensing.md) and [licensing.html](licensing.html) summarize the repository license notices.
 

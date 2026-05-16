@@ -5,8 +5,8 @@ This repository uses a lightweight project workflow. There is no separate extern
 ## Repository Setup
 
 ```bash
-git clone https://github.com/mrbdahlem/paperbridge.git
-cd paperbridge
+git clone https://github.com/mrbdahlem/scribbledpage.git
+cd scribbledpage
 npm install
 npm run dev
 ```

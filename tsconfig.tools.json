@@ -9,7 +9,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "src/js/paperbridge/**",
+    "src/js/scribbledpage/**",
     "src/tests/scribbledpage-*.test.ts",
     "vitest.scribbledpage.config.ts"
   ]

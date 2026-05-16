@@ -2,7 +2,7 @@
   <!-- Dark circle background -->
   <circle cx="83" cy="83" r="83" fill="#1c1917"/>
 
-  <!-- sp-empty content scaled ×2, centered in the 166×166 circle -->
+  <!-- sp-icon content scaled ×2, centered in the 166×166 circle -->
   <!-- Source viewBox 0 0 72 72; bounding box of content ~(10,10)-(52,55); -->
   <!-- scale(2) → box becomes (84×90); translate(21,18) centers it in 166×166 -->
   <g transform="translate(21, 18) scale(2)">
