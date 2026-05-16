@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "lint": "eslint ../.. --ignore-pattern src/js/scribbledpage/** --ignore-pattern src/tests/scribbledpage-*.test.ts",
+    "lint": "cd ../.. && eslint . --ignore-pattern src/js/scribbledpage/** --ignore-pattern src/tests/scribbledpage-*.test.ts",
     "typecheck": "tsc -p ../../tsconfig.tools.json --noEmit",
     "test": "cd ../.. && vitest run --config vitest.tools.config.ts",
     "build": "npm run typecheck && cd ../.. && BUILD_TARGET=tools vite build",
