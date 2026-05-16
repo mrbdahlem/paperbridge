@@ -9,34 +9,36 @@ This document describes the current workspace structure and records the intended
 The repository has three runtime-facing surfaces:
 
 - ScribbledPage app: classroom assignment, packet generation, QR stamping, and submission-oriented workflows.
-- BentoPDF tools surface: convenience PDF utility pages that remain available inside the same deployed app.
+- BentoPDF tools surface: forked convenience PDF utility pages that remain available inside the same deployed app.
 - Fastify runtime: production server that serves the generated Vite `dist/` output and exposes server endpoints such as `/healthz`.
 
 The current deployment still builds one frontend bundle set and serves one `dist/` directory. npm workspaces now provide package-level validation boundaries while source files remain in their current root-level paths.
 
 ## Source Boundaries
 
-| Area                        | Ownership                                                       |
-| --------------------------- | --------------------------------------------------------------- |
-| `apps/scribbledpage/`       | npm workspace package for the primary app validation scripts    |
-| `apps/tools/`               | npm workspace package for the BentoPDF tools validation scripts |
-| `src/js/scribbledpage/`     | Primary ScribbledPage application logic                         |
-| `index.html`                | ScribbledPage dashboard entry                                   |
-| `create-assignment.html`    | ScribbledPage assignment creation entry                         |
-| `src/pages/`                | BentoPDF tool pages                                             |
-| `src/js/logic/`             | BentoPDF page controllers and tool workflows                    |
-| `src/js/utils/`             | PDF utility helpers currently shared by tools                   |
-| `src/js/types/`             | Tool and PDF utility types                                      |
-| `src/js/config/`            | Tool configuration and runtime constants                        |
-| `src/css/scribbledpage.css` | ScribbledPage visual system                                     |
-| `src/css/styles.css`        | Broader tools/shared styling                                    |
-| `server/`                   | Fastify production runtime                                      |
-| `scripts/`                  | Build, i18n, sitemap, packaging, and docs glue                  |
-| `public/`                   | Static assets, workers, locales, and vendored browser assets    |
+| Area                        | Ownership                                                              |
+| --------------------------- | ---------------------------------------------------------------------- |
+| `apps/scribbledpage/`       | npm workspace package for the primary app validation scripts           |
+| `apps/tools/`               | npm workspace package for the forked BentoPDF tools validation scripts |
+| `src/js/scribbledpage/`     | Primary ScribbledPage application logic                                |
+| `index.html`                | ScribbledPage dashboard entry                                          |
+| `create-assignment.html`    | ScribbledPage assignment creation entry                                |
+| `src/pages/`                | BentoPDF tool pages                                                    |
+| `src/js/logic/`             | BentoPDF page controllers and tool workflows                           |
+| `src/js/utils/`             | PDF utility helpers currently shared by tools                          |
+| `src/js/types/`             | Tool and PDF utility types                                             |
+| `src/js/config/`            | Tool configuration and runtime constants                               |
+| `src/css/scribbledpage.css` | ScribbledPage visual system                                            |
+| `src/css/styles.css`        | Broader tools/shared styling                                           |
+| `server/`                   | Fastify production runtime                                             |
+| `scripts/`                  | Build, i18n, sitemap, packaging, and docs glue                         |
+| `public/`                   | Static assets, workers, locales, and vendored browser assets           |
 
 ScribbledPage source should not import BentoPDF page controllers from `src/js/logic/`. When ScribbledPage needs reusable PDF behavior, prefer extracting the reusable behavior out of tool-specific modules first.
 
 BentoPDF tool pages may continue to use BentoPDF branding where the user-facing page is a PDF utility. Repository workflow, deployment, and contributor documentation should use ScribbledPage as the primary project identity.
+
+`@scribbledpage/tools` is a maintained fork boundary, not first-party ScribbledPage product code. Fork metadata and maintenance policy live in [apps/tools/UPSTREAM.md](apps/tools/UPSTREAM.md). ScribbledPage should consume reusable PDF behavior through a shared adapter/package rather than importing BentoPDF page controllers directly.
 
 ## Build And Routing
 
@@ -89,6 +91,8 @@ Recommended migration order:
 5. Keep `vite.config.ts`, deployment docs, env templates, lockfiles, and tests aligned with the new workspace paths in the same change.
 
 Do not move code into `packages/shared/` just because both surfaces might use it later. Shared packages should contain behavior with a concrete consumer on both sides or a clear extraction target from existing duplication.
+
+When upstream BentoPDF functionality is needed, prefer upstream `@bentopdf/*` engine/runtime packages where they expose stable APIs or assets. Keep forked UI/page code contained in `@scribbledpage/tools`.
 
 ## Documentation Sources Of Truth
 

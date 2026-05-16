@@ -22,3 +22,4 @@ Durable notes about repository structure and migration decisions.
 - The primary app source directory is `src/js/scribbledpage/`; older `paperbridge` path references were removed as part of the workspace cleanup pass.
 - The first workspace cleanup intentionally kept the root build pipeline intact. The npm workspace pass added `@scribbledpage/app` and `@scribbledpage/tools` packages that delegate to root configs while source paths remain stable.
 - `ARCHITECTURE.md` is now the source of truth for current source boundaries and the intended `apps/` plus `packages/` workspace direction.
+- `apps/tools/UPSTREAM.md` tracks the BentoPDF fork boundary. Local commit `048049fbe9681d6164795a28014b214a1b52094f` is the practical local divergence marker; the exact upstream commit still needs to be recorded if upstream remote tracking is restored.
