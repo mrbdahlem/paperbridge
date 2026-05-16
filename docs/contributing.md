@@ -27,4 +27,4 @@ npm run dev
 ## More Detail
 
 Use the root [CONTRIBUTING.md](https://github.com/mrbdahlem/scribbledpage/blob/main/CONTRIBUTING.md) for the full workflow.
-Use [ARCHITECTURE.md](../ARCHITECTURE.md) for source boundaries and workspace migration direction.
+Use [ARCHITECTURE.md](https://github.com/mrbdahlem/scribbledpage/blob/main/ARCHITECTURE.md) for source boundaries and workspace migration direction.

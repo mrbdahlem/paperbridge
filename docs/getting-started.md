@@ -55,6 +55,6 @@ Use the narrowest command that matches your change:
 ## Next Steps
 
 - [Contributing](/contributing)
-- [Architecture](../ARCHITECTURE.md)
+- [Architecture](https://github.com/mrbdahlem/scribbledpage/blob/main/ARCHITECTURE.md)
 - [Tools Reference](/tools/)
 - [Licenses](/licensing)

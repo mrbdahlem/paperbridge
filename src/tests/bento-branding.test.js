@@ -81,4 +81,12 @@ describe('BentoPDF tool chrome branding', () => {
     );
     expect(toolChrome).not.toContain('src="{{baseUrl}}images/favicon.svg"');
   });
+
+  it('links back to ScribbledPage with an environment-aware internal URL', () => {
+    const navbar = readRepoFile('src/partials/navbar.html');
+
+    expect(navbar).toContain('href="{{baseUrl}}index.html"');
+    expect(navbar).not.toContain('href="/index.html"');
+    expect(navbar).not.toContain('href="https://scribbled.page"');
+  });
 });
