@@ -4,7 +4,7 @@ This guide is for working on the ScribbledPage repository locally.
 
 ## What Lives Here
 
-- ScribbledPage: the classroom packet/submission workflow under `src/js/paperbridge/`
+- ScribbledPage: the classroom packet/submission workflow under `src/js/scribbledpage/`
 - BentoPDF tools: the broader PDF tool surface that is still bundled in the app
 - Shared infrastructure: build scripts, translations, docs, and tests used by both surfaces
 
@@ -44,16 +44,17 @@ Use the narrowest command that matches your change:
 
 ## Project Areas
 
-| Area                  | Purpose                                               |
-| --------------------- | ----------------------------------------------------- |
-| `src/js/paperbridge/` | ScribbledPage assignment, packet, and dashboard flows |
-| `src/pages/`          | Tool pages and shared entry pages                     |
-| `src/js/logic/`       | BentoPDF tool logic                                   |
-| `src/tests/`          | Repository test suite                                 |
-| `docs/`               | Repository documentation                              |
+| Area                    | Purpose                                               |
+| ----------------------- | ----------------------------------------------------- |
+| `src/js/scribbledpage/` | ScribbledPage assignment, packet, and dashboard flows |
+| `src/pages/`            | Tool pages and shared entry pages                     |
+| `src/js/logic/`         | BentoPDF tool logic                                   |
+| `src/tests/`            | Repository test suite                                 |
+| `docs/`                 | Repository documentation                              |
 
 ## Next Steps
 
 - [Contributing](/contributing)
+- [Architecture](https://github.com/mrbdahlem/scribbledpage/blob/main/ARCHITECTURE.md)
 - [Tools Reference](/tools/)
 - [Licenses](/licensing)

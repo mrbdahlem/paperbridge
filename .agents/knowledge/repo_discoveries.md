@@ -16,3 +16,9 @@ Durable notes about repository structure and migration decisions.
 - Default dev optimization still includes `jszip` because ScribbledPage `create-assignment.html` imports it directly and needs browser ESM conversion even when dependency discovery is disabled.
 - Vite dev and preview bind to `localhost` by default outside devcontainers. Devcontainer config sets `VITE_DEV_HOST=0.0.0.0` and `VITE_PREVIEW_HOST=0.0.0.0` so forwarded ports are reachable from the host machine.
 - `docs/.vitepress/dist/**` is generated docs output and is ignored by ESLint; source docs remain linted where applicable.
+
+## 2026-05-16 ScribbledPage Source Naming
+
+- The primary app source directory is `src/js/scribbledpage/`; older `paperbridge` path references were removed as part of the workspace cleanup pass.
+- The first workspace cleanup intentionally keeps the root package and build pipeline intact. A later pass can introduce npm workspaces after the source split is validated.
+- `ARCHITECTURE.md` is now the source of truth for current source boundaries and the intended `apps/` plus `packages/` workspace direction.

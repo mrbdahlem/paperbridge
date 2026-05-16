@@ -1,7 +1,7 @@
 import {
   defaultPosition,
   DEFAULT_QR_SIZE_PT,
-} from '../js/paperbridge/qr-stamper';
+} from '../js/scribbledpage/qr-stamper';
 
 const LETTER_W = 612; // US Letter in points
 const LETTER_H = 792;

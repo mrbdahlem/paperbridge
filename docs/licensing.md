@@ -4,7 +4,7 @@ This repository keeps licensing notices lightweight.
 
 ## Repository License
 
-The repository license is defined in [LICENSE](https://github.com/mrbdahlem/paperbridge/blob/main/LICENSE).
+The repository license is defined in [LICENSE](https://github.com/mrbdahlem/scribbledpage/blob/main/LICENSE).
 
 ## Bundled and Runtime Components
 

@@ -9,7 +9,7 @@ import {
   generatePacketCode,
   QR_CODE_ALPHABET,
   QR_CODE_LENGTH,
-} from '../js/paperbridge/tokens';
+} from '../js/scribbledpage/tokens';
 
 describe('ScribbledPage token helpers', () => {
   const safeCodePattern = new RegExp(

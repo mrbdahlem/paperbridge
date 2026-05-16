@@ -55,12 +55,38 @@ describe('BentoPDF tool chrome branding', () => {
     const mainScript = readRepoFile('src/js/main.ts');
 
     expect(`${navbar}\n${footer}\n${mainScript}`).not.toContain(
-      'github.com/mrbdahlem/paperbridge'
+      'github.com/mrbdahlem/scribbledpage'
     );
     expect(navbar).toContain('https://github.com/alam00000/bentopdf');
     expect(footer).toContain('https://github.com/alam00000/bentopdf');
     expect(mainScript).toContain(
       'https://api.github.com/repos/alam00000/bentopdf'
     );
+  });
+
+  it('uses BentoPDF logo assets in tool chrome', () => {
+    const toolChrome = [
+      readRepoFile('src/partials/navbar.html'),
+      readRepoFile('src/partials/navbar-simple.html'),
+      readRepoFile('src/partials/footer.html'),
+      readRepoFile('src/partials/footer-simple.html'),
+      readRepoFile('simple-index.html'),
+      readRepoFile('src/pages/pdf-multi-tool.html'),
+    ].join('\n');
+
+    expect(toolChrome).toContain('images/bentopdf-logo-no-bg.svg');
+    expect(toolChrome).toContain('images/bentopdf-logo.svg');
+    expect(toolChrome).not.toContain(
+      'src="{{baseUrl}}images/favicon-no-bg.svg"'
+    );
+    expect(toolChrome).not.toContain('src="{{baseUrl}}images/favicon.svg"');
+  });
+
+  it('links back to ScribbledPage with an environment-aware internal URL', () => {
+    const navbar = readRepoFile('src/partials/navbar.html');
+
+    expect(navbar).toContain('href="{{baseUrl}}index.html"');
+    expect(navbar).not.toContain('href="/index.html"');
+    expect(navbar).not.toContain('href="https://scribbled.page"');
   });
 });
