@@ -4,6 +4,16 @@ import { fileURLToPath } from 'node:url';
 import fastify from 'fastify';
 import fastifySensible from '@fastify/sensible';
 import fastifyStatic from '@fastify/static';
+import {
+  closeDatabaseClient,
+  createDatabaseClient,
+  getDatabaseHealthStatus,
+  readDatabaseConfig,
+} from './database.js';
+import {
+  assertNeonBranchGuard,
+  getNeonBranchGuardResult,
+} from './neon-branch-guard.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DIST_DIR = path.resolve(__dirname, '..', 'dist');
@@ -35,19 +45,71 @@ function getStaticCacheControl(filePath) {
 export function buildServer(options = {}) {
   const distDir = options.distDir ?? DEFAULT_DIST_DIR;
   const notFoundPagePath = path.join(distDir, '404.html');
+  const env = options.env ?? process.env;
+  const databaseConfig = readDatabaseConfig(env);
+  const database =
+    options.database === undefined
+      ? createDatabaseClient({ env })
+      : options.database;
+  const databaseConfigured =
+    options.database === undefined
+      ? databaseConfig.configured
+      : Boolean(database);
+  const ownsDatabase = options.database === undefined && Boolean(database);
   const app = fastify({
     logger:
       options.logger ??
-      (process.env.NODE_ENV === 'production'
-        ? { level: process.env.LOG_LEVEL || 'info' }
+      (env.NODE_ENV === 'production'
+        ? { level: env.LOG_LEVEL || 'info' }
         : false),
   });
 
   app.register(fastifySensible);
+  app.decorate('database', database);
 
   app.addHook('onRequest', async (_request, reply) => {
     reply.header('Cross-Origin-Opener-Policy', 'same-origin');
     reply.header('Cross-Origin-Embedder-Policy', 'require-corp');
+  });
+
+  app.addHook('onReady', async () => {
+    const neonBranchGuard = getNeonBranchGuardResult({
+      env,
+      gitBranch: options.gitBranch,
+    });
+
+    assertNeonBranchGuard(neonBranchGuard);
+
+    app.log.info(
+      {
+        database: {
+          configured: databaseConfigured,
+        },
+      },
+      databaseConfigured
+        ? 'database connection configured'
+        : 'database connection not configured'
+    );
+
+    if (!neonBranchGuard.ok) {
+      app.log.warn(
+        {
+          neonBranchGuard: {
+            mode: neonBranchGuard.mode,
+            gitBranch: neonBranchGuard.gitBranch,
+            expectedBranchName: neonBranchGuard.expectedBranchName,
+            configuredBranchName: neonBranchGuard.configuredBranchName,
+          },
+        },
+        'configured Neon branch does not match current git branch'
+      );
+    }
+  });
+
+  app.addHook('onClose', async () => {
+    if (ownsDatabase) {
+      await closeDatabaseClient(database);
+    }
   });
 
   app.setErrorHandler((error, request, reply) => {
@@ -76,10 +138,29 @@ export function buildServer(options = {}) {
     service: 'scribbledpage',
   }));
 
-  app.get('/api/health', async () => ({
-    ok: true,
-    service: 'scribbledpage-api',
-  }));
+  app.get('/api/health', async (request, reply) => {
+    const databaseStatus = await getDatabaseHealthStatus(app.database);
+    const ok = !databaseStatus.configured || databaseStatus.connected;
+    const body = {
+      ok,
+      service: 'scribbledpage-api',
+      database: databaseStatus,
+    };
+
+    if (!ok) {
+      request.log.warn(
+        {
+          database: databaseStatus,
+          requestId: request.id,
+        },
+        'database health check failed'
+      );
+
+      return reply.status(503).send(body);
+    }
+
+    return body;
+  });
 
   app.register(fastifyStatic, {
     root: distDir,

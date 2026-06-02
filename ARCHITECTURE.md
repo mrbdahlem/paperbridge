@@ -11,6 +11,7 @@ The repository has three runtime-facing surfaces:
 - ScribbledPage app: classroom assignment, packet generation, QR stamping, and submission-oriented workflows.
 - BentoPDF tools surface: forked convenience PDF utility pages that remain available inside the same deployed app.
 - Fastify runtime: production server that serves the generated Vite `dist/` output and exposes server endpoints such as `/healthz`.
+- Postgres persistence: server-only database access prepared for Neon-hosted Postgres through runtime `DATABASE_URL` and migration-only `DATABASE_MIGRATION_URL`.
 
 The current deployment still builds one frontend bundle set and serves one `dist/` directory. npm workspaces now provide package-level validation boundaries while source files remain in their current root-level paths.
 
@@ -53,6 +54,22 @@ BentoPDF tool pages may continue to use BentoPDF branding where the user-facing 
 Production builds emit localized ScribbledPage pages for the active language set. `scripts/generate-i18n-pages.mjs`, `scripts/generate-sitemap.mjs`, and `scripts/generate-security-headers.mjs` run after the Vite build in the root `npm run build` pipeline.
 
 The production server in `server/` serves the full `dist/` output. Deployment details, environment variables, and cache behavior live in [DEPLOYMENT.md](DEPLOYMENT.md).
+
+Database access is owned by the Fastify runtime in `server/`. Browser code must not import database helpers or receive database credentials. The current database client uses Postgres.js against pooled runtime `DATABASE_URL`, which keeps the runtime compatible with Neon while avoiding a Neon-specific application dependency.
+
+Schema migrations are a separate Node/Render execution path from the long-running
+Fastify server. The server runtime should use a least-privilege database role
+for app traffic, while migration commands use a dedicated migration role with
+DDL privileges through direct, non-pooled `DATABASE_MIGRATION_URL`.
+Migration files live in `server/migrations/` and run through `npm run
+db:migrate`; GitHub Actions runs the same command against production after
+changes land on `main`.
+Short-lived local and PR development databases are expected to use Neon branches
+created from the production parent branch through `scripts/neon-branch.mjs`,
+which keeps branch setup in source-controlled automation instead of relying on
+manual dashboard steps. Non-production server startup validates configured
+`NEON_BRANCH_NAME` against the current git branch when database access is
+configured, with `NEON_BRANCH_GUARD` controlling warn, strict, or off behavior.
 
 ## Validation Boundaries
 

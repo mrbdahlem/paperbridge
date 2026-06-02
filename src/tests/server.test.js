@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { buildServer } from '../../server/app.js';
+import { readDatabaseConfig } from '../../server/database.js';
 
 describe('Fastify server', () => {
   let app;
@@ -28,7 +29,7 @@ describe('Fastify server', () => {
       path.join(distDir, 'assets', 'main-abc123.js'),
       'console.log("asset")'
     );
-    app = buildServer({ distDir, logger: false });
+    app = buildServer({ distDir, logger: false, database: null });
     await app.ready();
   });
 
@@ -47,13 +48,99 @@ describe('Fastify server', () => {
     });
   });
 
-  it('serves the API health endpoint', async () => {
+  it('serves the API health endpoint without a configured database', async () => {
     const response = await app.inject({ method: 'GET', url: '/api/health' });
 
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({
       ok: true,
       service: 'scribbledpage-api',
+      database: {
+        configured: false,
+        connected: false,
+      },
+    });
+  });
+
+  it('reports a healthy configured database through API health', async () => {
+    await app.close();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: async () => [{ ok: 1 }],
+    });
+    await app.ready();
+
+    const response = await app.inject({ method: 'GET', url: '/api/health' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({
+      ok: true,
+      service: 'scribbledpage-api',
+      database: {
+        configured: true,
+        connected: true,
+      },
+    });
+  });
+
+  it('reports a failing configured database through API health', async () => {
+    await app.close();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: async () => {
+        console.info('[TEST] expected database health failure');
+        throw new Error('expected database health failure');
+      },
+    });
+    await app.ready();
+
+    const response = await app.inject({ method: 'GET', url: '/api/health' });
+
+    expect(response.statusCode).toBe(503);
+    expect(response.json()).toEqual({
+      ok: false,
+      service: 'scribbledpage-api',
+      database: {
+        configured: true,
+        connected: false,
+        error: 'unavailable',
+      },
+    });
+  });
+
+  it('parses database connection settings', () => {
+    const config = readDatabaseConfig({
+      DATABASE_URL: 'postgres://user:password@example.com/db',
+      DATABASE_POOL_MAX: '12',
+      DATABASE_IDLE_TIMEOUT_SECONDS: '30',
+      DATABASE_CONNECT_TIMEOUT_SECONDS: '7',
+    });
+
+    expect(config).toEqual({
+      configured: true,
+      url: 'postgres://user:password@example.com/db',
+      poolMax: 12,
+      idleTimeoutSeconds: 30,
+      connectTimeoutSeconds: 7,
+    });
+  });
+
+  it('uses conservative database connection defaults', () => {
+    const config = readDatabaseConfig({
+      DATABASE_URL: '',
+      DATABASE_POOL_MAX: '0',
+      DATABASE_IDLE_TIMEOUT_SECONDS: 'not-a-number',
+      DATABASE_CONNECT_TIMEOUT_SECONDS: '-1',
+    });
+
+    expect(config).toEqual({
+      configured: false,
+      url: '',
+      poolMax: 5,
+      idleTimeoutSeconds: 20,
+      connectTimeoutSeconds: 5,
     });
   });
 

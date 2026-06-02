@@ -30,12 +30,22 @@ Dependency discovery and broad pre-bundling are disabled by default to keep loca
 Set `VITE_ENABLE_DEP_OPTIMIZER=true` to opt into broader Vite pre-bundling for heavier tool-page development.
 Production i18n page generation currently emits the active ScribbledPage language set: English, German, Spanish, French, Japanese, and Portuguese.
 
+Backend persistence is prepared through a server-only `DATABASE_URL`, intended for a Neon Postgres pooled connection string in deployed environments. Database migrations use server-only `DATABASE_MIGRATION_URL`, intended for a direct, non-pooled Neon connection string. Google OAuth setup uses server-only `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_URL`, and `SESSION_SECRET` values. Do not prefix secrets with `VITE_`; Vite exposes those variables to browser code.
+Run database migrations separately from the long-running Node/Render web server, using `npm run db:migrate` with a dedicated migration role rather than the runtime server role. Production migrations run from `.github/workflows/production-migrations.yml` after changes land on `main`.
+Generate a local `SESSION_SECRET` with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`.
+
+For branch-isolated Neon development, set `NEON_API_KEY`, `NEON_PROJECT_ID`, and usually `NEON_PARENT_BRANCH_ID` in your local shell, then run `npm run db:branch:create`. The script derives a Neon branch name from the current git branch, creates branch-local runtime and migration roles, and writes `DATABASE_URL`, `DATABASE_MIGRATION_URL`, `NEON_BRANCH_ID`, and `NEON_BRANCH_NAME` to `.env.local`. Local server startup compares `NEON_BRANCH_NAME` to the current git branch when `DATABASE_URL` is configured; use `NEON_BRANCH_GUARD=warn`, `strict`, or `off` to control that check. Use `npm run db:branch:env` to print shell exports for the current branch, and `npm run db:branch:delete` when the short-lived Neon branch is no longer needed.
+
 Useful scripts:
 
 - `npm run ci:scribbledpage` runs lint, typecheck, tests, and build for the ScribbledPage slice.
 - `npm run ci:tools` runs lint, typecheck, tests, and build for the bundled PDF tools surface.
 - `npm run ci -w @scribbledpage/app` and `npm run ci -w @scribbledpage/tools` run the same checks through the npm workspace packages.
 - `npm test -- --run` runs the full repository test suite.
+- `npm run db:branch:create` creates or reuses a short-lived Neon branch for the current git branch and updates `.env.local`.
+- `npm run db:branch:env` prints shell exports for the current git branch's Neon connection strings.
+- `npm run db:branch:delete` deletes the current git branch's matching short-lived Neon branch.
+- `npm run db:migrate` runs ordered SQL migrations from `server/migrations/` using `DATABASE_MIGRATION_URL`.
 - `npm run docs:dev` starts the docs site.
 - `npm start` serves the production `dist/` build through the Fastify server.
 

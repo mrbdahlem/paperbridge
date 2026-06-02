@@ -15,3 +15,22 @@ Durable deployment, runtime, and hosting notes for ScribbledPage.
 - The bundled PDF tools chrome is fixed to BentoPDF branding and should not consume Render's ScribbledPage environment variables; the Render environment no longer requires `VITE_BRAND_NAME`.
 - Neon credentials must stay server-side in `DATABASE_URL`; browser-facing `VITE_*` variables must not contain database credentials.
 - Neon development databases should use branches rather than a shared mutable development database when testing schema/data changes.
+
+## 2026-05-16 Database Connection Prep
+
+- Server-side database access is initialized in the Fastify runtime with Postgres.js using `DATABASE_URL`.
+- Deployed Neon connections should use the pooled connection string unless a future workload requires direct connections.
+- `/api/health` returns database status. Missing `DATABASE_URL` is treated as an unconfigured optional dependency; a configured but unreachable database returns `503`.
+- Server startup logs whether database access is configured but must not log `DATABASE_URL` or credentials.
+- Database migrations run separately from the long-running Node/Render server and should use `DATABASE_MIGRATION_URL`, a direct/non-pooled Neon connection string for a dedicated migration role with DDL privileges.
+- Google OAuth and session values are server-only: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_URL`, and `SESSION_SECRET`.
+
+## 2026-06-02 Neon Branch Automation
+
+- `scripts/neon-branch.mjs` manages short-lived local/PR Neon branches through the Neon API and is wired through `npm run db:branch:create`, `npm run db:branch:env`, and `npm run db:branch:delete`.
+- Local branch setup requires `NEON_API_KEY` and `NEON_PROJECT_ID`; `NEON_PARENT_BRANCH_ID` should point at the production parent branch when creating dev branches from production.
+- `db:branch:create` derives the Neon branch name from the current git branch, creates branch-local runtime and migration roles, and writes `DATABASE_URL`, `DATABASE_MIGRATION_URL`, `NEON_BRANCH_ID`, and `NEON_BRANCH_NAME` to `.env.local`.
+- Generated database URLs and `NEON_API_KEY` must stay out of committed env files and logs; the script masks connection-string passwords in normal output.
+- Non-production server startup checks configured `NEON_BRANCH_NAME` against the current git branch when `DATABASE_URL` is set. `NEON_BRANCH_GUARD` defaults to `warn` outside production and `off` in production; `strict` fails startup on mismatch.
+- `npm run db:migrate` runs ordered SQL migrations from `server/migrations/` with `DATABASE_MIGRATION_URL` and records applied filenames/checksums in `schema_migrations`.
+- `.github/workflows/production-migrations.yml` runs production migrations on `push` to `main` and manual dispatch through the GitHub production environment. Migrations must be backward compatible with the currently deployed app because they may run before Render finishes deploying the new version.
