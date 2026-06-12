@@ -5,6 +5,45 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { buildServer } from '../../server/app.js';
 import { readDatabaseConfig } from '../../server/database.js';
 
+function makeAssignmentDetail(overrides = {}) {
+  const assignment = {
+    id: 'assignment_1',
+    title: 'EX10 Relays',
+    classLabel: 'Period 4',
+    pageCount: 2,
+    qrMode: 'anonymous',
+    packetCount: 1,
+    templateVersion: 1,
+    ownerUserId: null,
+    createdAt: '2026-06-12T00:00:00.000Z',
+    updatedAt: '2026-06-12T00:00:00.000Z',
+    ...overrides.assignment,
+  };
+  const packets = overrides.packets ?? [
+    {
+      id: 'packet_1',
+      assignmentId: assignment.id,
+      packetCode: '9X7K2VBM',
+      mode: 'anonymous',
+      studentId: null,
+      createdAt: assignment.createdAt,
+    },
+  ];
+  const tokens = overrides.tokens ?? [
+    {
+      token: '9X7K2VBM-P1',
+      assignmentId: assignment.id,
+      templateVersion: 1,
+      packetId: 'packet_1',
+      pageNumber: 1,
+      expiresAt: null,
+      createdAt: assignment.createdAt,
+    },
+  ];
+
+  return { assignment, packets, tokens };
+}
+
 describe('Fastify server', () => {
   let app;
   let distDir;
@@ -141,6 +180,210 @@ describe('Fastify server', () => {
       poolMax: 5,
       idleTimeoutSeconds: 20,
       connectTimeoutSeconds: 5,
+    });
+  });
+
+  it('returns 503 for assignment APIs when the database is not configured', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/assignments',
+    });
+
+    expect(response.statusCode).toBe(503);
+    expect(response.json()).toEqual({
+      error: 'Database Not Configured',
+      statusCode: 503,
+    });
+  });
+
+  it('lists assignments through the assignment repository', async () => {
+    await app.close();
+    const detail = makeAssignmentDetail();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        listAssignments: async () => [detail.assignment],
+      },
+    });
+    await app.ready();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/assignments',
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({
+      assignments: [detail.assignment],
+    });
+  });
+
+  it('creates assignments with packets and QR tokens', async () => {
+    await app.close();
+    const detail = makeAssignmentDetail();
+    let receivedBody;
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        createAssignment: async (body) => {
+          receivedBody = body;
+          return detail;
+        },
+      },
+    });
+    await app.ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/assignments',
+      payload: detail,
+    });
+
+    expect(response.statusCode).toBe(201);
+    expect(receivedBody).toEqual(detail);
+    expect(response.json()).toEqual(detail);
+  });
+
+  it('returns 400 when assignment creation validation fails', async () => {
+    await app.close();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        createAssignment: async () => {
+          console.info('[TEST] expected assignment create validation failure');
+          throw new Error('assignment.title is required');
+        },
+      },
+    });
+    await app.ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/assignments',
+      payload: {},
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({
+      error: 'assignment.title is required',
+      statusCode: 400,
+    });
+  });
+
+  it('gets and deletes assignment details', async () => {
+    await app.close();
+    const detail = makeAssignmentDetail();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        getAssignment: async (id) =>
+          id === detail.assignment.id ? detail : null,
+        deleteAssignment: async (id) => id === detail.assignment.id,
+      },
+    });
+    await app.ready();
+
+    const getResponse = await app.inject({
+      method: 'GET',
+      url: `/api/assignments/${detail.assignment.id}`,
+    });
+    const deleteResponse = await app.inject({
+      method: 'DELETE',
+      url: `/api/assignments/${detail.assignment.id}`,
+    });
+
+    expect(getResponse.statusCode).toBe(200);
+    expect(getResponse.json()).toEqual(detail);
+    expect(deleteResponse.statusCode).toBe(204);
+    expect(deleteResponse.body).toBe('');
+  });
+
+  it('returns 404 for missing assignments', async () => {
+    await app.close();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        getAssignment: async () => null,
+        deleteAssignment: async () => false,
+      },
+    });
+    await app.ready();
+
+    const getResponse = await app.inject({
+      method: 'GET',
+      url: '/api/assignments/missing',
+    });
+    const deleteResponse = await app.inject({
+      method: 'DELETE',
+      url: '/api/assignments/missing',
+    });
+
+    expect(getResponse.statusCode).toBe(404);
+    expect(getResponse.json()).toEqual({
+      error: 'Assignment Not Found',
+      statusCode: 404,
+    });
+    expect(deleteResponse.statusCode).toBe(404);
+    expect(deleteResponse.json()).toEqual({
+      error: 'Assignment Not Found',
+      statusCode: 404,
+    });
+  });
+
+  it('resolves QR tokens through the assignment repository', async () => {
+    await app.close();
+    const detail = makeAssignmentDetail();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        resolveQRToken: async (token) =>
+          token === detail.tokens[0].token ? detail.tokens[0] : null,
+      },
+    });
+    await app.ready();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: `/api/qr-tokens/${detail.tokens[0].token}`,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ token: detail.tokens[0] });
+  });
+
+  it('returns 404 for missing QR tokens', async () => {
+    await app.close();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        resolveQRToken: async () => null,
+      },
+    });
+    await app.ready();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/qr-tokens/missing',
+    });
+
+    expect(response.statusCode).toBe(404);
+    expect(response.json()).toEqual({
+      error: 'QR Token Not Found',
+      statusCode: 404,
     });
   });
 

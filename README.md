@@ -32,9 +32,12 @@ Production i18n page generation currently emits the active ScribbledPage languag
 
 Backend persistence is prepared through a server-only `DATABASE_URL`, intended for a Neon Postgres pooled connection string in deployed environments. Database migrations use server-only `DATABASE_MIGRATION_URL`, intended for a direct, non-pooled Neon connection string. Google OAuth setup uses server-only `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_URL`, and `SESSION_SECRET` values. Do not prefix secrets with `VITE_`; Vite exposes those variables to browser code.
 Run database migrations separately from the long-running Node/Render web server, using `npm run db:migrate` with a dedicated migration role rather than the runtime server role. Production migrations run from `.github/workflows/production-migrations.yml` after changes land on `main`.
+The first durable paper-submission records are `assignments`, `packets`, and `qr_tokens`, exposed through server-only Fastify APIs under `/api/assignments` and `/api/qr-tokens/:token`.
+The role in `DATABASE_MIGRATION_URL` must have schema DDL privileges, such as `CREATE` on `public`, before migrations can create tables.
 Generate a local `SESSION_SECRET` with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`.
 
 For branch-isolated Neon development, set `NEON_API_KEY`, `NEON_PROJECT_ID`, and usually `NEON_PARENT_BRANCH_ID` in your local shell, then run `npm run db:branch:create`. The script derives a Neon branch name from the current git branch, creates branch-local runtime and migration roles, and writes `DATABASE_URL`, `DATABASE_MIGRATION_URL`, `NEON_BRANCH_ID`, and `NEON_BRANCH_NAME` to `.env.local`. Local server startup compares `NEON_BRANCH_NAME` to the current git branch when `DATABASE_URL` is configured; use `NEON_BRANCH_GUARD=warn`, `strict`, or `off` to control that check. Use `npm run db:branch:env` to print shell exports for the current branch, and `npm run db:branch:delete` when the short-lived Neon branch is no longer needed.
+Node server commands such as `npm start` and `npm run db:migrate` load `.env` and `.env.local` automatically, with real shell variables taking precedence.
 
 Useful scripts:
 

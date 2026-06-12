@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isNeonConflictError,
   maskSecret,
   neonBranchNameFromGitBranch,
   parseArgs,
@@ -57,6 +58,17 @@ describe('Neon branch script helpers', () => {
     expect(maskSecret('postgres://role:secret@example.neon.tech/db')).toBe(
       'postgres://role:********@example.neon.tech/db'
     );
+  });
+
+  it('detects Neon conflicting operation errors for retry', () => {
+    expect(
+      isNeonConflictError(
+        new Error(
+          'Neon API POST /branches failed: project already has running conflicting operations, scheduling of new ones is prohibited'
+        )
+      )
+    ).toBe(true);
+    expect(isNeonConflictError(new Error('something unrelated'))).toBe(false);
   });
 
   it('parses create command flags', () => {

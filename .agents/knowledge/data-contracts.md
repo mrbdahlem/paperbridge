@@ -14,3 +14,10 @@ Durable API, token, and payload contracts for ScribbledPage workflows.
 - First-party user accounts should be created server-side after Google OAuth validates the Google identity.
 - Store the internal ScribbledPage user id separately from the Google provider subject. Treat Google's `sub` claim as stable provider identity, not as the primary application id.
 - Keep OAuth client secrets, session secrets, provider tokens, and database credentials out of browser-exposed `VITE_*` variables.
+
+## 2026-06-12 Assignment QR Persistence
+
+- MVP 0 server persistence starts with `assignments`, `packets`, and `qr_tokens`.
+- `qr_tokens.token` remains the opaque printed/scanned lookup key, while `assignment_id`, `packet_id`, `template_version`, and `page_number` remain server-resolved metadata.
+- `GET /api/qr-tokens/:token` returns the resolved QR token metadata or `404` when the token is unknown.
+- Assignment APIs return `503` when `DATABASE_URL` is not configured so local static-only workflows can remain available without pretending data is durable.

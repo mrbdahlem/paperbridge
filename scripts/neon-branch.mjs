@@ -10,6 +10,8 @@ const DEFAULT_BRANCH_PREFIX = 'dev';
 const DEFAULT_DATABASE_NAME = 'neondb';
 const DEFAULT_RUNTIME_ROLE = 'scribbledpage_dev_app';
 const DEFAULT_MIGRATION_ROLE = 'scribbledpage_dev_migration';
+const DEFAULT_CONFLICT_RETRY_COUNT = 8;
+const DEFAULT_CONFLICT_RETRY_DELAY_MS = 1500;
 
 export function parseArgs(argv) {
   const [command = 'help', ...rest] = argv;
@@ -127,6 +129,18 @@ export function maskSecret(value) {
   }
 }
 
+export function isNeonConflictError(error) {
+  return /conflicting operations|already has running conflicting operations|scheduling of new ones is prohibited/i.test(
+    String(error?.message || '')
+  );
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 function slugify(value) {
   return String(value || '')
     .trim()
@@ -153,7 +167,20 @@ function readConfig(env) {
     databaseName,
     runtimeRoleBase,
     migrationRoleBase,
+    conflictRetryCount: parsePositiveInteger(
+      env.NEON_CONFLICT_RETRY_COUNT,
+      DEFAULT_CONFLICT_RETRY_COUNT
+    ),
+    conflictRetryDelayMs: parsePositiveInteger(
+      env.NEON_CONFLICT_RETRY_DELAY_MS,
+      DEFAULT_CONFLICT_RETRY_DELAY_MS
+    ),
   };
+}
+
+function parsePositiveInteger(value, fallback) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 }
 
 function requiredEnv(env, key) {
@@ -268,6 +295,29 @@ async function connectionUri(
   return uri;
 }
 
+async function withConflictRetry(
+  operation,
+  { retryCount, retryDelayMs, label, onRetry = () => {} }
+) {
+  for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (!isNeonConflictError(error) || attempt === retryCount) {
+        throw error;
+      }
+
+      onRetry({
+        attempt: attempt + 1,
+        retryCount,
+        retryDelayMs,
+        label,
+      });
+      await sleep(retryDelayMs);
+    }
+  }
+}
+
 async function setupBranch(options, env) {
   const config = readConfig(env);
   const client = createClient(config);
@@ -282,24 +332,56 @@ async function setupBranch(options, env) {
     parentBranchId: config.parentBranchId,
   });
 
-  const [runtimeRoleResult, migrationRoleResult] = await Promise.all([
-    ensureRole(client, branch.id, runtimeRole),
-    ensureRole(client, branch.id, migrationRole),
-  ]);
-  const [databaseUrl, migrationUrl] = await Promise.all([
-    connectionUri(client, {
-      branchId: branch.id,
-      databaseName: config.databaseName,
-      roleName: runtimeRole,
-      pooled: true,
-    }),
-    connectionUri(client, {
-      branchId: branch.id,
-      databaseName: config.databaseName,
-      roleName: migrationRole,
-      pooled: false,
-    }),
-  ]);
+  const retryOptions = {
+    retryCount: config.conflictRetryCount,
+    retryDelayMs: config.conflictRetryDelayMs,
+    onRetry({ attempt, retryCount, retryDelayMs, label }) {
+      console.log(
+        `Neon is still finishing ${label}; retry ${attempt}/${retryCount} in ${retryDelayMs}ms`
+      );
+    },
+  };
+
+  const runtimeRoleResult = await withConflictRetry(
+    () => ensureRole(client, branch.id, runtimeRole),
+    {
+      ...retryOptions,
+      label: `runtime role setup for ${neonBranch}`,
+    }
+  );
+  const migrationRoleResult = await withConflictRetry(
+    () => ensureRole(client, branch.id, migrationRole),
+    {
+      ...retryOptions,
+      label: `migration role setup for ${neonBranch}`,
+    }
+  );
+  const databaseUrl = await withConflictRetry(
+    () =>
+      connectionUri(client, {
+        branchId: branch.id,
+        databaseName: config.databaseName,
+        roleName: runtimeRole,
+        pooled: true,
+      }),
+    {
+      ...retryOptions,
+      label: `pooled connection lookup for ${neonBranch}`,
+    }
+  );
+  const migrationUrl = await withConflictRetry(
+    () =>
+      connectionUri(client, {
+        branchId: branch.id,
+        databaseName: config.databaseName,
+        roleName: migrationRole,
+        pooled: false,
+      }),
+    {
+      ...retryOptions,
+      label: `migration connection lookup for ${neonBranch}`,
+    }
+  );
 
   return {
     gitBranch,
@@ -388,7 +470,9 @@ Optional env:
   NEON_DATABASE_NAME
   NEON_BRANCH_PREFIX
   NEON_RUNTIME_ROLE_NAME
-  NEON_MIGRATION_ROLE_NAME`);
+  NEON_MIGRATION_ROLE_NAME
+  NEON_CONFLICT_RETRY_COUNT
+  NEON_CONFLICT_RETRY_DELAY_MS`);
 }
 
 async function main(argv, env) {

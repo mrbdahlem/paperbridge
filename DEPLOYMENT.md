@@ -44,7 +44,12 @@ Optional database pool tuning variables:
 `/api/health` reports whether database connectivity is configured and reachable. When `DATABASE_URL` is absent, the endpoint stays healthy and reports the database as unconfigured. When `DATABASE_URL` is present but a database check fails, the endpoint returns `503`.
 On startup, the Fastify runtime logs whether a database connection is configured without logging the database URL or credentials.
 
+When database access is configured, `/api/assignments` persists ScribbledPage assignment, packet, and QR token metadata in Postgres. `/api/qr-tokens/:token` resolves printed QR tokens server-side. When database access is not configured, these assignment APIs return `503` while the static app and `/api/health` remain available.
+
+Local Node server commands load `.env` and `.env.local` automatically. Shell-provided environment variables take precedence over checked-in or local env files. Hosted Render and GitHub Actions environments should continue to provide secrets through their platform environment-variable systems.
+
 Database migrations must run separately from the Fastify runtime server. The Render web service should use a runtime-only pooled `DATABASE_URL` role for normal app traffic, while migration jobs or release commands should use `DATABASE_MIGRATION_URL` with a direct, non-pooled Neon connection string and a separate migration role with schema change privileges. Do not grant production DDL permissions to the long-running server role.
+For Neon, make sure the role inside `DATABASE_MIGRATION_URL` has `CREATE` on the target schema, usually `public`, before running `npm run db:migrate`. Newly generated branch roles may be able to connect before they have DDL privileges. After migrations run, the migration runner grants normal table read/write privileges to the runtime role from `DATABASE_URL`.
 
 `npm run db:migrate` runs ordered `.sql` files from `server/migrations/` and records applied filenames and checksums in `schema_migrations`. Production migrations run through `.github/workflows/production-migrations.yml` on `push` to `main`, which is the post-merge event for PRs. The workflow uses the GitHub production environment secret `DATABASE_MIGRATION_URL`; keep that value separate from Render's runtime `DATABASE_URL`.
 

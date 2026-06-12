@@ -8,6 +8,7 @@ import {
   checksumSql,
   listMigrationFiles,
   readMigrationConfig,
+  roleNameFromDatabaseUrl,
 } from '../../scripts/db-migrate.mjs';
 
 describe('database migration script helpers', () => {
@@ -25,6 +26,7 @@ describe('database migration script helpers', () => {
 
   it('reads migration config from server-only environment variables', () => {
     const config = readMigrationConfig({
+      DATABASE_URL: 'postgres://runtime:secret@example.neon.tech/db',
       DATABASE_MIGRATION_URL:
         'postgres://migration:secret@example.neon.tech/db',
       DATABASE_MIGRATIONS_DIR: migrationsDir,
@@ -33,9 +35,18 @@ describe('database migration script helpers', () => {
 
     expect(config).toEqual({
       databaseUrl: 'postgres://migration:secret@example.neon.tech/db',
+      runtimeRoleName: 'runtime',
       migrationsDir,
       migrationsTable: 'app_schema_migrations',
     });
+  });
+
+  it('extracts the runtime role from DATABASE_URL', () => {
+    expect(
+      roleNameFromDatabaseUrl(
+        'postgres://scribbledpage_dev_app:secret@example.neon.tech/db'
+      )
+    ).toBe('scribbledpage_dev_app');
   });
 
   it('lists SQL migrations in deterministic order with checksums', () => {

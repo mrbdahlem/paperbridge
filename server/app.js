@@ -10,6 +10,7 @@ import {
   getDatabaseHealthStatus,
   readDatabaseConfig,
 } from './database.js';
+import { createAssignmentRepository } from './assignment-repository.js';
 import {
   assertNeonBranchGuard,
   getNeonBranchGuardResult,
@@ -55,6 +56,10 @@ export function buildServer(options = {}) {
     options.database === undefined
       ? databaseConfig.configured
       : Boolean(database);
+  const assignmentRepository =
+    options.assignmentRepository === undefined && database
+      ? createAssignmentRepository(database)
+      : (options.assignmentRepository ?? null);
   const ownsDatabase = options.database === undefined && Boolean(database);
   const app = fastify({
     logger:
@@ -66,6 +71,7 @@ export function buildServer(options = {}) {
 
   app.register(fastifySensible);
   app.decorate('database', database);
+  app.decorate('assignmentRepository', assignmentRepository);
 
   app.addHook('onRequest', async (_request, reply) => {
     reply.header('Cross-Origin-Opener-Policy', 'same-origin');
@@ -160,6 +166,118 @@ export function buildServer(options = {}) {
     }
 
     return body;
+  });
+
+  function requireAssignmentRepository(reply) {
+    if (app.assignmentRepository) {
+      return app.assignmentRepository;
+    }
+
+    reply.status(503).send({
+      error: 'Database Not Configured',
+      statusCode: 503,
+    });
+    return null;
+  }
+
+  app.get('/api/assignments', async (_request, reply) => {
+    const repository = requireAssignmentRepository(reply);
+    if (!repository) return reply;
+
+    const assignments = await repository.listAssignments();
+    return { assignments };
+  });
+
+  app.post('/api/assignments', async (request, reply) => {
+    const repository = requireAssignmentRepository(reply);
+    if (!repository) return reply;
+
+    try {
+      const result = await repository.createAssignment(request.body);
+
+      request.log.info(
+        {
+          assignmentId: result.assignment.id,
+          packetCount: result.packets.length,
+          tokenCount: result.tokens.length,
+          requestId: request.id,
+        },
+        'assignment created'
+      );
+
+      return reply.status(201).send(result);
+    } catch (error) {
+      request.log.warn(
+        {
+          err: {
+            message: error.message,
+            name: error.name,
+          },
+          requestId: request.id,
+        },
+        'assignment create request rejected'
+      );
+
+      return reply.status(400).send({
+        error: error.message,
+        statusCode: 400,
+      });
+    }
+  });
+
+  app.get('/api/assignments/:id', async (request, reply) => {
+    const repository = requireAssignmentRepository(reply);
+    if (!repository) return reply;
+
+    const result = await repository.getAssignment(request.params.id);
+    if (!result) {
+      return reply.status(404).send({
+        error: 'Assignment Not Found',
+        statusCode: 404,
+      });
+    }
+
+    return result;
+  });
+
+  app.delete('/api/assignments/:id', async (request, reply) => {
+    const repository = requireAssignmentRepository(reply);
+    if (!repository) return reply;
+
+    const deleted = await repository.deleteAssignment(request.params.id);
+
+    request.log.info(
+      {
+        assignmentId: request.params.id,
+        deleted,
+        requestId: request.id,
+      },
+      'assignment delete requested'
+    );
+
+    if (!deleted) {
+      return reply.status(404).send({
+        error: 'Assignment Not Found',
+        statusCode: 404,
+      });
+    }
+
+    return reply.status(204).send();
+  });
+
+  app.get('/api/qr-tokens/:token', async (request, reply) => {
+    const repository = requireAssignmentRepository(reply);
+    if (!repository) return reply;
+
+    const token = await repository.resolveQRToken(request.params.token);
+    if (!token) {
+      return reply.status(404).send({
+        error: 'QR Token Not Found',
+        statusCode: 404,
+      });
+    }
+
+    return { token };
   });
 
   app.register(fastifyStatic, {

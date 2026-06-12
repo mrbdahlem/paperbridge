@@ -56,6 +56,7 @@ Production builds emit localized ScribbledPage pages for the active language set
 The production server in `server/` serves the full `dist/` output. Deployment details, environment variables, and cache behavior live in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 Database access is owned by the Fastify runtime in `server/`. Browser code must not import database helpers or receive database credentials. The current database client uses Postgres.js against pooled runtime `DATABASE_URL`, which keeps the runtime compatible with Neon while avoiding a Neon-specific application dependency.
+Assignment, packet, and QR token metadata is persisted through server-side repository helpers and exposed through Fastify JSON routes. Browser code should call those APIs instead of talking to Postgres directly.
 
 Schema migrations are a separate Node/Render execution path from the long-running
 Fastify server. The server runtime should use a least-privilege database role

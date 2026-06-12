@@ -5,6 +5,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import postgres from 'postgres';
+import { loadServerEnv } from '../server/env-loader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_MIGRATIONS_DIR = path.resolve(
@@ -44,12 +45,25 @@ export function listMigrationFiles(migrationsDir = DEFAULT_MIGRATIONS_DIR) {
 export function readMigrationConfig(env = process.env) {
   return {
     databaseUrl: env.DATABASE_MIGRATION_URL?.trim() || '',
+    runtimeRoleName: roleNameFromDatabaseUrl(env.DATABASE_URL),
     migrationsDir: env.DATABASE_MIGRATIONS_DIR
       ? path.resolve(env.DATABASE_MIGRATIONS_DIR)
       : DEFAULT_MIGRATIONS_DIR,
     migrationsTable:
       env.DATABASE_MIGRATIONS_TABLE?.trim() || DEFAULT_MIGRATIONS_TABLE,
   };
+}
+
+export function roleNameFromDatabaseUrl(databaseUrl) {
+  if (!databaseUrl) {
+    return '';
+  }
+
+  try {
+    return decodeURIComponent(new URL(databaseUrl).username);
+  } catch {
+    return '';
+  }
 }
 
 export function assertSafeIdentifier(identifier, label) {
@@ -90,6 +104,7 @@ export function buildMigrationPlan(migrations, appliedRows) {
 
 export async function runMigrations({
   databaseUrl,
+  runtimeRoleName = '',
   migrationsDir = DEFAULT_MIGRATIONS_DIR,
   migrationsTable = DEFAULT_MIGRATIONS_TABLE,
   logger = console,
@@ -127,6 +142,7 @@ export async function runMigrations({
     const pending = buildMigrationPlan(migrations, appliedRows);
 
     if (pending.length === 0) {
+      await grantRuntimePrivileges(sql, runtimeRoleName);
       logger.info('No pending database migrations');
       return { applied: 0, pending: 0 };
     }
@@ -144,6 +160,7 @@ export async function runMigrations({
       });
     }
 
+    await grantRuntimePrivileges(sql, runtimeRoleName);
     logger.info(`Applied ${pending.length} database migration(s)`);
     return { applied: pending.length, pending: pending.length };
   } finally {
@@ -151,14 +168,40 @@ export async function runMigrations({
   }
 }
 
+async function grantRuntimePrivileges(sql, runtimeRoleName) {
+  if (!runtimeRoleName) {
+    return;
+  }
+
+  assertSafeIdentifier(runtimeRoleName, 'DATABASE_URL role name');
+
+  await sql`grant usage on schema public to ${sql(runtimeRoleName)}`;
+  await sql`
+    grant select, insert, update, delete
+    on table assignments, packets, qr_tokens
+    to ${sql(runtimeRoleName)}
+  `;
+}
+
 async function main(env = process.env) {
-  const config = readMigrationConfig(env);
+  const config = readMigrationConfig(loadServerEnv({ env }));
   await runMigrations(config);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((error) => {
-    console.error(error.message);
+    console.error(formatMigrationError(error));
     process.exitCode = 1;
   });
+}
+
+function formatMigrationError(error) {
+  const message = error?.message || String(error);
+
+  if (/permission denied for schema/i.test(message)) {
+    return `${message}
+Migration role is missing schema DDL privileges. Grant CREATE on the target schema to the role in DATABASE_MIGRATION_URL, or replace DATABASE_MIGRATION_URL with a Neon owner-role connection string.`;
+  }
+
+  return message;
 }
