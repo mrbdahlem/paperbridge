@@ -1,4 +1,5 @@
 import {
+  type DashboardAssignments,
   loadDashboardAssignments,
   removeAssignment,
 } from './assignment-data.js';
@@ -97,10 +98,11 @@ function renderAssignmentCard(
 }
 
 async function render(): Promise<void> {
-  let loadFailed = false;
-  let data;
+  let loadFailed: boolean;
+  let data: DashboardAssignments;
   try {
     data = await loadDashboardAssignments();
+    loadFailed = !data.durable;
   } catch (error) {
     console.error(error);
     loadFailed = true;

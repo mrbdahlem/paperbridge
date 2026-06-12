@@ -18,6 +18,7 @@ jobs:
     environment: production
     env:
       HUSKY: 0
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       DATABASE_MIGRATION_URL: ${{ secrets.DATABASE_MIGRATION_URL }}
     steps:
       - name: Checkout

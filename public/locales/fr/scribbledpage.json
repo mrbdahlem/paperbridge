@@ -13,7 +13,7 @@
     "title": "Devoirs",
     "subtitle_one": "{{count}} devoir",
     "subtitle_other": "{{count}} devoirs",
-    "loadFallback": "Impossible de charger les devoirs du serveur. Les devoirs locaux sont affiches.",
+    "loadFallback": "Impossible de charger les devoirs du serveur. Les devoirs locaux sont affichés.",
     "stats": {
       "assignments": "Devoirs",
       "packetsGenerated": "Paquets générés",
