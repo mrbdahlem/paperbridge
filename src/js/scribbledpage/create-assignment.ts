@@ -14,14 +14,8 @@ import {
   buildPacketTokens,
   buildGenericTokens,
 } from './tokens.js';
-import {
-  saveAssignment,
-  savePackets,
-  saveTokens,
-  type Assignment,
-  type Packet,
-  type QRToken,
-} from './store.js';
+import { saveGeneratedAssignment } from './assignment-data.js';
+import { type Assignment, type Packet, type QRToken } from './store.js';
 import { initScribbledPageI18n, pt } from './scribbledpage-i18n.js';
 import { mountThemeToggle } from './theme.js';
 
@@ -705,9 +699,11 @@ step2Next.addEventListener('click', async () => {
 
   try {
     const generated = await generatePackets(assignment, mode);
-    saveAssignment(assignment);
-    savePackets(generated.map((g) => g.packet));
-    saveTokens(generated.flatMap((g) => g.tokens));
+    await saveGeneratedAssignment({
+      assignment,
+      packets: generated.map((g) => g.packet),
+      tokens: generated.flatMap((g) => g.tokens),
+    });
 
     generateProgress.style.display = 'none';
     generateResults.style.display = '';

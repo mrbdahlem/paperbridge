@@ -1,4 +1,8 @@
-import { getAssignments, getPackets, deleteAssignment } from './store.js';
+import {
+  loadDashboardAssignments,
+  removeAssignment,
+} from './assignment-data.js';
+import { type Assignment, type Packet } from './store.js';
 import { initScribbledPageI18n, pt } from './scribbledpage-i18n.js';
 import { mountThemeToggle } from './theme.js';
 
@@ -26,9 +30,9 @@ function modeBadge(mode: string): string {
 }
 
 function renderAssignmentCard(
-  assignment: ReturnType<typeof getAssignments>[number]
+  assignment: Assignment,
+  packets: Packet[]
 ): string {
-  const packets = getPackets(assignment.id);
   const accentClass =
     assignment.qrMode === 'generic' ? 'pb-assignment-card--generic' : '';
   const label = assignment.classLabel
@@ -87,11 +91,12 @@ function renderAssignmentCard(
   `;
 }
 
-function render(): void {
-  const assignments = getAssignments().sort(
+async function render(): Promise<void> {
+  const data = await loadDashboardAssignments();
+  const assignments = data.assignments.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
-  const allPackets = getPackets();
+  const allPackets = data.packets;
 
   const emptyEl = document.getElementById('pb-empty')!;
   const dashboardEl = document.getElementById('pb-dashboard')!;
@@ -119,12 +124,19 @@ function render(): void {
 
   // Assignment fields are escaped in renderAssignmentCard before interpolation.
   // eslint-disable-next-line no-unsanitized/property
-  listEl.innerHTML = assignments.map(renderAssignmentCard).join('');
+  listEl.innerHTML = assignments
+    .map((assignment) =>
+      renderAssignmentCard(
+        assignment,
+        allPackets.filter((packet) => packet.assignmentId === assignment.id)
+      )
+    )
+    .join('');
 
   listEl
     .querySelectorAll<HTMLButtonElement>('button[data-delete]')
     .forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.dataset.delete!;
         const assignment = assignments.find((a) => a.id === id);
         if (!assignment) return;
@@ -132,8 +144,8 @@ function render(): void {
           title: assignment.title,
         });
         if (!confirm(msg)) return;
-        deleteAssignment(id);
-        render();
+        await removeAssignment(id);
+        await render();
       });
     });
 }
@@ -155,5 +167,5 @@ function mountMobileMenu(): void {
   await initScribbledPageI18n();
   mountThemeToggle();
   mountMobileMenu();
-  render();
+  await render();
 })();
