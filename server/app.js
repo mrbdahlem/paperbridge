@@ -10,7 +10,10 @@ import {
   getDatabaseHealthStatus,
   readDatabaseConfig,
 } from './database.js';
-import { createAssignmentRepository } from './assignment-repository.js';
+import {
+  AssignmentValidationError,
+  createAssignmentRepository,
+} from './assignment-repository.js';
 import {
   assertNeonBranchGuard,
   getNeonBranchGuardResult,
@@ -182,7 +185,7 @@ export function buildServer(options = {}) {
 
   app.get('/api/assignments', async (_request, reply) => {
     const repository = requireAssignmentRepository(reply);
-    if (!repository) return reply;
+    if (!repository) return undefined;
 
     const assignments = await repository.listAssignments();
     return { assignments };
@@ -190,7 +193,7 @@ export function buildServer(options = {}) {
 
   app.post('/api/assignments', async (request, reply) => {
     const repository = requireAssignmentRepository(reply);
-    if (!repository) return reply;
+    if (!repository) return undefined;
 
     try {
       const result = await repository.createAssignment(request.body);
@@ -207,27 +210,48 @@ export function buildServer(options = {}) {
 
       return reply.status(201).send(result);
     } catch (error) {
-      request.log.warn(
+      if (error instanceof AssignmentValidationError) {
+        request.log.warn(
+          {
+            err: {
+              message: error.message,
+              name: error.name,
+            },
+            operation: 'createAssignment',
+            requestId: request.id,
+          },
+          'assignment create request rejected'
+        );
+
+        return reply.status(400).send({
+          error: error.message,
+          statusCode: 400,
+        });
+      }
+
+      request.log.error(
         {
           err: {
             message: error.message,
             name: error.name,
+            stack: error.stack,
           },
+          operation: 'createAssignment',
           requestId: request.id,
         },
-        'assignment create request rejected'
+        'assignment create request failed'
       );
 
-      return reply.status(400).send({
-        error: error.message,
-        statusCode: 400,
+      return reply.status(500).send({
+        error: 'Internal Server Error',
+        statusCode: 500,
       });
     }
   });
 
   app.get('/api/assignments/:id', async (request, reply) => {
     const repository = requireAssignmentRepository(reply);
-    if (!repository) return reply;
+    if (!repository) return undefined;
 
     const result = await repository.getAssignment(request.params.id);
     if (!result) {
@@ -242,7 +266,7 @@ export function buildServer(options = {}) {
 
   app.delete('/api/assignments/:id', async (request, reply) => {
     const repository = requireAssignmentRepository(reply);
-    if (!repository) return reply;
+    if (!repository) return undefined;
 
     const deleted = await repository.deleteAssignment(request.params.id);
 
@@ -267,7 +291,7 @@ export function buildServer(options = {}) {
 
   app.get('/api/qr-tokens/:token', async (request, reply) => {
     const repository = requireAssignmentRepository(reply);
-    if (!repository) return reply;
+    if (!repository) return undefined;
 
     const token = await repository.resolveQRToken(request.params.token);
     if (!token) {

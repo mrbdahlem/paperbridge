@@ -25,6 +25,16 @@ describe('Neon branch script helpers', () => {
     expect(branchName).toMatch(/-[a-f0-9]{8}$/u);
   });
 
+  it('keeps generated Neon branch names safe with a long prefix', () => {
+    const branchName = neonBranchNameFromGitBranch(
+      'feature/local',
+      'development-preview-database-branch-prefix-that-is-too-long-for-neon'
+    );
+
+    expect(branchName.length).toBeLessThanOrEqual(63);
+    expect(branchName).toMatch(/-[a-f0-9]{8}$/u);
+  });
+
   it('builds branch-specific Postgres role names', () => {
     expect(
       roleNameForBranch(

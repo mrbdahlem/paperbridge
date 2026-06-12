@@ -14,6 +14,9 @@ Run migrations with:
 npm run db:migrate
 ```
 
+Ensure `DATABASE_MIGRATION_URL` is set for migration execution; do not run
+migrations against the pooled runtime `DATABASE_URL`.
+
 The runner records applied migration filenames and checksums in
 `schema_migrations`. Do not edit a migration after it has run against a shared
 or production database; add a new migration instead.

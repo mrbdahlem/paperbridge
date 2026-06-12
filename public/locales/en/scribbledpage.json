@@ -13,6 +13,7 @@
     "title": "Assignments",
     "subtitle_one": "{{count}} assignment",
     "subtitle_other": "{{count}} assignments",
+    "loadFallback": "Could not load server assignments. Showing local assignments.",
     "stats": {
       "assignments": "Assignments",
       "packetsGenerated": "Packets Generated",

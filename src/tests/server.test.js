@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { buildServer } from '../../server/app.js';
+import { AssignmentValidationError } from '../../server/assignment-repository.js';
 import { readDatabaseConfig } from '../../server/database.js';
 
 function makeAssignmentDetail(overrides = {}) {
@@ -257,7 +258,7 @@ describe('Fastify server', () => {
       assignmentRepository: {
         createAssignment: async () => {
           console.info('[TEST] expected assignment create validation failure');
-          throw new Error('assignment.title is required');
+          throw new AssignmentValidationError('assignment.title is required');
         },
       },
     });
@@ -273,6 +274,34 @@ describe('Fastify server', () => {
     expect(response.json()).toEqual({
       error: 'assignment.title is required',
       statusCode: 400,
+    });
+  });
+
+  it('returns 500 when assignment creation fails unexpectedly', async () => {
+    await app.close();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        createAssignment: async () => {
+          console.info('[TEST] expected assignment create unexpected failure');
+          throw new Error('unexpected');
+        },
+      },
+    });
+    await app.ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/assignments',
+      payload: makeAssignmentDetail(),
+    });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.json()).toEqual({
+      error: 'Internal Server Error',
+      statusCode: 500,
     });
   });
 

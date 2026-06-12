@@ -56,7 +56,7 @@ export function neonBranchNameFromGitBranch(
   gitBranch,
   prefix = DEFAULT_BRANCH_PREFIX
 ) {
-  const safePrefix = slugify(prefix || DEFAULT_BRANCH_PREFIX);
+  let safePrefix = slugify(prefix || DEFAULT_BRANCH_PREFIX);
   const safeBranch = slugify(gitBranch);
   const suffix = safeBranch || 'local';
   const candidate = `${safePrefix}-${suffix}`;
@@ -69,7 +69,15 @@ export function neonBranchNameFromGitBranch(
     .update(String(gitBranch || 'local'))
     .digest('hex')
     .slice(0, 8);
-  const maxSuffixLength = 63 - safePrefix.length - hash.length - 2;
+  let maxSuffixLength = Math.max(0, 63 - safePrefix.length - hash.length - 2);
+
+  if (maxSuffixLength === 0) {
+    safePrefix = safePrefix
+      .slice(0, Math.max(1, 63 - suffix.length - hash.length - 2))
+      .replace(/-+$/u, '');
+    maxSuffixLength = Math.max(1, 63 - safePrefix.length - hash.length - 2);
+  }
+
   const trimmedSuffix = suffix.slice(0, maxSuffixLength).replace(/-+$/u, '');
 
   return `${safePrefix}-${trimmedSuffix}-${hash}`;
@@ -213,7 +221,14 @@ function createClient({ projectId, apiKey }) {
     );
 
     const text = await response.text();
-    const payload = text ? JSON.parse(text) : {};
+    let payload = {};
+    if (text) {
+      try {
+        payload = JSON.parse(text);
+      } catch {
+        payload = { message: text };
+      }
+    }
 
     if (!response.ok) {
       const message =
@@ -327,11 +342,6 @@ async function setupBranch(options, env) {
     neonBranchNameFromGitBranch(gitBranch, config.branchPrefix);
   const runtimeRole = roleNameForBranch(config.runtimeRoleBase, neonBranch);
   const migrationRole = roleNameForBranch(config.migrationRoleBase, neonBranch);
-  const { branch, created } = await ensureBranch(client, {
-    name: neonBranch,
-    parentBranchId: config.parentBranchId,
-  });
-
   const retryOptions = {
     retryCount: config.conflictRetryCount,
     retryDelayMs: config.conflictRetryDelayMs,
@@ -341,6 +351,17 @@ async function setupBranch(options, env) {
       );
     },
   };
+  const { branch, created } = await withConflictRetry(
+    () =>
+      ensureBranch(client, {
+        name: neonBranch,
+        parentBranchId: config.parentBranchId,
+      }),
+    {
+      ...retryOptions,
+      label: `branch setup for ${neonBranch}`,
+    }
+  );
 
   const runtimeRoleResult = await withConflictRetry(
     () => ensureRole(client, branch.id, runtimeRole),

@@ -147,6 +147,8 @@ export async function runMigrations({
       return { applied: 0, pending: 0 };
     }
 
+    const appliedCount = pending.length;
+
     for (const migration of pending) {
       logger.info(`Applying database migration ${migration.fileName}`);
       await sql.begin(async (transaction) => {
@@ -161,8 +163,8 @@ export async function runMigrations({
     }
 
     await grantRuntimePrivileges(sql, runtimeRoleName);
-    logger.info(`Applied ${pending.length} database migration(s)`);
-    return { applied: pending.length, pending: pending.length };
+    logger.info(`Applied ${appliedCount} database migration(s)`);
+    return { applied: appliedCount, pending: 0 };
   } finally {
     await sql.end({ timeout: 5 });
   }

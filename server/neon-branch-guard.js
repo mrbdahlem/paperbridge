@@ -33,15 +33,14 @@ export function getCurrentGitBranch() {
 
 export function getNeonBranchGuardResult({
   env = process.env,
-  gitBranch = getCurrentGitBranch(),
+  gitBranch,
 } = {}) {
   const config = readNeonBranchGuardConfig(env);
 
   if (
     config.mode === 'off' ||
     !config.databaseConfigured ||
-    !config.configuredBranchName ||
-    !gitBranch
+    (config.mode !== 'strict' && !config.configuredBranchName)
   ) {
     return {
       ok: true,
@@ -50,8 +49,21 @@ export function getNeonBranchGuardResult({
     };
   }
 
+  const currentGitBranch = gitBranch ?? getCurrentGitBranch();
+
+  if (!currentGitBranch) {
+    return {
+      ok: config.mode !== 'strict',
+      mode: config.mode,
+      skipped: config.mode !== 'strict',
+      gitBranch: '',
+      expectedBranchName: '',
+      configuredBranchName: config.configuredBranchName,
+    };
+  }
+
   const expectedBranchName = neonBranchNameFromGitBranch(
-    gitBranch,
+    currentGitBranch,
     config.branchPrefix
   );
   const ok = config.configuredBranchName === expectedBranchName;
@@ -60,7 +72,7 @@ export function getNeonBranchGuardResult({
     ok,
     mode: config.mode,
     skipped: false,
-    gitBranch,
+    gitBranch: currentGitBranch,
     expectedBranchName,
     configuredBranchName: config.configuredBranchName,
   };

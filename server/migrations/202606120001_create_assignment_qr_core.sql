@@ -18,6 +18,7 @@ create table if not exists packets (
   mode text not null check (mode in ('generic', 'anonymous')),
   student_id text,
   created_at timestamptz not null default now(),
+  unique (assignment_id, id),
   unique (assignment_id, packet_code)
 );
 
@@ -25,10 +26,13 @@ create table if not exists qr_tokens (
   token text primary key,
   assignment_id text not null references assignments(id) on delete cascade,
   template_version integer not null default 1 check (template_version > 0),
-  packet_id text references packets(id) on delete cascade,
+  packet_id text,
   page_number integer not null check (page_number > 0),
   expires_at timestamptz,
   created_at timestamptz not null default now(),
+  foreign key (assignment_id, packet_id)
+    references packets (assignment_id, id)
+    on delete cascade,
   unique (assignment_id, packet_id, page_number)
 );
 

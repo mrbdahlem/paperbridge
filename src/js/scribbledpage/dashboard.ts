@@ -2,7 +2,12 @@ import {
   loadDashboardAssignments,
   removeAssignment,
 } from './assignment-data.js';
-import { type Assignment, type Packet } from './store.js';
+import {
+  getAssignments,
+  getPackets,
+  type Assignment,
+  type Packet,
+} from './store.js';
 import { initScribbledPageI18n, pt } from './scribbledpage-i18n.js';
 import { mountThemeToggle } from './theme.js';
 
@@ -92,11 +97,29 @@ function renderAssignmentCard(
 }
 
 async function render(): Promise<void> {
-  const data = await loadDashboardAssignments();
+  let loadFailed = false;
+  let data;
+  try {
+    data = await loadDashboardAssignments();
+  } catch (error) {
+    console.error(error);
+    loadFailed = true;
+    data = {
+      assignments: getAssignments(),
+      packets: getPackets(),
+      durable: false,
+    };
+  }
   const assignments = data.assignments.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
   const allPackets = data.packets;
+  const packetsByAssignment = new Map<string, Packet[]>();
+  for (const packet of allPackets) {
+    const packets = packetsByAssignment.get(packet.assignmentId) || [];
+    packets.push(packet);
+    packetsByAssignment.set(packet.assignmentId, packets);
+  }
 
   const emptyEl = document.getElementById('pb-empty')!;
   const dashboardEl = document.getElementById('pb-dashboard')!;
@@ -115,9 +138,11 @@ async function render(): Promise<void> {
   dashboardEl.style.display = '';
 
   if (subtitleEl) {
-    subtitleEl.textContent = pt('dashboard.subtitle', {
-      count: assignments.length,
-    });
+    subtitleEl.textContent = loadFailed
+      ? pt('dashboard.loadFallback')
+      : pt('dashboard.subtitle', {
+          count: assignments.length,
+        });
   }
   if (statAssignments) statAssignments.textContent = String(assignments.length);
   if (statPackets) statPackets.textContent = String(allPackets.length);
@@ -128,7 +153,7 @@ async function render(): Promise<void> {
     .map((assignment) =>
       renderAssignmentCard(
         assignment,
-        allPackets.filter((packet) => packet.assignmentId === assignment.id)
+        packetsByAssignment.get(assignment.id) || []
       )
     )
     .join('');

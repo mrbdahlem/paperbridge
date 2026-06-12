@@ -74,6 +74,7 @@ describe('database migration script helpers', () => {
   });
 
   it('rejects unsafe migration table identifiers', () => {
+    console.log('[TEST] unsafe migration table identifier validation');
     expect(() =>
       assertSafeIdentifier('schema_migrations; drop table users;', 'test')
     ).toThrow(/safe Postgres identifier/u);
@@ -113,6 +114,7 @@ describe('database migration script helpers', () => {
       },
     ];
 
+    console.log('[TEST] migration checksum mismatch validation');
     expect(() =>
       buildMigrationPlan(migrations, [
         {

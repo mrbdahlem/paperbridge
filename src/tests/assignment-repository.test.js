@@ -74,19 +74,30 @@ describe('assignment repository payload normalization', () => {
   });
 
   it('rejects invalid assignment counters before database writes', () => {
+    console.log('[TEST] packetCount validation');
     expect(() =>
       normalizeAssignmentPayload(
         makePayload({ assignment: { packetCount: -1 } })
       )
     ).toThrow(/packetCount/u);
+    console.log('[TEST] assignment templateVersion validation');
     expect(() =>
       normalizeAssignmentPayload(
         makePayload({ assignment: { templateVersion: 0 } })
       )
     ).toThrow(/templateVersion/u);
+    console.log('[TEST] token templateVersion validation');
+    expect(() =>
+      normalizeAssignmentPayload(
+        makePayload({
+          tokens: [{ ...makePayload().tokens[0], templateVersion: 0 }],
+        })
+      )
+    ).toThrow(/templateVersion/u);
   });
 
   it('rejects nested records for a different assignment', () => {
+    console.log('[TEST] packet.assignmentId validation');
     expect(() =>
       normalizeAssignmentPayload(
         makePayload({
@@ -101,6 +112,7 @@ describe('assignment repository payload normalization', () => {
         })
       )
     ).toThrow(/packet\.assignmentId/u);
+    console.log('[TEST] token.assignmentId validation');
     expect(() =>
       normalizeAssignmentPayload(
         makePayload({
@@ -118,6 +130,7 @@ describe('assignment repository payload normalization', () => {
   });
 
   it('rejects QR tokens for packets outside the submitted payload', () => {
+    console.log('[TEST] token.packetId validation');
     expect(() =>
       normalizeAssignmentPayload(
         makePayload({

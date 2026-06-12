@@ -56,12 +56,12 @@ Later Drive destination fields may belong on `users`, `assignments`, or a separa
 ## Server Work
 
 - Add session cookie infrastructure to Fastify.
-- Add Google OAuth routes:
+- Expose Google OAuth routes:
   - `GET /auth/google`
   - `GET /auth/google/callback`
   - `POST /auth/logout`
-- Add `GET /api/me` for frontend auth state.
-- Add route guards for teacher APIs and app routes.
+- Provide `GET /api/me` for frontend auth state.
+- Implement route guards for teacher APIs and app routes.
 - Keep `/healthz`, `/api/health`, static assets, OAuth routes, landing page, and scan routes public.
 - Update assignment repository methods to filter teacher-owned records by authenticated user id.
 - On assignment creation, set `owner_user_id` from the current session.
@@ -122,7 +122,7 @@ Later Drive destination fields may belong on `users`, `assignments`, or a separa
 ## Open Decisions
 
 - Choose the first Drive scope and export behavior: app-created folder only, selected folder, or teacher's root Drive.
-- Decide whether Google sign-in and Drive authorization happen together or in two explicit steps.
-- Decide local authenticated development port and whether to add `npm run dev:full`.
-- Decide production refresh-token encryption approach before storing real teacher Drive refresh tokens.
-- Decide whether public scan uploads require any additional anti-abuse control beyond opaque QR tokens and rate limits.
+- Determine whether Google sign-in and Drive authorization happen together or in two explicit steps.
+- Select a local authenticated development port and decide whether to add `npm run dev:full`.
+- Choose a production refresh-token encryption approach before storing real teacher Drive refresh tokens.
+- Evaluate whether public scan uploads require any additional anti-abuse control beyond opaque QR tokens and rate limits.

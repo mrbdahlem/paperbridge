@@ -13,6 +13,7 @@
     "title": "Tarefas",
     "subtitle_one": "{{count}} tarefa",
     "subtitle_other": "{{count}} tarefas",
+    "loadFallback": "Nao foi possivel carregar as tarefas do servidor. Mostrando tarefas locais.",
     "stats": {
       "assignments": "Tarefas",
       "packetsGenerated": "Pacotes gerados",

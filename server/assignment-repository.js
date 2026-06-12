@@ -1,5 +1,13 @@
 const VALID_QR_MODES = new Set(['generic', 'anonymous']);
 
+export class AssignmentValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'AssignmentValidationError';
+    this.statusCode = 400;
+  }
+}
+
 function toIso(value) {
   return value instanceof Date ? value.toISOString() : value;
 }
@@ -52,22 +60,30 @@ function normalizeAssignment(input) {
   const templateVersion = Number(assignment?.templateVersion ?? 1);
 
   if (!assignment?.id || typeof assignment.id !== 'string') {
-    throw new Error('assignment.id is required');
+    throw new AssignmentValidationError('assignment.id is required');
   }
   if (!title) {
-    throw new Error('assignment.title is required');
+    throw new AssignmentValidationError('assignment.title is required');
   }
   if (!Number.isInteger(pageCount) || pageCount <= 0) {
-    throw new Error('assignment.pageCount must be a positive integer');
+    throw new AssignmentValidationError(
+      'assignment.pageCount must be a positive integer'
+    );
   }
   if (!VALID_QR_MODES.has(qrMode)) {
-    throw new Error('assignment.qrMode must be generic or anonymous');
+    throw new AssignmentValidationError(
+      'assignment.qrMode must be generic or anonymous'
+    );
   }
   if (!Number.isInteger(packetCount) || packetCount < 0) {
-    throw new Error('assignment.packetCount must be a non-negative integer');
+    throw new AssignmentValidationError(
+      'assignment.packetCount must be a non-negative integer'
+    );
   }
   if (!Number.isInteger(templateVersion) || templateVersion <= 0) {
-    throw new Error('assignment.templateVersion must be a positive integer');
+    throw new AssignmentValidationError(
+      'assignment.templateVersion must be a positive integer'
+    );
   }
 
   return {
@@ -85,16 +101,20 @@ function normalizeAssignment(input) {
 
 function normalizePacket(packet, assignmentId) {
   if (!packet?.id || typeof packet.id !== 'string') {
-    throw new Error('packet.id is required');
+    throw new AssignmentValidationError('packet.id is required');
   }
   if (!packet?.packetCode || typeof packet.packetCode !== 'string') {
-    throw new Error('packet.packetCode is required');
+    throw new AssignmentValidationError('packet.packetCode is required');
   }
   if (!VALID_QR_MODES.has(packet.mode)) {
-    throw new Error('packet.mode must be generic or anonymous');
+    throw new AssignmentValidationError(
+      'packet.mode must be generic or anonymous'
+    );
   }
   if (packet.assignmentId && packet.assignmentId !== assignmentId) {
-    throw new Error('packet.assignmentId must match assignment.id');
+    throw new AssignmentValidationError(
+      'packet.assignmentId must match assignment.id'
+    );
   }
 
   return {
@@ -109,22 +129,34 @@ function normalizePacket(packet, assignmentId) {
 
 function normalizeQRToken(token, assignmentId) {
   if (!token?.token || typeof token.token !== 'string') {
-    throw new Error('token.token is required');
+    throw new AssignmentValidationError('token.token is required');
   }
   const pageNumber = Number(token.pageNumber);
+  const templateVersion =
+    token.templateVersion === undefined || token.templateVersion === null
+      ? 1
+      : Number(token.templateVersion);
+
   if (!Number.isInteger(pageNumber) || pageNumber <= 0) {
-    throw new Error('token.pageNumber must be a positive integer');
+    throw new AssignmentValidationError(
+      'token.pageNumber must be a positive integer'
+    );
+  }
+  if (!Number.isInteger(templateVersion) || templateVersion <= 0) {
+    throw new AssignmentValidationError(
+      'token.templateVersion must be a positive integer'
+    );
   }
   if (token.assignmentId && token.assignmentId !== assignmentId) {
-    throw new Error('token.assignmentId must match assignment.id');
+    throw new AssignmentValidationError(
+      'token.assignmentId must match assignment.id'
+    );
   }
 
   return {
     token: token.token,
     assignmentId: token.assignmentId || assignmentId,
-    templateVersion: Number.isInteger(Number(token.templateVersion))
-      ? Number(token.templateVersion)
-      : 1,
+    templateVersion,
     packetId: token.packetId || null,
     pageNumber,
     expiresAt: token.expiresAt || null,
@@ -144,7 +176,9 @@ export function normalizeAssignmentPayload(input) {
       normalizedToken.packetId !== null &&
       !packetIds.has(normalizedToken.packetId)
     ) {
-      throw new Error('token.packetId must reference a submitted packet');
+      throw new AssignmentValidationError(
+        'token.packetId must reference a submitted packet'
+      );
     }
 
     return normalizedToken;

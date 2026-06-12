@@ -57,6 +57,24 @@ describe('Neon branch startup guard', () => {
     });
   });
 
+  it('fails strict mode when NEON_BRANCH_NAME is missing', () => {
+    const result = getNeonBranchGuardResult({
+      env: {
+        DATABASE_URL: 'postgres://app:secret@example.neon.tech/db',
+        NEON_BRANCH_GUARD: 'strict',
+      },
+      gitBranch: 'feature/new',
+    });
+
+    expect(result).toMatchObject({
+      ok: false,
+      mode: 'strict',
+      skipped: false,
+      expectedBranchName: 'dev-feature-new',
+      configuredBranchName: '',
+    });
+  });
+
   it('fails Fastify startup when strict mode finds a mismatch', async () => {
     const distDir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'scribbledpage-dist-')
@@ -78,11 +96,14 @@ describe('Neon branch startup guard', () => {
       },
     });
 
-    console.info('[TEST] expected strict Neon branch guard startup failure');
-    await expect(app.ready()).rejects.toThrow(
-      /Configured Neon branch dev-feature-old does not match git branch feature\/new/u
-    );
-    await app.close();
-    fs.rmSync(distDir, { recursive: true, force: true });
+    try {
+      console.info('[TEST] expected strict Neon branch guard startup failure');
+      await expect(app.ready()).rejects.toThrow(
+        /Configured Neon branch dev-feature-old does not match git branch feature\/new/u
+      );
+    } finally {
+      await app.close();
+      fs.rmSync(distDir, { recursive: true, force: true });
+    }
   });
 });
