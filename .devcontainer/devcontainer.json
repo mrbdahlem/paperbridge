@@ -39,7 +39,8 @@
         "terminal.integrated.env.linux": {
           "HOST": "0.0.0.0",
           "VITE_DEV_HOST": "0.0.0.0",
-          "VITE_PREVIEW_HOST": "0.0.0.0"
+          "VITE_PREVIEW_HOST": "0.0.0.0",
+          "VITE_PREVIEW_PORT": "3000"
         }
       },
       "extensions": ["dbaeumer.vscode-eslint"]

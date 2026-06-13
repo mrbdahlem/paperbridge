@@ -2,15 +2,15 @@
 
 ## **Purpose**
 
-Let teachers create assignments in Google Docs, add a ScribbledPage QR marker, and either print directly for simple routing or send the document through ScribbledPage to generate PDFs with per page and per packet QR codes.
+Let teachers create assignments in Google Docs, add a ScribbledPage QR marker, and either print directly for simple routing or send the document through ScribbledPage to generate PDFs with per-page and per-packet QR codes.
 
 ## **Core rule**
 
-Google Docs direct printing does not create per page QR codes.
+Google Docs direct printing does not create per-page QR codes.
 
-The header repeats the same QR on every page, so direct printing can only identify the assignment or document copy. Per page codes only exist after ScribbledPage processes the exported PDF.
+The header repeats the same QR on every page, so direct printing can only identify the assignment or document copy. Per-page codes only exist after ScribbledPage processes the exported PDF.
 
-Google Docs copies also cannot carry reliable per page QR codes. A copied Doc can be linked to an assignment or packet, but the page number must be generated later by ScribbledPage when it exports the Doc to PDF and replaces the repeated placeholder QR on each exported page.
+Google Docs copies also cannot carry reliable per-page QR codes. A copied Doc can be linked to an assignment or packet, but the page number must be generated later by ScribbledPage when it exports the Doc to PDF and replaces the repeated placeholder QR on each exported page.
 
 ## **QR marker**
 
@@ -18,7 +18,7 @@ ScribbledPage inserts a QR code into the Google Docs header.
 
 The QR is a real URL, such as:
 
-```
+```url
 https://bits.mycode.run/d/abc123
 ```
 
@@ -32,11 +32,11 @@ The QR itself should remain a URL.
 
 Extra metadata can be stored in image alt text when possible:
 
-```
+```json
 {
- "scribbledPage": true,
- "assignmentId": "assign_abc123",
- "markerVersion": 1
+  "scribbledPage": true,
+  "assignmentId": "assign_abc123",
+  "markerVersion": 1
 }
 ```
 
@@ -56,7 +56,7 @@ If the marker's assignment exists but the current document ID does not match the
 
 Before changing any assignment linkage, ask the signed-in instructor what to do:
 
-```
+```text
 This Google Doc contains a ScribbledPage marker for an existing assignment, but this Doc is a different copy.
 
 Create a new ScribbledPage assignment from this copy?
@@ -76,7 +76,7 @@ Never silently attach a new Google document ID to an existing assignment owned b
 
 QR identifies the assignment only.
 
-Good for: single page work, notes, informal assignments.
+Good for: single-page work, notes, informal assignments.
 
 Limitations: no page sorting, no packet grouping, no automatic student identity.
 
@@ -88,18 +88,18 @@ If ScribbledPage treats the student copy as a packet, the marker may be refreshe
 
 Good for: absent students printing at home.
 
-Limitations: no per page codes. Pages must be submitted in order or reviewed manually.
+Limitations: no per-page codes. Pages must be submitted in order or reviewed manually.
 
 ### **ScribbledPage generic PDF**
 
-Teacher sends the Doc through ScribbledPage. ScribbledPage replaces the repeated placeholder with per page QR codes.
+Teacher sends the Doc through ScribbledPage. ScribbledPage replaces the repeated placeholder with per-page QR codes.
 
 QR identifies:
 
-```
+```json
 {
- "assignmentId": "assign_abc123",
- "pageNumber": 2
+  "assignmentId": "assign_abc123",
+  "pageNumber": 2
 }
 ```
 
@@ -107,15 +107,15 @@ Good for: page completeness and ordering when packet identity is not needed.
 
 ### **ScribbledPage anonymous packets**
 
-Teacher requests multiple packet copies. ScribbledPage generates unique packet IDs and per page QR codes.
+Teacher requests multiple packet copies. ScribbledPage generates unique packet IDs and per-page QR codes.
 
 QR identifies:
 
-```
+```json
 {
- "assignmentId": "assign_abc123",
- "packetId": "7KQ4M",
- "pageNumber": 2
+  "assignmentId": "assign_abc123",
+  "packetId": "7KQ4M",
+  "pageNumber": 2
 }
 ```
 
@@ -127,7 +127,7 @@ Same as anonymous packets, but tied to rostered students and optionally printed 
 
 ## **Google Docs menu**
 
-```
+```text
 ScribbledPage
  Insert or Refresh QR Marker
  Validate QR Marker
@@ -152,8 +152,8 @@ Create Doc.
 Insert QR marker.
 Choose Build Anonymous Packets.
 ScribbledPage exports Doc as PDF.
-ScribbledPage finds the placeholder QR on each page.
-ScribbledPage replaces it with packet and page specific QR codes.
+It finds the placeholder QR on each page.
+ScribbledPage replaces it with packet and page-specific QR codes.
 Teacher prints the generated packet PDF.
 
 Student copy print:
@@ -168,7 +168,7 @@ Student copy PDF build:
 
 Student or instructor opens a registered student Doc copy.
 ScribbledPage exports the Doc to PDF.
-ScribbledPage finds the repeated assignment or packet placeholder QR on each page.
+It finds the repeated assignment or packet placeholder QR on each page.
 ScribbledPage replaces each placeholder with a generated QR that adds the page number.
 The generated PDF can then support assignment, packet, and page recovery.
 

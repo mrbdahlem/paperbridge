@@ -114,6 +114,32 @@ describe('Vite devcontainer host binding', () => {
     expect(config.server?.host).toBe('0.0.0.0');
     expect(config.preview?.host).toBe('0.0.0.0');
   });
+
+  it('keeps devcontainer preview forwarding aligned with Vite env overrides', () => {
+    for (const path of [
+      '.devcontainer/devcontainer.json',
+      '.devcontainer/privileged/devcontainer.json',
+    ]) {
+      const devcontainer = JSON.parse(readFileSync(path, 'utf8')) as {
+        forwardPorts: number[];
+        customizations: {
+          vscode: {
+            settings: {
+              'terminal.integrated.env.linux': Record<string, string>;
+            };
+          };
+        };
+      };
+      const terminalEnv =
+        devcontainer.customizations.vscode.settings[
+          'terminal.integrated.env.linux'
+        ];
+
+      expect(devcontainer.forwardPorts).toContain(3000);
+      expect(terminalEnv.VITE_PREVIEW_HOST).toBe('0.0.0.0');
+      expect(terminalEnv.VITE_PREVIEW_PORT).toBe('3000');
+    }
+  });
 });
 
 describe('Vite server ports', () => {
