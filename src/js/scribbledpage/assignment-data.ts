@@ -175,7 +175,8 @@ export async function resolveQRToken(
   );
 
   if (response.ok) return response.data?.token;
-  if (response.unavailable || response.status === 404) {
+  if (response.status === 404) return undefined;
+  if (response.unavailable) {
     return resolveToken(token);
   }
   throw apiError('Resolving QR token', response);

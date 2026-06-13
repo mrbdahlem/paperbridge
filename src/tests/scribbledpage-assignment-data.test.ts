@@ -180,12 +180,20 @@ describe('assignment API persistence adapter', () => {
     await expect(resolveQRToken('TOKEN-P1')).resolves.toEqual(token);
   });
 
-  it('falls back to local token resolution on API misses', async () => {
+  it('does not fall back to stale local tokens on server 404', async () => {
     const token = makeToken();
     saveTokens([token]);
     vi.mocked(fetch).mockResolvedValueOnce(
       jsonResponse({ error: 'QR Token Not Found' }, { status: 404 })
     );
+
+    await expect(resolveQRToken('TOKEN-P1')).resolves.toBeUndefined();
+  });
+
+  it('falls back to local token resolution when the API is unavailable', async () => {
+    const token = makeToken();
+    saveTokens([token]);
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('offline'));
 
     await expect(resolveQRToken('TOKEN-P1')).resolves.toEqual(token);
   });
