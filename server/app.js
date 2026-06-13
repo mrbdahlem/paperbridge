@@ -91,8 +91,11 @@ export function buildServer(options = {}) {
   });
 
   app.addHook('onReady', async () => {
+    const neonBranchGuardEnv = databaseConfigured
+      ? { DATABASE_URL: 'postgres://injected@localhost/injected', ...env }
+      : { ...env, DATABASE_URL: '' };
     const neonBranchGuard = getNeonBranchGuardResult({
-      env: databaseConfigured ? env : { ...env, DATABASE_URL: '' },
+      env: neonBranchGuardEnv,
       gitBranch: options.gitBranch,
     });
 

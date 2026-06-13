@@ -50,6 +50,7 @@ function renderAssignmentCard(
   const createdText = pt('dashboard.card.created', {
     date: formatDate(assignment.createdAt),
   });
+  const assignmentId = escHtml(assignment.id);
   const deleteTitle = escHtml(pt('dashboard.card.delete'));
   const downloadLabel = escHtml(pt('dashboard.card.downloadPackets'));
 
@@ -79,7 +80,7 @@ function renderAssignmentCard(
             ${downloadLabel}
           </a>
           <button
-            data-delete="${assignment.id}"
+            data-delete="${assignmentId}"
             class="pb-btn pb-btn-danger"
             style="padding:.3rem .5rem"
             title="${deleteTitle}"
