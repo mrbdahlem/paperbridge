@@ -178,7 +178,13 @@ export function normalizeAssignmentPayload(input) {
     normalizePacket(packet, assignment.id, createdAt)
   );
   assignment.packetCount = packets.length;
-  const packetIds = new Set(packets.map((packet) => packet.id));
+  const packetIds = new Set();
+  for (const packet of packets) {
+    if (packetIds.has(packet.id)) {
+      throw new AssignmentValidationError('packet.id must be unique');
+    }
+    packetIds.add(packet.id);
+  }
   const tokens = (input?.tokens || []).map((token) => {
     const normalizedToken = normalizeQRToken(token, assignment.id);
 

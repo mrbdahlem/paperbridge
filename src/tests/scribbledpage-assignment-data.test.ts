@@ -99,6 +99,7 @@ describe('assignment API persistence adapter', () => {
   });
 
   it('falls back to localStorage when save API is unavailable', async () => {
+    console.info('[TEST] expected 503 save API fallback');
     const bundle = makeBundle();
     vi.mocked(fetch).mockResolvedValueOnce(
       jsonResponse({ error: 'Database Unavailable' }, { status: 503 })
@@ -111,6 +112,7 @@ describe('assignment API persistence adapter', () => {
   });
 
   it('falls back to localStorage when the save API route is absent', async () => {
+    console.info('[TEST] expected missing save API route fallback');
     const bundle = makeBundle();
     vi.mocked(fetch).mockResolvedValueOnce(
       jsonResponse({ error: 'Not Found', statusCode: 404 }, { status: 404 })
@@ -142,6 +144,7 @@ describe('assignment API persistence adapter', () => {
   });
 
   it('skips assignments deleted between list and detail API responses', async () => {
+    console.info('[TEST] expected assignment detail 404 skip behavior');
     const assignment = makeAssignment();
     vi.mocked(fetch)
       .mockResolvedValueOnce(jsonResponse({ assignments: [assignment] }))
@@ -159,6 +162,7 @@ describe('assignment API persistence adapter', () => {
   });
 
   it('falls back to local dashboard data when the API route is absent', async () => {
+    console.info('[TEST] expected missing dashboard API route fallback');
     const assignment = makeAssignment();
     const packet = makePacket();
     saveAssignment(assignment);
@@ -196,12 +200,32 @@ describe('assignment API persistence adapter', () => {
   });
 
   it('falls back to local delete on network failure', async () => {
+    console.info('[TEST] expected offline delete fallback');
     saveAssignment(makeAssignment());
     savePackets([makePacket()]);
     vi.mocked(fetch).mockRejectedValueOnce(new Error('offline'));
 
     await removeAssignment('assignment_1');
 
+    expect(getAssignments()).toEqual([]);
+    expect(getPackets()).toEqual([]);
+  });
+
+  it('falls back to local delete when delete API returns 404', async () => {
+    console.info('[TEST] expected delete 404 local fallback');
+    const fetchMock = vi.mocked(fetch);
+    saveAssignment(makeAssignment());
+    savePackets([makePacket()]);
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ error: 'Assignment Not Found' }, { status: 404 })
+    );
+
+    await removeAssignment('assignment_1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/assignments/assignment_1',
+      expect.objectContaining({ method: 'DELETE' })
+    );
     expect(getAssignments()).toEqual([]);
     expect(getPackets()).toEqual([]);
   });
@@ -214,6 +238,7 @@ describe('assignment API persistence adapter', () => {
   });
 
   it('does not fall back to stale local tokens on server 404', async () => {
+    console.info('[TEST] expected QR token 404 without local fallback');
     const token = makeToken();
     saveTokens([token]);
     vi.mocked(fetch).mockResolvedValueOnce(
@@ -224,6 +249,7 @@ describe('assignment API persistence adapter', () => {
   });
 
   it('falls back to local token resolution when the API is unavailable', async () => {
+    console.info('[TEST] expected offline token fallback');
     const token = makeToken();
     saveTokens([token]);
     vi.mocked(fetch).mockRejectedValueOnce(new Error('offline'));
@@ -232,6 +258,7 @@ describe('assignment API persistence adapter', () => {
   });
 
   it('falls back to local token resolution when the QR API route is absent', async () => {
+    console.info('[TEST] expected missing QR route fallback');
     const token = makeToken();
     saveTokens([token]);
     vi.mocked(fetch).mockResolvedValueOnce(

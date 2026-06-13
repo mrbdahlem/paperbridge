@@ -147,6 +147,30 @@ describe('assignment repository payload normalization', () => {
     expect(normalized.assignment.packetCount).toBe(2);
   });
 
+  it('rejects duplicate packet ids before database writes', () => {
+    console.log('[TEST] duplicate packet.id validation');
+    expect(() =>
+      normalizeAssignmentPayload(
+        makePayload({
+          packets: [
+            {
+              id: 'packet_1',
+              assignmentId: 'assignment_1',
+              packetCode: '9X7K2VBM',
+              mode: 'anonymous',
+            },
+            {
+              id: 'packet_1',
+              assignmentId: 'assignment_1',
+              packetCode: '8X7K2VBM',
+              mode: 'anonymous',
+            },
+          ],
+        })
+      )
+    ).toThrow(/packet\.id/u);
+  });
+
   it('rejects nested records for a different assignment', () => {
     console.log('[TEST] packet.assignmentId validation');
     expect(() =>
