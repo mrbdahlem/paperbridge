@@ -107,6 +107,38 @@ describe('Neon branch startup guard', () => {
     }
   });
 
+  it('still applies strict guard to injected database clients when DATABASE_URL is empty', async () => {
+    const distDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'scribbledpage-dist-')
+    );
+    fs.writeFileSync(
+      path.join(distDir, 'index.html'),
+      '<h1>ScribbledPage</h1>'
+    );
+
+    const app = buildServer({
+      distDir,
+      logger: false,
+      database: async () => [],
+      gitBranch: 'feature/new',
+      env: {
+        DATABASE_URL: '',
+        NEON_BRANCH_NAME: 'dev-feature-old',
+        NEON_BRANCH_GUARD: 'strict',
+      },
+    });
+
+    try {
+      console.info('[TEST] expected strict Neon branch guard startup failure');
+      await expect(app.ready()).rejects.toThrow(
+        /Configured Neon branch dev-feature-old does not match git branch feature\/new/u
+      );
+    } finally {
+      await app.close();
+      fs.rmSync(distDir, { recursive: true, force: true });
+    }
+  });
+
   it('skips strict guard when buildServer explicitly disables database access', async () => {
     const distDir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'scribbledpage-dist-')
