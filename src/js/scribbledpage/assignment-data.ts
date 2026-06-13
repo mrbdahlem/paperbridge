@@ -62,11 +62,21 @@ function persistLocal(bundle: AssignmentBundle): void {
   saveTokens(bundle.tokens);
 }
 
-function isApiUnavailable(status: number, contentType: string): boolean {
+function isGenericNotFound(data: unknown): boolean {
+  const body = data as { error?: string; statusCode?: number } | null;
+  return body?.statusCode === 404 && body.error === 'Not Found';
+}
+
+function isApiUnavailable(
+  status: number,
+  contentType: string,
+  data: unknown
+): boolean {
   return (
     status === 0 ||
     status === 503 ||
-    (status === 404 && !contentType.includes('application/json'))
+    (status === 404 &&
+      (!contentType.includes('application/json') || isGenericNotFound(data)))
   );
 }
 
@@ -91,7 +101,7 @@ async function requestJson<T>(
       ok: response.ok,
       status: response.status,
       data,
-      unavailable: isApiUnavailable(response.status, contentType),
+      unavailable: isApiUnavailable(response.status, contentType, data),
     };
   } catch {
     return {
@@ -193,9 +203,9 @@ export async function resolveQRToken(
   );
 
   if (response.ok) return response.data?.token;
-  if (response.status === 404) return undefined;
   if (response.unavailable) {
     return resolveToken(token);
   }
+  if (response.status === 404) return undefined;
   throw apiError('Resolving QR token', response);
 }

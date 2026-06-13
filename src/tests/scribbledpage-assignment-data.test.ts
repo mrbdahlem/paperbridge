@@ -110,6 +110,18 @@ describe('assignment API persistence adapter', () => {
     expect(getPackets()).toEqual(bundle.packets);
   });
 
+  it('falls back to localStorage when the save API route is absent', async () => {
+    const bundle = makeBundle();
+    vi.mocked(fetch).mockResolvedValueOnce(
+      jsonResponse({ error: 'Not Found', statusCode: 404 }, { status: 404 })
+    );
+
+    await saveGeneratedAssignment(bundle);
+
+    expect(getAssignments()).toEqual([bundle.assignment]);
+    expect(getPackets()).toEqual(bundle.packets);
+  });
+
   it('loads dashboard data from assignment detail API responses', async () => {
     const assignment = makeAssignment();
     const packet = makePacket();
@@ -211,6 +223,16 @@ describe('assignment API persistence adapter', () => {
     const token = makeToken();
     saveTokens([token]);
     vi.mocked(fetch).mockRejectedValueOnce(new Error('offline'));
+
+    await expect(resolveQRToken('TOKEN-P1')).resolves.toEqual(token);
+  });
+
+  it('falls back to local token resolution when the QR API route is absent', async () => {
+    const token = makeToken();
+    saveTokens([token]);
+    vi.mocked(fetch).mockResolvedValueOnce(
+      jsonResponse({ error: 'Not Found', statusCode: 404 }, { status: 404 })
+    );
 
     await expect(resolveQRToken('TOKEN-P1')).resolves.toEqual(token);
   });
