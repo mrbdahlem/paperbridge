@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -52,6 +53,10 @@ function assertValidInjectedDatabase(database) {
       'options.database must be a Postgres.js client function'
     );
   }
+}
+
+function hashLogValue(value) {
+  return createHash('sha256').update(String(value)).digest('hex').slice(0, 12);
 }
 
 export function buildServer(options = {}) {
@@ -197,7 +202,6 @@ export function buildServer(options = {}) {
         method: request.method,
         requestId: request.id,
         route: request.routeOptions.url,
-        url: request.url,
         ...extra,
       },
       message
@@ -344,7 +348,7 @@ export function buildServer(options = {}) {
     if (!token) {
       logApiFallback(request, 'QR token not found', {
         statusCode: 404,
-        token: request.params.token,
+        tokenHash: hashLogValue(request.params.token),
       });
 
       return reply.status(404).send({
