@@ -699,6 +699,7 @@ step2Next.addEventListener('click', async () => {
 
   try {
     const generated = await generatePackets(assignment, mode);
+    assignment.packetCount = generated.length;
     await saveGeneratedAssignment({
       assignment,
       packets: generated.map((g) => g.packet),

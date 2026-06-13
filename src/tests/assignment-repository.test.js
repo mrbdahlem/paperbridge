@@ -117,6 +117,36 @@ describe('assignment repository payload normalization', () => {
     ).toThrow(/templateVersion/u);
   });
 
+  it('derives assignment packetCount from submitted packets', () => {
+    const normalized = normalizeAssignmentPayload(
+      makePayload({
+        assignment: { packetCount: 99 },
+        packets: [
+          {
+            id: 'packet_1',
+            assignmentId: 'assignment_1',
+            packetCode: '9X7K2VBM',
+            mode: 'anonymous',
+          },
+          {
+            id: 'packet_2',
+            assignmentId: 'assignment_1',
+            packetCode: '8X7K2VBM',
+            mode: 'anonymous',
+          },
+        ],
+        tokens: [
+          {
+            ...makePayload().tokens[0],
+            packetId: 'packet_1',
+          },
+        ],
+      })
+    );
+
+    expect(normalized.assignment.packetCount).toBe(2);
+  });
+
   it('rejects nested records for a different assignment', () => {
     console.log('[TEST] packet.assignmentId validation');
     expect(() =>
