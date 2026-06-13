@@ -171,6 +171,30 @@ describe('assignment repository payload normalization', () => {
     ).toThrow(/packet\.id/u);
   });
 
+  it('rejects duplicate QR tokens before database writes', () => {
+    console.log('[TEST] duplicate token.token validation');
+    expect(() =>
+      normalizeAssignmentPayload(
+        makePayload({
+          tokens: [
+            {
+              token: '9X7K2VBM-P1',
+              assignmentId: 'assignment_1',
+              packetId: 'packet_1',
+              pageNumber: 1,
+            },
+            {
+              token: '9X7K2VBM-P1',
+              assignmentId: 'assignment_1',
+              packetId: 'packet_1',
+              pageNumber: 2,
+            },
+          ],
+        })
+      )
+    ).toThrow(/token\.token/u);
+  });
+
   it('rejects nested records for a different assignment', () => {
     console.log('[TEST] packet.assignmentId validation');
     expect(() =>
