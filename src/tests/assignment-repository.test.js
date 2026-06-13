@@ -38,7 +38,25 @@ function makePayload(overrides = {}) {
 
 describe('assignment repository payload normalization', () => {
   it('normalizes assignment, packet, and QR token payloads', () => {
-    expect(normalizeAssignmentPayload(makePayload())).toEqual({
+    const normalized = normalizeAssignmentPayload(
+      makePayload({
+        assignment: {
+          ownerUserId: 'spoofed_user',
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+        packets: [
+          {
+            id: 'packet_1',
+            assignmentId: 'assignment_1',
+            packetCode: '9X7K2VBM',
+            mode: 'anonymous',
+            createdAt: '2026-01-01T00:00:00.000Z',
+          },
+        ],
+      })
+    );
+
+    expect(normalized).toEqual({
       assignment: {
         id: 'assignment_1',
         title: 'EX10 Relays',
@@ -48,7 +66,7 @@ describe('assignment repository payload normalization', () => {
         packetCount: 1,
         templateVersion: 1,
         ownerUserId: null,
-        createdAt: '2026-06-12T00:00:00.000Z',
+        createdAt: normalized.assignment.createdAt,
       },
       packets: [
         {
@@ -57,7 +75,7 @@ describe('assignment repository payload normalization', () => {
           packetCode: '9X7K2VBM',
           mode: 'anonymous',
           studentId: null,
-          createdAt: '2026-06-12T00:00:00.000Z',
+          createdAt: normalized.assignment.createdAt,
         },
       ],
       tokens: [
@@ -71,6 +89,9 @@ describe('assignment repository payload normalization', () => {
         },
       ],
     });
+    expect(normalized.assignment.createdAt).not.toBe(
+      '2026-01-01T00:00:00.000Z'
+    );
   });
 
   it('rejects invalid assignment counters before database writes', () => {

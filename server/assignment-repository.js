@@ -50,7 +50,7 @@ function mapQRToken(row) {
   };
 }
 
-function normalizeAssignment(input) {
+function normalizeAssignment(input, createdAt) {
   const assignment = input?.assignment ?? input;
   const title = String(assignment?.title || '').trim();
   const pageCount = Number(assignment?.pageCount);
@@ -94,12 +94,12 @@ function normalizeAssignment(input) {
     qrMode,
     packetCount,
     templateVersion,
-    ownerUserId: assignment.ownerUserId || null,
-    createdAt: assignment.createdAt || new Date().toISOString(),
+    ownerUserId: null,
+    createdAt,
   };
 }
 
-function normalizePacket(packet, assignmentId) {
+function normalizePacket(packet, assignmentId, createdAt) {
   if (!packet?.id || typeof packet.id !== 'string') {
     throw new AssignmentValidationError('packet.id is required');
   }
@@ -123,7 +123,7 @@ function normalizePacket(packet, assignmentId) {
     packetCode: packet.packetCode,
     mode: packet.mode,
     studentId: packet.studentId || null,
-    createdAt: packet.createdAt || new Date().toISOString(),
+    createdAt,
   };
 }
 
@@ -172,9 +172,10 @@ function normalizeQRToken(token, assignmentId) {
 }
 
 export function normalizeAssignmentPayload(input) {
-  const assignment = normalizeAssignment(input);
+  const createdAt = new Date().toISOString();
+  const assignment = normalizeAssignment(input, createdAt);
   const packets = (input?.packets || []).map((packet) =>
-    normalizePacket(packet, assignment.id)
+    normalizePacket(packet, assignment.id, createdAt)
   );
   const packetIds = new Set(packets.map((packet) => packet.id));
   const tokens = (input?.tokens || []).map((token) => {
