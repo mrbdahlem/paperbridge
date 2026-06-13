@@ -83,7 +83,7 @@ export function buildServer(options = {}) {
 
   app.addHook('onReady', async () => {
     const neonBranchGuard = getNeonBranchGuardResult({
-      env,
+      env: databaseConfigured ? env : { ...env, DATABASE_URL: '' },
       gitBranch: options.gitBranch,
     });
 

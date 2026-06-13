@@ -87,7 +87,7 @@ describe('Neon branch startup guard', () => {
     const app = buildServer({
       distDir,
       logger: false,
-      database: null,
+      database: {},
       gitBranch: 'feature/new',
       env: {
         DATABASE_URL: 'postgres://app:secret@example.neon.tech/db',
@@ -101,6 +101,35 @@ describe('Neon branch startup guard', () => {
       await expect(app.ready()).rejects.toThrow(
         /Configured Neon branch dev-feature-old does not match git branch feature\/new/u
       );
+    } finally {
+      await app.close();
+      fs.rmSync(distDir, { recursive: true, force: true });
+    }
+  });
+
+  it('skips strict guard when buildServer explicitly disables database access', async () => {
+    const distDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'scribbledpage-dist-')
+    );
+    fs.writeFileSync(
+      path.join(distDir, 'index.html'),
+      '<h1>ScribbledPage</h1>'
+    );
+
+    const app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      gitBranch: 'feature/new',
+      env: {
+        DATABASE_URL: 'postgres://app:secret@example.neon.tech/db',
+        NEON_BRANCH_NAME: 'dev-feature-old',
+        NEON_BRANCH_GUARD: 'strict',
+      },
+    });
+
+    try {
+      await expect(app.ready()).resolves.toBe(app);
     } finally {
       await app.close();
       fs.rmSync(distDir, { recursive: true, force: true });
