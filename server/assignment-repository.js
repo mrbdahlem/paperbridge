@@ -136,6 +136,8 @@ function normalizeQRToken(token, assignmentId) {
     token.templateVersion === undefined || token.templateVersion === null
       ? 1
       : Number(token.templateVersion);
+  const packetId = token.packetId ?? null;
+  const expiresAt = token.expiresAt ?? null;
 
   if (!Number.isInteger(pageNumber) || pageNumber <= 0) {
     throw new AssignmentValidationError(
@@ -152,14 +154,20 @@ function normalizeQRToken(token, assignmentId) {
       'token.assignmentId must match assignment.id'
     );
   }
+  if (packetId !== null && typeof packetId !== 'string') {
+    throw new AssignmentValidationError('token.packetId must be a string');
+  }
+  if (expiresAt !== null && typeof expiresAt !== 'string') {
+    throw new AssignmentValidationError('token.expiresAt must be a string');
+  }
 
   return {
     token: token.token,
     assignmentId: token.assignmentId || assignmentId,
     templateVersion,
-    packetId: token.packetId || null,
+    packetId,
     pageNumber,
-    expiresAt: token.expiresAt || null,
+    expiresAt,
   };
 }
 

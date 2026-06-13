@@ -146,4 +146,34 @@ describe('assignment repository payload normalization', () => {
       )
     ).toThrow(/token\.packetId/u);
   });
+
+  it('rejects invalid optional QR token field types before database writes', () => {
+    console.log('[TEST] token.packetId type validation');
+    expect(() =>
+      normalizeAssignmentPayload(
+        makePayload({
+          tokens: [
+            {
+              ...makePayload().tokens[0],
+              packetId: { id: 'packet_1' },
+            },
+          ],
+        })
+      )
+    ).toThrow(/token\.packetId/u);
+
+    console.log('[TEST] token.expiresAt type validation');
+    expect(() =>
+      normalizeAssignmentPayload(
+        makePayload({
+          tokens: [
+            {
+              ...makePayload().tokens[0],
+              expiresAt: { at: '2026-06-13T00:00:00.000Z' },
+            },
+          ],
+        })
+      )
+    ).toThrow(/token\.expiresAt/u);
+  });
 });
