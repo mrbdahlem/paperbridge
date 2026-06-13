@@ -14,19 +14,19 @@
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh ${containerWorkspaceFolder}",
   "postStartCommand": "post_start_failed=0; if ! bash .devcontainer/post-start-bootstrap.sh \"${containerWorkspaceFolder}\"; then echo 'Post-start bootstrap failed'; post_start_failed=1; fi; if ! bash .devcontainer/setup-dev.sh; then echo 'Setup script failed'; post_start_failed=1; fi; if [ $post_start_failed -ne 0 ]; then echo 'Post-start completed with warnings'; fi",
-  "forwardPorts": [5173, 4173],
+  "forwardPorts": [5173, 3000],
   "portsAttributes": {
     "5173": {
       "label": "Vite Dev Server",
       "onAutoForward": "openBrowser",
       "protocol": "http",
-      "requireLocalPort": true
+      "requireLocalPort": false
     },
-    "4173": {
+    "3000": {
       "label": "Preview Server",
       "onAutoForward": "silent",
       "protocol": "http",
-      "requireLocalPort": true
+      "requireLocalPort": false
     }
   },
   "otherPortsAttributes": {
@@ -39,7 +39,8 @@
         "terminal.integrated.env.linux": {
           "HOST": "0.0.0.0",
           "VITE_DEV_HOST": "0.0.0.0",
-          "VITE_PREVIEW_HOST": "0.0.0.0"
+          "VITE_PREVIEW_HOST": "0.0.0.0",
+          "VITE_PREVIEW_PORT": "3000"
         }
       },
       "extensions": ["dbaeumer.vscode-eslint"]

@@ -23,7 +23,7 @@ npm run dev
 ```
 
 By default, `npm run dev` serves on `http://localhost:5173` and `npm run preview` serves on `http://localhost:4173`.
-Outside devcontainers both bind to `localhost`; devcontainers set `VITE_DEV_HOST=0.0.0.0` and `VITE_PREVIEW_HOST=0.0.0.0` so forwarded ports are reachable from the host machine.
+Outside devcontainers both bind to `localhost`; devcontainers set `VITE_DEV_HOST=0.0.0.0`, `VITE_PREVIEW_HOST=0.0.0.0`, and `VITE_PREVIEW_PORT=3000` so forwarded ports are reachable from the host machine.
 Set `VITE_DEV_PORT` in your shell or `.env.development.local` if you need a different dev server port.
 Set `VITE_PREVIEW_PORT` in your shell, `.env.local`, or `.env.production.local` if you need a different preview server port.
 Dependency discovery and broad pre-bundling are disabled by default to keep local startup memory low; JSZip remains pre-bundled for the ScribbledPage assignment flow.
