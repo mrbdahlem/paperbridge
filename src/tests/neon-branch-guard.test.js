@@ -57,6 +57,26 @@ describe('Neon branch startup guard', () => {
     });
   });
 
+  it('warns when git branch cannot be determined', () => {
+    const result = getNeonBranchGuardResult({
+      env: {
+        DATABASE_URL: 'postgres://app:secret@example.neon.tech/db',
+        NEON_BRANCH_NAME: 'dev-feature-old',
+        NEON_BRANCH_GUARD: 'warn',
+      },
+      gitBranch: '',
+    });
+
+    expect(result).toMatchObject({
+      ok: false,
+      mode: 'warn',
+      skipped: false,
+      gitBranch: '',
+      expectedBranchName: '',
+      configuredBranchName: 'dev-feature-old',
+    });
+  });
+
   it('fails strict mode when NEON_BRANCH_NAME is missing', () => {
     const result = getNeonBranchGuardResult({
       env: {

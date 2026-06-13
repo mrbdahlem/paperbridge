@@ -53,9 +53,9 @@ export function getNeonBranchGuardResult({
 
   if (!currentGitBranch) {
     return {
-      ok: config.mode !== 'strict',
+      ok: false,
       mode: config.mode,
-      skipped: config.mode !== 'strict',
+      skipped: false,
       gitBranch: '',
       expectedBranchName: '',
       configuredBranchName: config.configuredBranchName,

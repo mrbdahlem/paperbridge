@@ -277,6 +277,39 @@ describe('Fastify server', () => {
     });
   });
 
+  it('returns 409 when assignment creation conflicts with existing data', async () => {
+    await app.close();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: null,
+      assignmentRepository: {
+        createAssignment: async () => {
+          console.info('[TEST] expected assignment create unique conflict');
+          const error = new Error(
+            'duplicate key value violates unique constraint'
+          );
+          error.code = '23505';
+          error.constraint = 'assignments_pkey';
+          throw error;
+        },
+      },
+    });
+    await app.ready();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/assignments',
+      payload: makeAssignmentDetail(),
+    });
+
+    expect(response.statusCode).toBe(409);
+    expect(response.json()).toEqual({
+      error: 'Assignment Conflict',
+      statusCode: 409,
+    });
+  });
+
   it('returns 500 when assignment creation fails unexpectedly', async () => {
     await app.close();
     app = buildServer({

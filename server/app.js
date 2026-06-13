@@ -59,6 +59,10 @@ function hashLogValue(value) {
   return createHash('sha256').update(String(value)).digest('hex').slice(0, 12);
 }
 
+function isUniqueViolation(error) {
+  return error?.code === '23505';
+}
+
 export function buildServer(options = {}) {
   const distDir = options.distDir ?? DEFAULT_DIST_DIR;
   const notFoundPagePath = path.join(distDir, '404.html');
@@ -267,6 +271,26 @@ export function buildServer(options = {}) {
         return reply.status(400).send({
           error: error.message,
           statusCode: 400,
+        });
+      }
+      if (isUniqueViolation(error)) {
+        request.log.warn(
+          {
+            err: {
+              code: error.code,
+              constraint: error.constraint,
+              message: error.message,
+              name: error.name,
+            },
+            operation: 'createAssignment',
+            requestId: request.id,
+          },
+          'assignment create request conflicted'
+        );
+
+        return reply.status(409).send({
+          error: 'Assignment Conflict',
+          statusCode: 409,
         });
       }
 
