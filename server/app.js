@@ -63,6 +63,10 @@ function isUniqueViolation(error) {
   return error?.code === '23505';
 }
 
+function canCreateAssignmentRepository(database) {
+  return Boolean(database && typeof database.begin === 'function');
+}
+
 export function buildServer(options = {}) {
   const distDir = options.distDir ?? DEFAULT_DIST_DIR;
   const notFoundPagePath = path.join(distDir, '404.html');
@@ -78,7 +82,8 @@ export function buildServer(options = {}) {
       ? databaseConfig.configured
       : Boolean(database);
   const assignmentRepository =
-    options.assignmentRepository === undefined && database
+    options.assignmentRepository === undefined &&
+    canCreateAssignmentRepository(database)
       ? createAssignmentRepository(database)
       : (options.assignmentRepository ?? null);
   const ownsDatabase = options.database === undefined && Boolean(database);

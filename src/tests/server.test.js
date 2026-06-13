@@ -197,6 +197,27 @@ describe('Fastify server', () => {
     });
   });
 
+  it('does not auto-enable assignment APIs for injected database stubs without transactions', async () => {
+    await app.close();
+    app = buildServer({
+      distDir,
+      logger: false,
+      database: async () => [],
+    });
+    await app.ready();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/assignments',
+    });
+
+    expect(response.statusCode).toBe(503);
+    expect(response.json()).toEqual({
+      error: 'Database Not Configured',
+      statusCode: 503,
+    });
+  });
+
   it('lists assignments through the assignment repository', async () => {
     await app.close();
     const detail = makeAssignmentDetail();
