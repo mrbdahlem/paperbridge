@@ -14,6 +14,7 @@
     "subtitle_one": "{{count}} Aufgabe",
     "subtitle_other": "{{count}} Aufgaben",
     "loadFallback": "Server-Aufgaben konnten nicht geladen werden. Lokale Aufgaben werden angezeigt.",
+    "deleteFailed": "Aufgabe konnte nicht gelöscht werden. Versuchen Sie es erneut.",
     "stats": {
       "assignments": "Aufgaben",
       "packetsGenerated": "Generierte Pakete",

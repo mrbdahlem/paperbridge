@@ -14,6 +14,7 @@
     "subtitle_one": "{{count}} tarea",
     "subtitle_other": "{{count}} tareas",
     "loadFallback": "No se pudieron cargar las tareas del servidor. Se muestran las tareas locales.",
+    "deleteFailed": "No se pudo eliminar la tarea. Inténtalo de nuevo.",
     "stats": {
       "assignments": "Tareas",
       "packetsGenerated": "Paquetes generados",

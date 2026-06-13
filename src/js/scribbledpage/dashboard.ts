@@ -172,8 +172,17 @@ async function render(): Promise<void> {
           title: assignment.title,
         });
         if (!confirm(msg)) return;
-        await removeAssignment(id);
-        await render();
+        btn.disabled = true;
+        try {
+          await removeAssignment(id);
+          await render();
+        } catch (error) {
+          console.error(error);
+          btn.disabled = false;
+          if (subtitleEl) {
+            subtitleEl.textContent = pt('dashboard.deleteFailed');
+          }
+        }
       });
     });
 }

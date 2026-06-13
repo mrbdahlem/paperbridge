@@ -14,6 +14,7 @@
     "subtitle_one": "{{count}}件の課題",
     "subtitle_other": "{{count}}件の課題",
     "loadFallback": "サーバーの課題を読み込めませんでした。ローカルの課題を表示しています。",
+    "deleteFailed": "課題を削除できませんでした。もう一度お試しください。",
     "stats": {
       "assignments": "課題数",
       "packetsGenerated": "生成済みパケット数",
