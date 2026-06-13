@@ -46,6 +46,14 @@ function getStaticCacheControl(filePath) {
   return undefined;
 }
 
+function assertValidInjectedDatabase(database) {
+  if (database && typeof database !== 'function') {
+    throw new TypeError(
+      'options.database must be a Postgres.js client function'
+    );
+  }
+}
+
 export function buildServer(options = {}) {
   const distDir = options.distDir ?? DEFAULT_DIST_DIR;
   const notFoundPagePath = path.join(distDir, '404.html');
@@ -55,6 +63,7 @@ export function buildServer(options = {}) {
     options.database === undefined
       ? createDatabaseClient({ env })
       : options.database;
+  assertValidInjectedDatabase(database);
   const databaseConfigured =
     options.database === undefined
       ? databaseConfig.configured

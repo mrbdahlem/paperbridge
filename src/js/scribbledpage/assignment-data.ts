@@ -28,6 +28,10 @@ interface AssignmentDetailResponse {
   tokens: QRToken[];
 }
 
+interface MissingAssignmentDetail {
+  missing: string;
+}
+
 interface QRTokenResponse {
   token: QRToken;
 }
@@ -137,6 +141,7 @@ export async function loadDashboardAssignments(): Promise<DashboardAssignments> 
         `/api/assignments/${encodeURIComponent(assignment.id)}`
       );
       if (detailResponse.unavailable) return null;
+      if (detailResponse.status === 404) return { missing: assignment.id };
       if (!detailResponse.ok || !detailResponse.data) {
         throw apiError('Loading assignment details', detailResponse);
       }
@@ -145,10 +150,23 @@ export async function loadDashboardAssignments(): Promise<DashboardAssignments> 
   );
 
   if (details.some((detail) => detail === null)) return fallbackDashboard();
+  const missingAssignmentIds = new Set(
+    details
+      .filter((detail): detail is MissingAssignmentDetail =>
+        Boolean(detail && 'missing' in detail)
+      )
+      .map((detail) => detail.missing)
+  );
+  const existingDetails = details.filter(
+    (detail): detail is AssignmentDetailResponse =>
+      Boolean(detail && !('missing' in detail))
+  );
 
   return {
-    assignments: listResponse.data.assignments,
-    packets: details.flatMap((detail) => detail?.packets || []),
+    assignments: listResponse.data.assignments.filter(
+      (assignment) => !missingAssignmentIds.has(assignment.id)
+    ),
+    packets: existingDetails.flatMap((detail) => detail.packets),
     durable: true,
   };
 }

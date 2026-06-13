@@ -87,7 +87,7 @@ describe('Neon branch startup guard', () => {
     const app = buildServer({
       distDir,
       logger: false,
-      database: {},
+      database: async () => [],
       gitBranch: 'feature/new',
       env: {
         DATABASE_URL: 'postgres://app:secret@example.neon.tech/db',

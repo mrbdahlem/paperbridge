@@ -129,6 +129,23 @@ describe('assignment API persistence adapter', () => {
     });
   });
 
+  it('skips assignments deleted between list and detail API responses', async () => {
+    const assignment = makeAssignment();
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(jsonResponse({ assignments: [assignment] }))
+      .mockResolvedValueOnce(
+        jsonResponse({ error: 'Assignment Not Found' }, { status: 404 })
+      );
+
+    const result = await loadDashboardAssignments();
+
+    expect(result).toEqual({
+      assignments: [],
+      packets: [],
+      durable: true,
+    });
+  });
+
   it('falls back to local dashboard data when the API route is absent', async () => {
     const assignment = makeAssignment();
     const packet = makePacket();
