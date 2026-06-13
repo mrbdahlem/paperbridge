@@ -17,7 +17,7 @@
 ## Working Rules
 
 - From the package root you can call `npm test`; all tests must pass before commit.
-- Redirect and cache test output to a temp file, then inspect or tail that file instead of streaming long test logs directly.
+- Tee and cache test output to a temp file, then inspect or tail that file instead of streaming long test logs directly.
 - Treat generated outputs (`dist`, caches, `node_modules`) as out of scope for manual edits.
 - Add or update tests for the code you change, even if nobody asked.
 - For tests that intentionally exercise failure/error paths, add explicit `[TEST]` log messages so expected noisy output is clearly distinguishable from real regressions.
@@ -27,6 +27,22 @@
 - Use structured logging for all server-side events.
 - Never expose, log, or commit secrets, API keys, or other sensitive information.
 - Plans should be iterative and include checklists of steps for the plan. Checklists must be updated as tasks are created and completed.
+
+## Neon Database Branch Workflow
+
+- Use `npm run db:branch:create` to create or refresh the local Neon database branch for the current git branch before running database-backed local work.
+- Keep `NEON_BRANCH_NAME` in `.env.local` aligned with the current git branch; do not manually point feature work at an unrelated Neon branch.
+- Leave `NEON_BRANCH_GUARD=warn` enabled for normal local work, use `NEON_BRANCH_GUARD=strict` when branch mismatch must fail startup, and use `NEON_BRANCH_GUARD=off` only with an explicit reason.
+- Never commit generated Neon connection strings, `NEON_API_KEY`, `.env.local`, or branch-specific database credentials.
+- Use `npm run db:branch:delete` when a short-lived feature branch or PR database branch is no longer needed.
+
+## Database Migration Workflow
+
+- Put schema changes in ordered SQL files under `server/migrations/`.
+- Run migrations with `npm run db:migrate` using `DATABASE_MIGRATION_URL`; never use the pooled runtime `DATABASE_URL` for migrations.
+- Treat applied migrations as immutable; add a new migration instead of editing a migration that may have run in a shared or production database.
+- Keep migrations backward compatible with the currently deployed app because production migrations run on `push` to `main` and may complete before Render finishes deploying the new app.
+- Keep `.github/workflows/production-migrations.yml`, `DEPLOYMENT.md`, `README.md`, `ARCHITECTURE.md`, `.env.example`, and `.agents/knowledge/deployment-notes.md` aligned when changing migration behavior.
 
 ## Configuration and Documentation Alignment
 

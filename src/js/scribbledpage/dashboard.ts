@@ -1,4 +1,14 @@
-import { getAssignments, getPackets, deleteAssignment } from './store.js';
+import {
+  type DashboardAssignments,
+  loadDashboardAssignments,
+  removeAssignment,
+} from './assignment-data.js';
+import {
+  getAssignments,
+  getPackets,
+  type Assignment,
+  type Packet,
+} from './store.js';
 import { initScribbledPageI18n, pt } from './scribbledpage-i18n.js';
 import { mountThemeToggle } from './theme.js';
 
@@ -26,9 +36,9 @@ function modeBadge(mode: string): string {
 }
 
 function renderAssignmentCard(
-  assignment: ReturnType<typeof getAssignments>[number]
+  assignment: Assignment,
+  packets: Packet[]
 ): string {
-  const packets = getPackets(assignment.id);
   const accentClass =
     assignment.qrMode === 'generic' ? 'pb-assignment-card--generic' : '';
   const label = assignment.classLabel
@@ -40,6 +50,7 @@ function renderAssignmentCard(
   const createdText = pt('dashboard.card.created', {
     date: formatDate(assignment.createdAt),
   });
+  const assignmentId = escHtml(assignment.id);
   const deleteTitle = escHtml(pt('dashboard.card.delete'));
   const downloadLabel = escHtml(pt('dashboard.card.downloadPackets'));
 
@@ -69,7 +80,7 @@ function renderAssignmentCard(
             ${downloadLabel}
           </a>
           <button
-            data-delete="${assignment.id}"
+            data-delete="${assignmentId}"
             class="pb-btn pb-btn-danger"
             style="padding:.3rem .5rem"
             title="${deleteTitle}"
@@ -87,11 +98,31 @@ function renderAssignmentCard(
   `;
 }
 
-function render(): void {
-  const assignments = getAssignments().sort(
+async function render(): Promise<void> {
+  let loadFailed: boolean;
+  let data: DashboardAssignments;
+  try {
+    data = await loadDashboardAssignments();
+    loadFailed = !data.durable;
+  } catch (error) {
+    console.error(error);
+    loadFailed = true;
+    data = {
+      assignments: getAssignments(),
+      packets: getPackets(),
+      durable: false,
+    };
+  }
+  const assignments = data.assignments.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
-  const allPackets = getPackets();
+  const allPackets = data.packets;
+  const packetsByAssignment = new Map<string, Packet[]>();
+  for (const packet of allPackets) {
+    const packets = packetsByAssignment.get(packet.assignmentId) || [];
+    packets.push(packet);
+    packetsByAssignment.set(packet.assignmentId, packets);
+  }
 
   const emptyEl = document.getElementById('pb-empty')!;
   const dashboardEl = document.getElementById('pb-dashboard')!;
@@ -110,21 +141,30 @@ function render(): void {
   dashboardEl.style.display = '';
 
   if (subtitleEl) {
-    subtitleEl.textContent = pt('dashboard.subtitle', {
-      count: assignments.length,
-    });
+    subtitleEl.textContent = loadFailed
+      ? pt('dashboard.loadFallback')
+      : pt('dashboard.subtitle', {
+          count: assignments.length,
+        });
   }
   if (statAssignments) statAssignments.textContent = String(assignments.length);
   if (statPackets) statPackets.textContent = String(allPackets.length);
 
   // Assignment fields are escaped in renderAssignmentCard before interpolation.
   // eslint-disable-next-line no-unsanitized/property
-  listEl.innerHTML = assignments.map(renderAssignmentCard).join('');
+  listEl.innerHTML = assignments
+    .map((assignment) =>
+      renderAssignmentCard(
+        assignment,
+        packetsByAssignment.get(assignment.id) || []
+      )
+    )
+    .join('');
 
   listEl
     .querySelectorAll<HTMLButtonElement>('button[data-delete]')
     .forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.dataset.delete!;
         const assignment = assignments.find((a) => a.id === id);
         if (!assignment) return;
@@ -132,8 +172,17 @@ function render(): void {
           title: assignment.title,
         });
         if (!confirm(msg)) return;
-        deleteAssignment(id);
-        render();
+        btn.disabled = true;
+        try {
+          await removeAssignment(id);
+          await render();
+        } catch (error) {
+          console.error(error);
+          btn.disabled = false;
+          if (subtitleEl) {
+            subtitleEl.textContent = pt('dashboard.deleteFailed');
+          }
+        }
       });
     });
 }
@@ -155,5 +204,5 @@ function mountMobileMenu(): void {
   await initScribbledPageI18n();
   mountThemeToggle();
   mountMobileMenu();
-  render();
+  await render();
 })();

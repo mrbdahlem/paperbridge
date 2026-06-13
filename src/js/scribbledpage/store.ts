@@ -6,6 +6,9 @@ export interface Assignment {
   qrMode: 'generic' | 'anonymous';
   packetCount: number;
   createdAt: string;
+  ownerUserId?: string | null;
+  templateVersion?: number;
+  updatedAt?: string;
 }
 
 export interface Packet {
@@ -14,6 +17,7 @@ export interface Packet {
   packetCode: string;
   mode: 'anonymous' | 'generic';
   createdAt: string;
+  studentId?: string | null;
 }
 
 export interface QRToken {
@@ -22,6 +26,8 @@ export interface QRToken {
   templateVersion: number;
   packetId: string | null;
   pageNumber: number;
+  createdAt?: string;
+  expiresAt?: string | null;
 }
 
 const KEYS = {
