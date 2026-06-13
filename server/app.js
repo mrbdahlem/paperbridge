@@ -171,10 +171,31 @@ export function buildServer(options = {}) {
     return body;
   });
 
-  function requireAssignmentRepository(reply) {
+  function logApiFallback(request, message, extra = {}) {
+    request.log.warn(
+      {
+        appState: {
+          databaseConfigured,
+          assignmentRepositoryConfigured: Boolean(app.assignmentRepository),
+        },
+        method: request.method,
+        requestId: request.id,
+        route: request.routeOptions.url,
+        url: request.url,
+        ...extra,
+      },
+      message
+    );
+  }
+
+  function requireAssignmentRepository(request, reply) {
     if (app.assignmentRepository) {
       return app.assignmentRepository;
     }
+
+    logApiFallback(request, 'Assignment repository unavailable', {
+      statusCode: 503,
+    });
 
     reply.status(503).send({
       error: 'Database Not Configured',
@@ -183,8 +204,8 @@ export function buildServer(options = {}) {
     return null;
   }
 
-  app.get('/api/assignments', async (_request, reply) => {
-    const repository = requireAssignmentRepository(reply);
+  app.get('/api/assignments', async (request, reply) => {
+    const repository = requireAssignmentRepository(request, reply);
     if (!repository) return undefined;
 
     const assignments = await repository.listAssignments();
@@ -192,7 +213,7 @@ export function buildServer(options = {}) {
   });
 
   app.post('/api/assignments', async (request, reply) => {
-    const repository = requireAssignmentRepository(reply);
+    const repository = requireAssignmentRepository(request, reply);
     if (!repository) return undefined;
 
     try {
@@ -250,11 +271,16 @@ export function buildServer(options = {}) {
   });
 
   app.get('/api/assignments/:id', async (request, reply) => {
-    const repository = requireAssignmentRepository(reply);
+    const repository = requireAssignmentRepository(request, reply);
     if (!repository) return undefined;
 
     const result = await repository.getAssignment(request.params.id);
     if (!result) {
+      logApiFallback(request, 'Assignment not found', {
+        assignmentId: request.params.id,
+        statusCode: 404,
+      });
+
       return reply.status(404).send({
         error: 'Assignment Not Found',
         statusCode: 404,
@@ -265,7 +291,7 @@ export function buildServer(options = {}) {
   });
 
   app.delete('/api/assignments/:id', async (request, reply) => {
-    const repository = requireAssignmentRepository(reply);
+    const repository = requireAssignmentRepository(request, reply);
     if (!repository) return undefined;
 
     const deleted = await repository.deleteAssignment(request.params.id);
@@ -280,6 +306,11 @@ export function buildServer(options = {}) {
     );
 
     if (!deleted) {
+      logApiFallback(request, 'Assignment not found', {
+        assignmentId: request.params.id,
+        statusCode: 404,
+      });
+
       return reply.status(404).send({
         error: 'Assignment Not Found',
         statusCode: 404,
@@ -290,11 +321,16 @@ export function buildServer(options = {}) {
   });
 
   app.get('/api/qr-tokens/:token', async (request, reply) => {
-    const repository = requireAssignmentRepository(reply);
+    const repository = requireAssignmentRepository(request, reply);
     if (!repository) return undefined;
 
     const token = await repository.resolveQRToken(request.params.token);
     if (!token) {
+      logApiFallback(request, 'QR token not found', {
+        statusCode: 404,
+        token: request.params.token,
+      });
+
       return reply.status(404).send({
         error: 'QR Token Not Found',
         statusCode: 404,
