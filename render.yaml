@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: scribbledpage
+    runtime: node
+    buildCommand: HUSKY=0 npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: '24'
+      - key: LOG_LEVEL
+        value: info
+      - key: SITE_URL
+        value: https://scribbled.page
+      - key: VITE_QR_BASE_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false

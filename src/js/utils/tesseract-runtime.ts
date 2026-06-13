@@ -10,12 +10,12 @@ const TESSERACT_ENV_KEYS = [
   'VITE_TESSERACT_LANG_URL',
 ] as const;
 
-const TESSERACT_RUNTIME_ENV_KEYS = [
+const _TESSERACT_RUNTIME_ENV_KEYS = [
   ...TESSERACT_ENV_KEYS,
   TESSERACT_AVAILABLE_LANGUAGES_ENV_KEY,
 ] as const;
 
-type TesseractRuntimeEnvKey = (typeof TESSERACT_RUNTIME_ENV_KEYS)[number];
+type TesseractRuntimeEnvKey = (typeof _TESSERACT_RUNTIME_ENV_KEYS)[number];
 
 export type TesseractAssetEnv = Partial<
   Pick<ImportMetaEnv, TesseractRuntimeEnvKey>

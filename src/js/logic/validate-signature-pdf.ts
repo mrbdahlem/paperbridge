@@ -223,7 +223,7 @@ export async function validateSignature(
     }
 
     if (signature.byteRange && signature.byteRange.length === 4) {
-      const [, len1, start2, len2] = signature.byteRange;
+      const [, , start2, len2] = signature.byteRange;
       const expectedEnd = start2 + len2;
 
       if (expectedEnd === pdfBytes.length) {

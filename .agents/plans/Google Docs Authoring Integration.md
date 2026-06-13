@@ -2,19 +2,19 @@
 
 ## **Purpose**
 
-Let teachers create assignments in Google Docs, add a PaperBridge QR marker, and either print directly for simple routing or send the document through PaperBridge to generate PDFs with per page and per packet QR codes.
+Let teachers create assignments in Google Docs, add a ScribbledPage QR marker, and either print directly for simple routing or send the document through ScribbledPage to generate PDFs with per page and per packet QR codes.
 
 ## **Core rule**
 
 Google Docs direct printing does not create per page QR codes.
 
-The header repeats the same QR on every page, so direct printing can only identify the assignment or document copy. Per page codes only exist after PaperBridge processes the exported PDF.
+The header repeats the same QR on every page, so direct printing can only identify the assignment or document copy. Per page codes only exist after ScribbledPage processes the exported PDF.
 
-Google Docs copies also cannot carry reliable per page QR codes. A copied Doc can be linked to an assignment or packet, but the page number must be generated later by PaperBridge when it exports the Doc to PDF and replaces the repeated placeholder QR on each exported page.
+Google Docs copies also cannot carry reliable per page QR codes. A copied Doc can be linked to an assignment or packet, but the page number must be generated later by ScribbledPage when it exports the Doc to PDF and replaces the repeated placeholder QR on each exported page.
 
 ## **QR marker**
 
-PaperBridge inserts a QR code into the Google Docs header.
+ScribbledPage inserts a QR code into the Google Docs header.
 
 The QR is a real URL, such as:
 
@@ -24,7 +24,7 @@ https://bits.mycode.run/d/abc123
 
 The QR appears on every page because it is in the header. The teacher can move it within the header.
 
-The QR also acts as a location marker. When PaperBridge generates a PDF, it finds the placeholder QR on each exported page and covers it with a generated QR code.
+The QR also acts as a location marker. When ScribbledPage generates a PDF, it finds the placeholder QR on each exported page and covers it with a generated QR code.
 
 ## **Metadata**
 
@@ -34,7 +34,7 @@ Extra metadata can be stored in image alt text when possible:
 
 ```
 {
- "paperBridge": true,
+ "scribbledPage": true,
  "assignmentId": "assign_abc123",
  "markerVersion": 1
 }
@@ -52,17 +52,17 @@ Do not rely on Google exposing “this Doc was copied from that Doc.” Instead,
 
 When the add-on opens or validates a Google Doc, compare the current Google document ID with the document ID registered for the marker's `assignmentId`.
 
-If the marker's assignment exists but the current document ID does not match the registered assignment document ID, treat the Doc as a copied or shared derivative. This can happen when the original instructor makes a personal copy, shares a copy with a colleague, or a colleague opens a copied assignment with their own PaperBridge account.
+If the marker's assignment exists but the current document ID does not match the registered assignment document ID, treat the Doc as a copied or shared derivative. This can happen when the original instructor makes a personal copy, shares a copy with a colleague, or a colleague opens a copied assignment with their own ScribbledPage account.
 
 Before changing any assignment linkage, ask the signed-in instructor what to do:
 
 ```
-This Google Doc contains a PaperBridge marker for an existing assignment, but this Doc is a different copy.
+This Google Doc contains a ScribbledPage marker for an existing assignment, but this Doc is a different copy.
 
-Create a new PaperBridge assignment from this copy?
+Create a new ScribbledPage assignment from this copy?
 ```
 
-Primary action: create a new assignment on PaperBridge, bind it to the current Google document ID, and replace the copied marker with a marker for the new `assignmentId`.
+Primary action: create a new assignment on ScribbledPage, bind it to the current Google document ID, and replace the copied marker with a marker for the new `assignmentId`.
 
 Secondary action: keep linked to the existing assignment only when the instructor has permission to use that assignment and explicitly chooses to relink this document copy.
 
@@ -84,15 +84,15 @@ Limitations: no page sorting, no packet grouping, no automatic student identity.
 
 If a student receives a copied Google Doc, the copied marker can identify the assignment. The add-on may combine that marker with the current Google Doc ID to register a document copy.
 
-If PaperBridge treats the student copy as a packet, the marker may be refreshed to identify the assignment and packet. It still must not claim page identity inside Google Docs because the same header marker appears on every page.
+If ScribbledPage treats the student copy as a packet, the marker may be refreshed to identify the assignment and packet. It still must not claim page identity inside Google Docs because the same header marker appears on every page.
 
 Good for: absent students printing at home.
 
 Limitations: no per page codes. Pages must be submitted in order or reviewed manually.
 
-### **PaperBridge generic PDF**
+### **ScribbledPage generic PDF**
 
-Teacher sends the Doc through PaperBridge. PaperBridge replaces the repeated placeholder with per page QR codes.
+Teacher sends the Doc through ScribbledPage. ScribbledPage replaces the repeated placeholder with per page QR codes.
 
 QR identifies:
 
@@ -105,9 +105,9 @@ QR identifies:
 
 Good for: page completeness and ordering when packet identity is not needed.
 
-### **PaperBridge anonymous packets**
+### **ScribbledPage anonymous packets**
 
-Teacher requests multiple packet copies. PaperBridge generates unique packet IDs and per page QR codes.
+Teacher requests multiple packet copies. ScribbledPage generates unique packet IDs and per page QR codes.
 
 QR identifies:
 
@@ -128,7 +128,7 @@ Same as anonymous packets, but tied to rostered students and optionally printed 
 ## **Google Docs menu**
 
 ```
-PaperBridge
+ScribbledPage
  Insert or Refresh QR Marker
  Validate QR Marker
  Build Generic PDF
@@ -151,9 +151,9 @@ Teacher packet build:
 Create Doc.
 Insert QR marker.
 Choose Build Anonymous Packets.
-PaperBridge exports Doc as PDF.
-PaperBridge finds the placeholder QR on each page.
-PaperBridge replaces it with packet and page specific QR codes.
+ScribbledPage exports Doc as PDF.
+ScribbledPage finds the placeholder QR on each page.
+ScribbledPage replaces it with packet and page specific QR codes.
 Teacher prints the generated packet PDF.
 
 Student copy print:
@@ -161,28 +161,28 @@ Student copy print:
 Student opens copied Doc.
 Marker identifies assignment.
 Add-on may register current Doc ID as a document copy or student packet.
-If a packet is created, PaperBridge refreshes the copied marker with assignment and packet identity only.
+If a packet is created, ScribbledPage refreshes the copied marker with assignment and packet identity only.
 Student prints, completes, then submits pages in order.
 
 Student copy PDF build:
 
 Student or instructor opens a registered student Doc copy.
-PaperBridge exports the Doc to PDF.
-PaperBridge finds the repeated assignment or packet placeholder QR on each page.
-PaperBridge replaces each placeholder with a generated QR that adds the page number.
+ScribbledPage exports the Doc to PDF.
+ScribbledPage finds the repeated assignment or packet placeholder QR on each page.
+ScribbledPage replaces each placeholder with a generated QR that adds the page number.
 The generated PDF can then support assignment, packet, and page recovery.
 
 Instructor copy or colleague handoff:
 
 Instructor opens a copied Doc whose marker points to an existing assignment.
 Add-on detects that the current Google document ID differs from the assignment's registered document ID.
-PaperBridge asks whether to create a new assignment from this copy.
-If confirmed, PaperBridge creates the new assignment and refreshes the marker.
-If canceled, PaperBridge leaves the copied marker untouched.
+ScribbledPage asks whether to create a new assignment from this copy.
+If confirmed, ScribbledPage creates the new assignment and refreshes the marker.
+If canceled, ScribbledPage leaves the copied marker untouched.
 
 ## **Validation**
 
-PaperBridge should check:
+ScribbledPage should check:
 
 QR marker exists.
 QR marker is detectable after PDF export.

@@ -1,12 +1,12 @@
-# PaperBridge Project Workflow
+# ScribbledPage Project Workflow
 
 This repository uses a lightweight project workflow. There is no separate external agreement process.
 
 ## Repository Setup
 
 ```bash
-git clone https://github.com/mrbdahlem/paperbridge.git
-cd paperbridge
+git clone https://github.com/mrbdahlem/scribbledpage.git
+cd scribbledpage
 npm install
 npm run dev
 ```
@@ -15,8 +15,9 @@ npm run dev
 
 Run the narrowest validation path that matches your change:
 
-- `npm run ci:paperbridge` for PaperBridge-specific work
+- `npm run ci:scribbledpage` for ScribbledPage-specific work
 - `npm run ci:tools` for the bundled PDF tools surface
+- `npm run ci -w @scribbledpage/app` or `npm run ci -w @scribbledpage/tools` for direct workspace checks
 - `npm test -- --run` for the full repository gate
 
 If you changed shared code or shared docs, prefer the full test suite plus the most relevant scoped CI script.

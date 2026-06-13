@@ -1,22 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
+import { getI18nBuildLanguages } from './i18n-language-config.mjs';
+import { getSiteUrl } from './site-url-config.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DIST_DIR = path.resolve(__dirname, '../dist');
 const LOCALES_DIR = path.resolve(__dirname, '../public/locales');
-const SITE_URL = (process.env.SITE_URL || 'https://www.bentopdf.com').replace(
-  /\/+$/,
-  ''
-);
+const SITE_URL = getSiteUrl();
 const BASE_PATH = (process.env.BASE_URL || '/').replace(/\/$/, '');
 
-const languages = fs.readdirSync(LOCALES_DIR).filter((file) => {
-  return fs.statSync(path.join(LOCALES_DIR, file)).isDirectory();
-});
+const languages = getI18nBuildLanguages(LOCALES_DIR);
 
 const toCamelCase = (str) => {
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
@@ -84,7 +81,7 @@ function injectOrganizationLd(document) {
     url: SITE_URL,
     logo: `${SITE_URL}/images/favicon.svg`,
     sameAs: [
-      'https://github.com/mrbdahlem/paperbridge',
+      'https://github.com/mrbdahlem/scribbledpage',
       'https://x.com/BentoPDF',
       'https://www.linkedin.com/company/bentopdf/',
       'https://www.instagram.com/thebentopdf/',
@@ -165,7 +162,7 @@ function resolveToolName(translationKey, langTools) {
   return enEntry && enEntry.name ? enEntry.name : null;
 }
 
-function processFileForLanguage(
+export function processFileForLanguage(
   originalContent,
   file,
   lang,
@@ -303,6 +300,7 @@ function processFileForLanguage(
 
   dom.window.close();
 
+  fs.mkdirSync(langDir, { recursive: true });
   fs.writeFileSync(path.join(langDir, file), result);
 }
 
@@ -424,7 +422,9 @@ async function generateI18nPages() {
   console.log('✅ i18n pages generated successfully!');
 }
 
-generateI18nPages().catch((err) => {
-  console.error('❌ i18n page generation failed:', err);
-  process.exit(1);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  generateI18nPages().catch((err) => {
+    console.error('❌ i18n page generation failed:', err);
+    process.exit(1);
+  });
+}

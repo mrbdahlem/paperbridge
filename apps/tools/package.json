@@ -1,0 +1,13 @@
+{
+  "name": "@scribbledpage/tools",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "lint": "cd ../.. && eslint . --ignore-pattern src/js/scribbledpage/** --ignore-pattern src/tests/scribbledpage-*.test.ts",
+    "typecheck": "tsc -p ../../tsconfig.tools.json --noEmit",
+    "test": "cd ../.. && vitest run --config vitest.tools.config.ts",
+    "build": "npm run typecheck && cd ../.. && BUILD_TARGET=tools vite build",
+    "ci": "npm run lint && npm run typecheck && npm run test && npm run build"
+  }
+}

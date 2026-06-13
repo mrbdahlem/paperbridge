@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "Setting up PaperBridge development environment..."
+echo "Setting up ScribbledPage development environment..."
 
 post_create_mode=0
 for _arg in "$@"; do

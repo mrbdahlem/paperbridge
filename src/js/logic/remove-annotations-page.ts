@@ -26,7 +26,7 @@ function hideLoader() {
 function showAlert(
   title: string,
   message: string,
-  type: string = 'error',
+  _type: string = 'error',
   callback?: () => void
 ) {
   const modal = document.getElementById('alert-modal');

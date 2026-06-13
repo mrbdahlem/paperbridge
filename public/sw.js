@@ -173,7 +173,7 @@ async function cacheFirstStrategyWithDedup(request, isCDN) {
             }
             return fallbackResponse;
           }
-        } catch (fallbackError) {
+        } catch (_fallbackError) {
           console.error(
             '[ServiceWorker] Both CDN and local failed for:',
             fileName
@@ -341,7 +341,7 @@ self.addEventListener('message', (event) => {
       if (sourceOrigin !== self.location.origin) {
         return;
       }
-    } catch (e) {
+    } catch (_e) {
       return;
     }
   }

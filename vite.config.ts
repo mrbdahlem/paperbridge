@@ -3,7 +3,7 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import http from 'http';
 import https from 'https';
 import { loadEnv } from 'vite';
-import type { Connect, Plugin, ViteDevServer } from 'vite';
+import type { Connect, Plugin, UserConfig, ViteDevServer } from 'vite';
 // import basicSsl from '@vitejs/plugin-basic-ssl';
 import tailwindcss from '@tailwindcss/vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
@@ -14,28 +14,7 @@ import { resolve } from 'path';
 import fs from 'fs';
 import { constants as zlibConstants } from 'zlib';
 
-const SUPPORTED_LANGUAGES = [
-  'en',
-  'ar',
-  'be',
-  'da',
-  'ru',
-  'de',
-  'es',
-  'fr',
-  'id',
-  'it',
-  'nl',
-  'pt',
-  'sv',
-  'tr',
-  'vi',
-  'zh',
-  'zh-TW',
-  'ko',
-  'ja',
-  'uk',
-] as const;
+const SUPPORTED_LANGUAGES = ['en', 'de', 'es', 'fr', 'ja', 'pt'] as const;
 const LANG_REGEX = new RegExp(
   `^/(${SUPPORTED_LANGUAGES.join('|')})(?:/(.*))?$`
 );
@@ -73,17 +52,20 @@ function loadPages(): Set<string> {
 }
 
 const PAGES = loadPages();
-const PAPERBRIDGE_INPUT_NAMES = new Set(['main', 'create-assignment']);
+const SCRIBBLEDPAGE_INPUT_NAMES = new Set(['main', 'create-assignment']);
+const DEFAULT_DEV_HOST = 'localhost';
+const DEFAULT_PREVIEW_HOST = 'localhost';
+type ViteConfigFragment = Omit<UserConfig, 'plugins'> | null | void;
 
 function selectBuildInputs(
   inputs: Record<string, string>
 ): Record<string, string> {
   const target = process.env.BUILD_TARGET ?? 'all';
 
-  if (target === 'paperbridge') {
+  if (target === 'scribbledpage') {
     return Object.fromEntries(
       Object.entries(inputs).filter(([name]) =>
-        PAPERBRIDGE_INPUT_NAMES.has(name)
+        SCRIBBLEDPAGE_INPUT_NAMES.has(name)
       )
     );
   }
@@ -91,7 +73,7 @@ function selectBuildInputs(
   if (target === 'tools') {
     return Object.fromEntries(
       Object.entries(inputs).filter(
-        ([name]) => !PAPERBRIDGE_INPUT_NAMES.has(name)
+        ([name]) => !SCRIBBLEDPAGE_INPUT_NAMES.has(name)
       )
     );
   }
@@ -105,6 +87,78 @@ function applyModeEnv(mode: string): void {
   for (const [key, value] of Object.entries(env)) {
     process.env[key] ??= value;
   }
+}
+
+function parseConfiguredPort(envName: string, fallback: number): number {
+  const rawValue = process.env[envName]?.trim();
+
+  if (!rawValue) {
+    return fallback;
+  }
+
+  const port = Number(rawValue);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error(
+      `[vite] ${envName} must be an integer between 1 and 65535. Received: ${rawValue}`
+    );
+  }
+
+  return port;
+}
+
+function stripNoopBuildEsbuildConfig(
+  config: ViteConfigFragment
+): ViteConfigFragment {
+  if (!config || !('esbuild' in config)) return config;
+
+  // vite-plugin-node-polyfills emits a top-level esbuild config object even for
+  // production builds where its banner is undefined. Vite 8 warns about plugin
+  // esbuild config, so strip that build-only no-op while keeping aliases and
+  // Rollup polyfills intact.
+  if (!isNoopBuildEsbuildConfig(config.esbuild)) return config;
+
+  const { esbuild: _esbuild, ...rest } = config;
+  return rest;
+}
+
+function isNoopBuildEsbuildConfig(esbuild: unknown): boolean {
+  if (!esbuild || typeof esbuild !== 'object' || Array.isArray(esbuild)) {
+    return false;
+  }
+
+  const entries = Object.entries(esbuild);
+  return (
+    entries.length === 0 ||
+    entries.every(([key, value]) => key === 'banner' && value === undefined)
+  );
+}
+
+function nodePolyfillsWithoutBuildEsbuildWarning(): Plugin {
+  const plugin = nodePolyfills({
+    include: ['buffer', 'stream', 'util', 'zlib', 'process'],
+    globals: {
+      Buffer: true,
+      global: false,
+      process: true,
+    },
+  });
+  const originalConfig = plugin.config;
+
+  return {
+    ...plugin,
+    config(config, env) {
+      if (typeof originalConfig !== 'function') return undefined;
+
+      const result = originalConfig.call(this, config, env);
+      if (env.command !== 'build') return result;
+
+      if (result && typeof result === 'object' && 'then' in result) {
+        return result.then(stripNoopBuildEsbuildConfig);
+      }
+
+      return stripNoopBuildEsbuildConfig(result);
+    },
+  };
 }
 
 function getBasePath(): string {
@@ -548,6 +602,20 @@ function rewriteHtmlPathsPlugin(): Plugin {
 export default defineConfig(({ mode }) => {
   applyModeEnv(mode);
 
+  // Local port overrides:
+  // - VITE_DEV_HOST controls the Vite dev server bind host.
+  // - VITE_PREVIEW_HOST controls the Vite preview server bind host.
+  //   Both default to localhost. Devcontainers set these to 0.0.0.0 so
+  //   forwarded ports are reachable from the host machine.
+  // - VITE_DEV_PORT controls the Vite dev server port (default: 5173).
+  // - VITE_PREVIEW_PORT controls the Vite preview server port (default: 4173).
+  //   Preview is pinned to 4173 unless explicitly overridden so local preview
+  //   runs consistently on a predictable URL.
+  const devPort = parseConfiguredPort('VITE_DEV_PORT', 5173);
+  const previewPort = parseConfiguredPort('VITE_PREVIEW_PORT', 4173);
+  const enableDependencyOptimizer =
+    process.env.VITE_ENABLE_DEP_OPTIMIZER === 'true';
+
   const USE_CDN = process.env.VITE_USE_CDN === 'true';
 
   if (USE_CDN) {
@@ -572,9 +640,6 @@ export default defineConfig(({ mode }) => {
         context: {
           baseUrl: (process.env.BASE_URL || '/').replace(/\/?$/, '/'),
           simpleMode: process.env.SIMPLE_MODE === 'true',
-          brandName: process.env.VITE_BRAND_NAME || '',
-          brandLogo: process.env.VITE_BRAND_LOGO || '',
-          footerText: process.env.VITE_FOOTER_TEXT || '',
           appVersion: process.env.npm_package_version || 'Unknown',
         },
       }),
@@ -582,14 +647,7 @@ export default defineConfig(({ mode }) => {
       flattenPagesPlugin(),
       rewriteHtmlPathsPlugin(),
       tailwindcss(),
-      nodePolyfills({
-        include: ['buffer', 'stream', 'util', 'zlib', 'process'],
-        globals: {
-          Buffer: true,
-          global: false,
-          process: true,
-        },
-      }),
+      nodePolyfillsWithoutBuildEsbuildWarning(),
       viteStaticCopy({
         targets: staticCopyTargets,
       }),
@@ -617,7 +675,6 @@ export default defineConfig(({ mode }) => {
     ],
     define: {
       __SIMPLE_MODE__: JSON.stringify(process.env.SIMPLE_MODE === 'true'),
-      __BRAND_NAME__: JSON.stringify(process.env.VITE_BRAND_NAME || ''),
       __DISABLED_TOOLS__: JSON.stringify(
         (process.env.DISABLE_TOOLS || '')
           .split(',')
@@ -633,18 +690,37 @@ export default defineConfig(({ mode }) => {
         zlib: 'browserify-zlib',
       },
     },
-    optimizeDeps: {
-      include: ['pdfkit', 'blob-stream'],
-      exclude: ['coherentpdf', 'wasm-vips'],
-    },
+    optimizeDeps: enableDependencyOptimizer
+      ? {
+          entries: ['index.html', 'create-assignment.html'],
+          include: [
+            'pdfkit',
+            'blob-stream',
+            'jszip',
+            'pako',
+            'sortablejs',
+            'node-forge',
+          ],
+          exclude: ['coherentpdf', 'wasm-vips'],
+        }
+      : {
+          noDiscovery: true,
+          include: ['jszip', 'pako'],
+          exclude: ['coherentpdf', 'wasm-vips'],
+        },
     server: {
-      host: process.env.VITE_DEV_HOST || 'localhost',
+      host: process.env.VITE_DEV_HOST || DEFAULT_DEV_HOST,
+      port: devPort,
+      strictPort: true,
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'require-corp',
       },
     },
     preview: {
+      host: process.env.VITE_PREVIEW_HOST || DEFAULT_PREVIEW_HOST,
+      port: previewPort,
+      strictPort: true,
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'require-corp',

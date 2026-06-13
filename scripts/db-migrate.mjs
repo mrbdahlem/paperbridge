@@ -1,0 +1,209 @@
+#!/usr/bin/env node
+
+import { createHash } from 'node:crypto';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import postgres from 'postgres';
+import { loadServerEnv } from '../server/env-loader.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DEFAULT_MIGRATIONS_DIR = path.resolve(
+  __dirname,
+  '..',
+  'server',
+  'migrations'
+);
+const DEFAULT_MIGRATIONS_TABLE = 'schema_migrations';
+
+export function checksumSql(sql) {
+  return createHash('sha256').update(sql).digest('hex');
+}
+
+export function listMigrationFiles(migrationsDir = DEFAULT_MIGRATIONS_DIR) {
+  if (!existsSync(migrationsDir)) {
+    return [];
+  }
+
+  return readdirSync(migrationsDir)
+    .filter((fileName) => fileName.endsWith('.sql'))
+    .sort((left, right) => left.localeCompare(right))
+    .map((fileName) => {
+      const filePath = path.join(migrationsDir, fileName);
+      const sql = readFileSync(filePath, 'utf8');
+
+      return {
+        id: fileName.replace(/\.sql$/u, ''),
+        fileName,
+        filePath,
+        sql,
+        checksum: checksumSql(sql),
+      };
+    });
+}
+
+export function readMigrationConfig(env = process.env) {
+  return {
+    databaseUrl: env.DATABASE_MIGRATION_URL?.trim() || '',
+    runtimeRoleName: roleNameFromDatabaseUrl(env.DATABASE_URL),
+    migrationsDir: env.DATABASE_MIGRATIONS_DIR
+      ? path.resolve(env.DATABASE_MIGRATIONS_DIR)
+      : DEFAULT_MIGRATIONS_DIR,
+    migrationsTable:
+      env.DATABASE_MIGRATIONS_TABLE?.trim() || DEFAULT_MIGRATIONS_TABLE,
+  };
+}
+
+export function roleNameFromDatabaseUrl(databaseUrl) {
+  if (!databaseUrl) {
+    return '';
+  }
+
+  try {
+    return decodeURIComponent(new URL(databaseUrl).username);
+  } catch {
+    return '';
+  }
+}
+
+export function assertSafeIdentifier(identifier, label) {
+  if (!/^[a-z_][a-z0-9_]*$/u.test(identifier)) {
+    throw new Error(`${label} must be a safe Postgres identifier`);
+  }
+}
+
+export function buildMigrationPlan(migrations, appliedRows) {
+  const applied = new Map(
+    appliedRows.map((row) => [
+      row.id,
+      {
+        checksum: row.checksum,
+        executedAt: row.executed_at,
+      },
+    ])
+  );
+  const pending = [];
+
+  for (const migration of migrations) {
+    const appliedMigration = applied.get(migration.id);
+
+    if (!appliedMigration) {
+      pending.push(migration);
+      continue;
+    }
+
+    if (appliedMigration.checksum !== migration.checksum) {
+      throw new Error(
+        `Migration checksum changed for ${migration.fileName}. Create a new migration instead of editing an applied migration.`
+      );
+    }
+  }
+
+  return pending;
+}
+
+export async function runMigrations({
+  databaseUrl,
+  runtimeRoleName = '',
+  migrationsDir = DEFAULT_MIGRATIONS_DIR,
+  migrationsTable = DEFAULT_MIGRATIONS_TABLE,
+  logger = console,
+} = {}) {
+  if (!databaseUrl) {
+    throw new Error(
+      'Missing required environment variable: DATABASE_MIGRATION_URL'
+    );
+  }
+
+  assertSafeIdentifier(migrationsTable, 'DATABASE_MIGRATIONS_TABLE');
+
+  const migrations = listMigrationFiles(migrationsDir);
+  const sql = postgres(databaseUrl, {
+    max: 1,
+    idle_timeout: 5,
+    connect_timeout: 10,
+  });
+
+  try {
+    await sql`
+      create table if not exists ${sql(migrationsTable)} (
+        id text primary key,
+        file_name text not null,
+        checksum text not null,
+        executed_at timestamptz not null default now()
+      )
+    `;
+
+    const appliedRows = await sql`
+      select id, checksum, executed_at
+      from ${sql(migrationsTable)}
+      order by id asc
+    `;
+    const pending = buildMigrationPlan(migrations, appliedRows);
+
+    if (pending.length === 0) {
+      await grantRuntimePrivileges(sql, runtimeRoleName);
+      logger.info('No pending database migrations');
+      return { applied: 0, pending: 0 };
+    }
+
+    const appliedCount = pending.length;
+
+    for (const migration of pending) {
+      logger.info(`Applying database migration ${migration.fileName}`);
+      await sql.begin(async (transaction) => {
+        await transaction.unsafe(migration.sql);
+        await transaction`
+          insert into ${transaction(migrationsTable)}
+            (id, file_name, checksum)
+          values
+            (${migration.id}, ${migration.fileName}, ${migration.checksum})
+        `;
+      });
+    }
+
+    await grantRuntimePrivileges(sql, runtimeRoleName);
+    logger.info(`Applied ${appliedCount} database migration(s)`);
+    return { applied: appliedCount, pending: 0 };
+  } finally {
+    await sql.end({ timeout: 5 });
+  }
+}
+
+async function grantRuntimePrivileges(sql, runtimeRoleName) {
+  if (!runtimeRoleName) {
+    return;
+  }
+
+  assertSafeIdentifier(runtimeRoleName, 'DATABASE_URL role name');
+
+  await sql`grant usage on schema public to ${sql(runtimeRoleName)}`;
+  await sql`
+    grant select, insert, update, delete
+    on table assignments, packets, qr_tokens
+    to ${sql(runtimeRoleName)}
+  `;
+}
+
+async function main(env = process.env) {
+  const config = readMigrationConfig(loadServerEnv({ env }));
+  await runMigrations(config);
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error(formatMigrationError(error));
+    process.exitCode = 1;
+  });
+}
+
+function formatMigrationError(error) {
+  const message = error?.message || String(error);
+
+  if (/permission denied for schema/i.test(message)) {
+    return `${message}
+Migration role is missing schema DDL privileges. Grant CREATE on the target schema to the role in DATABASE_MIGRATION_URL, or replace DATABASE_MIGRATION_URL with a Neon owner-role connection string.`;
+  }
+
+  return message;
+}

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PaperBridge</title>
+    <title>ScribbledPage</title>
     <meta
       name="description"
       content="Turn printable PDF assignments into trackable, scannable, digitally organized student submissions."
@@ -37,7 +37,7 @@
     </script>
 
     <link href="src/css/styles.css" rel="stylesheet" />
-    <link href="src/css/paperbridge.css" rel="stylesheet" />
+    <link href="src/css/scribbledpage.css" rel="stylesheet" />
   </head>
 
   <body class="pb-page">
@@ -45,61 +45,33 @@
     <nav class="pb-nav">
       <div class="pb-nav-inner">
         <a href="index.html" class="pb-logo">
-          <div class="pb-logo-mark" aria-hidden="true">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="2"
-                y="4"
-                width="10"
-                height="10"
-                rx="1.5"
-                fill="white"
-                opacity=".9"
-              />
-              <rect
-                x="4"
-                y="2"
-                width="10"
-                height="10"
-                rx="1.5"
-                fill="white"
-                opacity=".5"
-              />
-              <path
-                d="M5 9 Q8 6 11 9"
-                stroke="white"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                fill="none"
-              />
-            </svg>
-          </div>
-          <span class="pb-logo-text">PaperBridge</span>
+          <img
+            src="/images/sp-icon.svg"
+            width="32"
+            height="32"
+            aria-hidden="true"
+            style="flex-shrink: 0"
+          />
+          <span class="pb-logo-text">ScribbledPage</span>
         </a>
 
         <nav class="pb-nav-links" aria-label="Primary navigation">
           <a
             href="index.html"
             class="pb-nav-link pb-nav-link--active"
-            data-i18n="paperbridge:nav.dashboard"
+            data-i18n="scribbledpage:nav.dashboard"
             >Dashboard</a
           >
           <a
             href="create-assignment.html"
             class="pb-nav-link"
-            data-i18n="paperbridge:nav.newAssignment"
+            data-i18n="scribbledpage:nav.newAssignment"
             >New Assignment</a
           >
           <a
             href="tools.html"
             class="pb-nav-link"
-            data-i18n="paperbridge:nav.pdfTools"
+            data-i18n="scribbledpage:nav.pdfTools"
             >PDF Tools</a
           >
         </nav>
@@ -151,7 +123,7 @@
             class="pb-theme-btn"
             style="display: none"
             aria-label="Open menu"
-            data-i18n-title="paperbridge:nav.menuOpen"
+            data-i18n-title="scribbledpage:nav.menuOpen"
           >
             <svg
               width="16"
@@ -173,19 +145,19 @@
         <a
           href="index.html"
           class="pb-mobile-link pb-mobile-link--active"
-          data-i18n="paperbridge:nav.dashboard"
+          data-i18n="scribbledpage:nav.dashboard"
           >Dashboard</a
         >
         <a
           href="create-assignment.html"
           class="pb-mobile-link"
-          data-i18n="paperbridge:nav.newAssignment"
+          data-i18n="scribbledpage:nav.newAssignment"
           >New Assignment</a
         >
         <a
           href="tools.html"
           class="pb-mobile-link"
-          data-i18n="paperbridge:nav.pdfTools"
+          data-i18n="scribbledpage:nav.pdfTools"
           >PDF Tools</a
         >
       </div>
@@ -195,121 +167,14 @@
       <!-- ── Empty state ── -->
       <div id="pb-empty" class="pb-empty" style="display: none">
         <div class="pb-empty-icon" aria-hidden="true">
-          <!-- Stacked pages + arc illustration -->
-          <svg
-            width="72"
-            height="72"
-            viewBox="0 0 72 72"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="16"
-              y="22"
-              width="34"
-              height="42"
-              rx="3"
-              fill="var(--pb-primary-subtle)"
-              stroke="var(--pb-primary-muted)"
-              stroke-width="1.5"
-            />
-            <rect
-              x="12"
-              y="18"
-              width="34"
-              height="42"
-              rx="3"
-              fill="var(--pb-surface)"
-              stroke="var(--pb-border)"
-              stroke-width="1.5"
-            />
-            <rect
-              x="8"
-              y="14"
-              width="34"
-              height="42"
-              rx="3"
-              fill="var(--pb-surface)"
-              stroke="var(--pb-border-strong)"
-              stroke-width="1.5"
-            />
-            <!-- Ruled lines on top page -->
-            <line
-              x1="14"
-              y1="26"
-              x2="36"
-              y2="26"
-              stroke="var(--pb-border)"
-              stroke-width="1"
-            />
-            <line
-              x1="14"
-              y1="31"
-              x2="36"
-              y2="31"
-              stroke="var(--pb-border)"
-              stroke-width="1"
-            />
-            <line
-              x1="14"
-              y1="36"
-              x2="36"
-              y2="36"
-              stroke="var(--pb-border)"
-              stroke-width="1"
-            />
-            <!-- QR hint -->
-            <rect
-              x="28"
-              y="42"
-              width="10"
-              height="10"
-              rx="1.5"
-              fill="var(--pb-primary-subtle)"
-              stroke="var(--pb-primary)"
-              stroke-width="1.5"
-            />
-            <rect
-              x="30"
-              y="44"
-              width="2.5"
-              height="2.5"
-              rx=".5"
-              fill="var(--pb-primary)"
-            />
-            <rect
-              x="33.5"
-              y="44"
-              width="2.5"
-              height="2.5"
-              rx=".5"
-              fill="var(--pb-primary)"
-            />
-            <rect
-              x="30"
-              y="47.5"
-              width="2.5"
-              height="2.5"
-              rx=".5"
-              fill="var(--pb-primary)"
-            />
-            <!-- Bridge arc -->
-            <path
-              d="M6 58 Q36 42 66 58"
-              stroke="var(--pb-accent)"
-              stroke-width="2"
-              stroke-linecap="round"
-              fill="none"
-              opacity=".6"
-            />
-          </svg>
+          <img src="/images/sp-icon.svg" width="72" height="72" alt="" />
         </div>
         <h1
           class="pb-heading-xl"
           style="margin-bottom: 0.75rem"
-          data-i18n="paperbridge:dashboard.empty.title"
+          data-i18n="scribbledpage:dashboard.empty.title"
         >
-          Welcome to PaperBridge
+          Welcome to ScribbledPage
         </h1>
         <p
           style="
@@ -319,7 +184,7 @@
             margin: 0 auto 2rem;
             line-height: 1.65;
           "
-          data-i18n="paperbridge:dashboard.empty.description"
+          data-i18n="scribbledpage:dashboard.empty.description"
         >
           Create assignments, generate QR-stamped packets for students, then
           upload scanned PDFs to automatically sort and organize submissions.
@@ -327,7 +192,7 @@
         <a
           href="create-assignment.html"
           class="pb-btn pb-btn-primary pb-btn-lg"
-          data-i18n="paperbridge:dashboard.empty.cta"
+          data-i18n="scribbledpage:dashboard.empty.cta"
         >
           Create Your First Assignment
         </a>
@@ -347,7 +212,7 @@
           "
         >
           <div>
-            <h1 class="pb-heading-xl" data-i18n="paperbridge:dashboard.title">
+            <h1 class="pb-heading-xl" data-i18n="scribbledpage:dashboard.title">
               Assignments
             </h1>
             <p
@@ -363,7 +228,7 @@
             href="create-assignment.html"
             class="pb-btn pb-btn-primary"
             style="flex-shrink: 0"
-            data-i18n="paperbridge:nav.newAssignment"
+            data-i18n="scribbledpage:nav.newAssignment"
           >
             <svg
               width="14"
@@ -394,7 +259,7 @@
             <div class="pb-stat-number" id="pb-stat-assignments">0</div>
             <div
               class="pb-stat-label"
-              data-i18n="paperbridge:dashboard.stats.assignments"
+              data-i18n="scribbledpage:dashboard.stats.assignments"
             >
               Assignments
             </div>
@@ -403,7 +268,7 @@
             <div class="pb-stat-number" id="pb-stat-packets">0</div>
             <div
               class="pb-stat-label"
-              data-i18n="paperbridge:dashboard.stats.packetsGenerated"
+              data-i18n="scribbledpage:dashboard.stats.packetsGenerated"
             >
               Packets Generated
             </div>
@@ -412,7 +277,7 @@
             <div class="pb-stat-number pb-text-faint">—</div>
             <div
               class="pb-stat-label"
-              data-i18n="paperbridge:dashboard.stats.submissions"
+              data-i18n="scribbledpage:dashboard.stats.submissions"
             >
               Submissions
             </div>
@@ -428,6 +293,6 @@
     </main>
 
     <script type="module" src="/src/js/utils/lucide-init.ts"></script>
-    <script type="module" src="/src/js/paperbridge/dashboard.ts"></script>
+    <script type="module" src="/src/js/scribbledpage/dashboard.ts"></script>
   </body>
 </html>

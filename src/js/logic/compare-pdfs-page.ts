@@ -520,7 +520,7 @@ async function buildPagePairs() {
   pageState.currentPage = 1;
 }
 
-async function buildReportResults() {
+async function _buildReportResults() {
   const results: ComparePageResult[] = [];
   const ctx = getRenderContext();
 
@@ -851,9 +851,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   const flickerBtn = getElement<HTMLButtonElement>('flicker-btn');
-  const canvas2 = getElement<HTMLCanvasElement>(
-    'canvas-compare-2'
-  ) as HTMLCanvasElement;
   const opacitySlider = getElement<HTMLInputElement>(
     'opacity-slider'
   ) as HTMLInputElement;

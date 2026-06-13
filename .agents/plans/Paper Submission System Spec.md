@@ -2,7 +2,7 @@
 
 ## **Working name**
 
-Possible internal name: **PaperBridge**
+Possible internal name: **ScribbledPage**
 
 Purpose: Turn printable PDF assignments into trackable, scannable, digitally organized student submissions.
 
@@ -12,7 +12,7 @@ The system is designed for teachers who still want students to work on paper, es
 
 Teachers upload or create a PDF assignment. The system stamps QR codes onto every page and generates printable packets. Students complete the work on paper or digitally. Submissions are ingested through scanned PDFs or uploaded documents. The system treats submitted pages as opaque page artifacts: it reads the QR codes, identifies the assignment, packet, and page number, sorts pages, checks completeness, and stores the result as a clean submission PDF.
 
-Longer term, PaperBridge can add visible name, period, or ID marking areas and fillable PDF form fields. Form fields can define named answer zones for crop-based review, digital field extraction, and question-level workflows. For MVP 0, these page-overlay and form-zone features are not required.
+Longer term, ScribbledPage can add visible name, period, or ID marking areas and fillable PDF form fields. Form fields can define named answer zones for crop-based review, digital field extraction, and question-level workflows. For MVP 0, these page-overlay and form-zone features are not required.
 
 The PDF is for humans. The QR and packet metadata are for the system. Form field metadata becomes important in later phases.
 
@@ -280,7 +280,7 @@ Example hidden metadata behind the QR token:
 {
 "assignmentId": "ex10-relays",
 "templateVersion": 1,
-"packetId": "7KQ4M",
+"packetId": "9X7K2VBM",
 "pageNumber": 2,
 "studentId": null
 }
@@ -326,7 +326,7 @@ Example hidden metadata behind the QR token:
 {
 "assignmentId": "ex10-relays",
 "templateVersion": 1,
-"packetId": "7KQ4M",
+"packetId": "9X7K2VBM",
 "pageNumber": 2,
 "studentId": "student_928174"
 }
@@ -339,9 +339,15 @@ The QR code should preferably contain a URL, not raw JSON.
 
 Example:
 
-https://bits.mycode.run/p/7KQ4M2
+https://bits.mycode.run/p/9X7K2VBM-P2
 
 The token resolves server side to the real metadata.
+
+Generated packet and assignment codes should use an 8-character QR-safe alphabet without vowels or ambiguous `0` and `1` characters:
+
+```
+23456789BCDFGHJKLMNPQRSTVWXYZ
+```
 
 Reasons to use a URL:
 
@@ -359,20 +365,26 @@ A damaged or old QR can show a helpful fallback page.
 
 The printed page should also include a human-readable fallback near the QR code:
 
-Packet: 7KQ4M  
+```text
+Packet: 9X7K2VBM
 Page: 2 of 4
+```
 
 For generic assignment mode:
 
-EX10 Relays  
+```text
+EX10 Relays
 Page: 2 of 4
+```
 
 For roster mode later:
 
-Name: Maya Rodriguez  
-Period: 4  
-Packet: 7KQ4M  
+```text
+Name: Maya Rodriguez
+Period: 4
+Packet: 9X7K2VBM
 Page: 2 of 4
+```
 
 ## **MVP 0 assignment creation workflow**
 
@@ -412,7 +424,7 @@ In roster mode later, it generates one packet per rostered student and optionall
 
 ## **Later assignment form-zone workflow**
 
-Teacher creates or uploads a fillable PDF using PaperBridge, BentoPDF-derived form creation tools, or another form-capable PDF tool.
+Teacher creates or uploads a fillable PDF using ScribbledPage, BentoPDF-derived form creation tools, or another form-capable PDF tool.
 
 The PDF contains visible worksheet content and form fields that mark answer zones.
 
@@ -595,29 +607,33 @@ Extracted AcroForm values, later
 
 Example MVP 0 output structure:
 
-EX10 Relays/  
- packet-7KQ4M/  
- submission.pdf  
- metadata.json  
- pages/  
- page-1-preview.jpg  
- page-2-preview.jpg
+```text
+EX10 Relays/
+  packet-9X7K2VBM/
+    submission.pdf
+    metadata.json
+    pages/
+      page-1-preview.jpg
+      page-2-preview.jpg
+```
 
 Example later output structure with answer crops:
 
-EX10 Relays/  
- packet-7KQ4M/  
- submission.pdf  
- metadata.json  
- pages/  
- page-1-original.jpg  
- page-1-processed.png  
- page-2-original.jpg  
- page-2-processed.png  
- crops/  
- student.name.png  
- q01.prediction.png  
- q02.explanation.png
+```text
+EX10 Relays/
+  packet-9X7K2VBM/
+    submission.pdf
+    metadata.json
+    pages/
+      page-1-original.jpg
+      page-1-processed.png
+      page-2-original.jpg
+      page-2-processed.png
+    crops/
+      student.name.png
+      q01.prediction.png
+      q02.explanation.png
+```
 
 ## **Cropping answer zones**
 
@@ -705,7 +721,7 @@ For duplicates, the app should allow replacement.
 
 Example:
 
-Packet 7KQ4M already has page 2. Replace it with this newly detected page?
+Packet 9X7K2VBM already has page 2. Replace it with this newly detected page?
 
 ## **Teacher review dashboard**
 
@@ -743,7 +759,7 @@ For anonymous packet mode, MVP 0 identifies submissions by packet code. Manual s
 
 Example:
 
-Packet 7KQ4M  
+Packet 9X7K2VBM
 Pages found: 1, 2, 3, 4  
 Status: Complete
 
@@ -759,25 +775,29 @@ MVP 0 should probably export final PDFs and a summary CSV first.
 
 Example Drive structure:
 
-Paper Submissions/  
- EX10 Relays/  
- Complete/  
- packet-7KQ4M.pdf  
- packet-J82PA.pdf  
- Needs Review/  
- packet-X92KD.pdf  
- Metadata/  
- submissions.csv
+```text
+Paper Submissions/
+  EX10 Relays/
+    Complete/
+      packet-9X7K2VBM.pdf
+      packet-J82PZ6RC.pdf
+    Needs Review/
+      packet-X92KD7TM.pdf
+    Metadata/
+      submissions.csv
+```
 
 A later detailed export option:
 
-Paper Submissions/  
- EX10 Relays/  
- packet-7KQ4M/  
- submission.pdf  
- metadata.json  
- q01.prediction.png  
- q02.explanation.png
+```text
+Paper Submissions/
+  EX10 Relays/
+    packet-9X7K2VBM/
+      submission.pdf
+      metadata.json
+      q01.prediction.png
+      q02.explanation.png
+```
 
 Example MVP 0 CSV columns:
 
@@ -819,7 +839,7 @@ The server does not necessarily need to permanently store every uploaded origina
 
 Frontend:
 
-Replacement PaperBridge interface  
+Replacement ScribbledPage interface  
 Teacher dashboard  
 PDF upload and assignment setup  
 QR placement preview UI  
@@ -866,7 +886,7 @@ The existing workflow builder does not need to be exposed as a teacher-facing fe
 
 Its control and dataflow model can be useful as a rapid prototyping harness for processing ideas.
 
-Potential PaperBridge prototype nodes:
+Potential ScribbledPage prototype nodes:
 
 Assignment PDF Input  
 Generate Packet Tokens  
@@ -902,9 +922,9 @@ The teacher-facing product should use normal assignment and submission screens. 
 ### **Packet**
 
 {
-"id": "packet_7KQ4M",
+"id": "packet_9X7K2VBM",
 "assignmentId": "assign_123",
-"packetCode": "7KQ4M",
+"packetCode": "9X7K2VBM",
 "studentId": null,
 "mode": "anonymous",
 "createdAt": "2026-05-12T19:10:00Z"
@@ -913,10 +933,10 @@ The teacher-facing product should use normal assignment and submission screens. 
 ### **QR token**
 
 {
-"token": "7KQ4M2",
+"token": "9X7K2VBM-P2",
 "assignmentId": "assign_123",
 "templateVersion": 1,
-"packetId": "packet_7KQ4M",
+"packetId": "packet_9X7K2VBM",
 "pageNumber": 2,
 "expiresAt": null
 }
@@ -936,7 +956,7 @@ The teacher-facing product should use normal assignment and submission screens. 
 {
 "id": "sub_abc123",
 "assignmentId": "assign_123",
-"packetId": "packet_7KQ4M",
+"packetId": "packet_9X7K2VBM",
 "status": "complete",
 "source": "teacher-scan",
 "createdAt": "2026-05-12T20:15:00Z",
@@ -1014,7 +1034,7 @@ Teacher sees grouped results.
 
 For anonymous packet mode:
 
-Packet 7KQ4M  
+Packet 9X7K2VBM
 Pages found: 1, 2, 3, 4  
 Status: Complete
 
@@ -1093,7 +1113,7 @@ Generate final PDFs from recovered pages.
 
 Keep roster mode as a later extension.
 
-Expose BentoPDF-style tools only as an optional secondary use case, not as the main PaperBridge interface.
+Expose BentoPDF-style tools only as an optional secondary use case, not as the main ScribbledPage interface.
 
 ## **Open questions**
 
@@ -1105,7 +1125,7 @@ How good can automatic QR placement be before manual movement is needed?
 
 In Phase 1, should the system add a name/period/ID marking area automatically, or let the teacher opt in?
 
-Should anonymous packet codes be short and human-readable, like `7KQ4M`, or longer and more collision resistant?
+Should anonymous packet codes remain 8 QR-safe characters, or should production use a longer code plus collision checks?
 
 Should uploaded originals be deleted immediately after processing, or retained for a limited time?
 

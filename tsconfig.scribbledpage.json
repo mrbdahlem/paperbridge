@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/js/scribbledpage/**/*.ts",
+    "src/tests/scribbledpage-*.test.ts",
+    "vitest.scribbledpage.config.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

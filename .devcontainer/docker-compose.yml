@@ -1,9 +1,11 @@
 services:
   app:
-    image: mcr.microsoft.com/devcontainers/javascript-node:22
+    image: mcr.microsoft.com/devcontainers/javascript-node:24
     user: vscode
     volumes:
-      - ..:/workspaces/paperbridge:cached
+      - ..:/workspaces/scribbledpage:cached
     command: sleep infinity
     environment:
       HOST: 0.0.0.0
+      VITE_DEV_HOST: 0.0.0.0
+      VITE_PREVIEW_HOST: 0.0.0.0

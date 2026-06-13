@@ -203,7 +203,9 @@ async function renderPageMergeThumbnails() {
           lazyLoadMargin: '300px',
           onProgress: () => {
             currentPageNumber++;
-            showLoader(`Rendering page previews...`);
+            showLoader(
+              `Rendering page preview ${currentPageNumber} of ${totalPages}...`
+            );
           },
           onBatchComplete: () => {
             createIcons({ icons });
@@ -607,11 +609,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
 
-  const fileControls = document.getElementById('file-controls');
   const addMoreBtn = document.getElementById('add-more-btn');
   const clearFilesBtn = document.getElementById('clear-files-btn');
   const backBtn = document.getElementById('back-to-tools');
-  const mergeOptions = document.getElementById('merge-options');
 
   if (backBtn) {
     backBtn.addEventListener('click', () => {

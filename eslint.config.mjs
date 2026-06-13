@@ -89,4 +89,25 @@ export default [
       'no-misleading-character-class': 'warn',
     },
   },
+  {
+    files: ['**/*.{ts,mts,cts}'],
+    rules: {
+      // TypeScript resolves type-only names and ambient declarations.
+      'no-undef': 'off',
+    },
+  },
+  {
+    files: ['src/tests/**/*.{js,ts}', '**/*.{test,spec}.{js,ts}'],
+    languageOptions: {
+      globals: {
+        ...globals.vitest,
+      },
+    },
+  },
+  {
+    files: ['scripts/build.js'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
 ];

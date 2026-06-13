@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getLanguageFromUrl } from '@/js/i18n/i18n';
+import {
+  getLanguageFromUrl,
+  rewriteLinks,
+  supportedLanguages,
+} from '@/js/i18n/i18n';
+
+const SCRIBBLEDPAGE_LANGUAGES = ['en', 'de', 'es', 'fr', 'ja', 'pt'];
 
 describe('getLanguageFromUrl', () => {
   const originalLocation = window.location;
@@ -57,17 +63,17 @@ describe('getLanguageFromUrl', () => {
 
   it('should return language from localStorage if URL has no language', () => {
     window.location.pathname = '/about';
-    localStorage.setItem('i18nextLng', 'it');
-    expect(getLanguageFromUrl()).toBe('it');
+    localStorage.setItem('i18nextLng', 'pt');
+    expect(getLanguageFromUrl()).toBe('pt');
   });
 
   it('should return exact match from navigator.languages', () => {
     window.location.pathname = '/';
     Object.defineProperty(window.navigator, 'languages', {
-      value: ['zh-TW', 'en-US', 'en'],
+      value: ['ja', 'en-US', 'en'],
       configurable: true,
     });
-    expect(getLanguageFromUrl()).toBe('zh-TW');
+    expect(getLanguageFromUrl()).toBe('ja');
   });
 
   it('should return primary language match from navigator.languages', () => {
@@ -104,8 +110,8 @@ describe('getLanguageFromUrl', () => {
       value: ['xx'],
       configurable: true,
     }); // unsupported
-    vi.stubEnv('VITE_DEFAULT_LANGUAGE', 'vi');
-    expect(getLanguageFromUrl()).toBe('vi');
+    vi.stubEnv('VITE_DEFAULT_LANGUAGE', 'ja');
+    expect(getLanguageFromUrl()).toBe('ja');
   });
 
   it('should fallback to en if everything else fails', () => {
@@ -125,5 +131,55 @@ describe('getLanguageFromUrl', () => {
       writable: true,
     });
     expect(getLanguageFromUrl()).toBe('en');
+  });
+
+  it('limits supported languages to the current ScribbledPage translation set', () => {
+    expect([...supportedLanguages]).toEqual(SCRIBBLEDPAGE_LANGUAGES);
+  });
+});
+
+describe('rewriteLinks', () => {
+  const originalLocation = window.location;
+
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: { ...originalLocation, pathname: '/fr/' },
+      writable: true,
+      configurable: true,
+    });
+    localStorage.clear();
+    document.body.innerHTML = '';
+    vi.stubEnv('BASE_URL', '/');
+    vi.stubEnv('VITE_DEFAULT_LANGUAGE', 'en');
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
+    document.body.innerHTML = '';
+    vi.unstubAllEnvs();
+  });
+
+  it('does not rewrite localized root links with query strings or hashes', () => {
+    document.body.innerHTML = `
+      <a id="query" href="/de?utm=campaign">German campaign</a>
+      <a id="hash" href="/de#section">German section</a>
+      <a id="plain" href="/about">About</a>
+    `;
+
+    rewriteLinks();
+
+    expect(document.getElementById('query')?.getAttribute('href')).toBe(
+      '/de?utm=campaign'
+    );
+    expect(document.getElementById('hash')?.getAttribute('href')).toBe(
+      '/de#section'
+    );
+    expect(document.getElementById('plain')?.getAttribute('href')).toBe(
+      '/fr/about'
+    );
   });
 });

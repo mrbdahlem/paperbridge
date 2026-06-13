@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Assignment — PaperBridge</title>
+    <title>Create Assignment — ScribbledPage</title>
     <meta name="robots" content="noindex, nofollow" />
 
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
@@ -33,7 +33,7 @@
     </script>
 
     <link href="src/css/styles.css" rel="stylesheet" />
-    <link href="src/css/paperbridge.css" rel="stylesheet" />
+    <link href="src/css/scribbledpage.css" rel="stylesheet" />
   </head>
 
   <body class="pb-page">
@@ -41,61 +41,33 @@
     <nav class="pb-nav">
       <div class="pb-nav-inner">
         <a href="index.html" class="pb-logo">
-          <div class="pb-logo-mark" aria-hidden="true">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="2"
-                y="4"
-                width="10"
-                height="10"
-                rx="1.5"
-                fill="white"
-                opacity=".9"
-              />
-              <rect
-                x="4"
-                y="2"
-                width="10"
-                height="10"
-                rx="1.5"
-                fill="white"
-                opacity=".5"
-              />
-              <path
-                d="M5 9 Q8 6 11 9"
-                stroke="white"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                fill="none"
-              />
-            </svg>
-          </div>
-          <span class="pb-logo-text">PaperBridge</span>
+          <img
+            src="/images/sp-icon.svg"
+            width="32"
+            height="32"
+            aria-hidden="true"
+            style="flex-shrink: 0"
+          />
+          <span class="pb-logo-text">ScribbledPage</span>
         </a>
 
         <nav class="pb-nav-links" aria-label="Primary navigation">
           <a
             href="index.html"
             class="pb-nav-link"
-            data-i18n="paperbridge:nav.dashboard"
+            data-i18n="scribbledpage:nav.dashboard"
             >Dashboard</a
           >
           <a
             href="create-assignment.html"
             class="pb-nav-link pb-nav-link--active"
-            data-i18n="paperbridge:nav.newAssignment"
+            data-i18n="scribbledpage:nav.newAssignment"
             >New Assignment</a
           >
           <a
             href="tools.html"
             class="pb-nav-link"
-            data-i18n="paperbridge:nav.pdfTools"
+            data-i18n="scribbledpage:nav.pdfTools"
             >PDF Tools</a
           >
         </nav>
@@ -144,7 +116,7 @@
             class="pb-theme-btn"
             style="display: none"
             aria-label="Open menu"
-            data-i18n-title="paperbridge:nav.menuOpen"
+            data-i18n-title="scribbledpage:nav.menuOpen"
           >
             <svg
               width="16"
@@ -166,19 +138,19 @@
         <a
           href="index.html"
           class="pb-mobile-link"
-          data-i18n="paperbridge:nav.dashboard"
+          data-i18n="scribbledpage:nav.dashboard"
           >Dashboard</a
         >
         <a
           href="create-assignment.html"
           class="pb-mobile-link pb-mobile-link--active"
-          data-i18n="paperbridge:nav.newAssignment"
+          data-i18n="scribbledpage:nav.newAssignment"
           >New Assignment</a
         >
         <a
           href="tools.html"
           class="pb-mobile-link"
-          data-i18n="paperbridge:nav.pdfTools"
+          data-i18n="scribbledpage:nav.pdfTools"
           >PDF Tools</a
         >
       </div>
@@ -191,7 +163,7 @@
           <div class="pb-step-circle">1</div>
           <span
             class="pb-step-label"
-            data-i18n="paperbridge:create.steps.upload"
+            data-i18n="scribbledpage:create.steps.upload"
             >Upload PDF</span
           >
         </div>
@@ -202,7 +174,7 @@
           <div class="pb-step-circle">2</div>
           <span
             class="pb-step-label"
-            data-i18n="paperbridge:create.steps.details"
+            data-i18n="scribbledpage:create.steps.details"
             >Details &amp; Placement</span
           >
         </div>
@@ -213,7 +185,7 @@
           <div class="pb-step-circle">3</div>
           <span
             class="pb-step-label"
-            data-i18n="paperbridge:create.steps.download"
+            data-i18n="scribbledpage:create.steps.download"
             >Download</span
           >
         </div>
@@ -224,7 +196,7 @@
         <h1
           class="pb-heading-lg"
           style="margin-bottom: 0.5rem"
-          data-i18n="paperbridge:create.step1.heading"
+          data-i18n="scribbledpage:create.step1.heading"
         >
           Upload your assignment PDF
         </h1>
@@ -235,7 +207,7 @@
             margin-bottom: 1.75rem;
             line-height: 1.6;
           "
-          data-i18n="paperbridge:create.step1.description"
+          data-i18n="scribbledpage:create.step1.description"
         >
           Used as the base for QR-stamped packets. No file leaves your browser.
         </p>
@@ -265,7 +237,7 @@
               margin-bottom: 0.3rem;
               font-size: 0.9375rem;
             "
-            data-i18n="paperbridge:create.step1.dropHere"
+            data-i18n="scribbledpage:create.step1.dropHere"
           >
             Drop your PDF here
           </p>
@@ -275,7 +247,7 @@
               font-size: 0.8125rem;
               margin-bottom: 1.25rem;
             "
-            data-i18n="paperbridge:create.step1.dropOr"
+            data-i18n="scribbledpage:create.step1.dropOr"
           >
             or click to browse
           </p>
@@ -287,8 +259,9 @@
           />
           <button
             id="browse-btn"
+            type="button"
             class="pb-btn pb-btn-secondary"
-            data-i18n="paperbridge:create.step1.browse"
+            data-i18n="scribbledpage:create.step1.browse"
           >
             Browse files
           </button>
@@ -389,7 +362,7 @@
             id="step1-next"
             disabled
             class="pb-btn pb-btn-primary"
-            data-i18n="paperbridge:create.step1.next"
+            data-i18n="scribbledpage:create.step1.next"
           >
             Next: Details &amp; Placement
             <svg
@@ -413,7 +386,7 @@
         <h1
           class="pb-heading-lg"
           style="margin-bottom: 0.5rem"
-          data-i18n="paperbridge:create.step2.heading"
+          data-i18n="scribbledpage:create.step2.heading"
         >
           Assignment details
         </h1>
@@ -424,7 +397,7 @@
             margin-bottom: 1.75rem;
             line-height: 1.6;
           "
-          data-i18n="paperbridge:create.step2.description"
+          data-i18n="scribbledpage:create.step2.description"
         >
           Configure the assignment then position the QR code on each page.
         </p>
@@ -433,7 +406,7 @@
           <!-- Title -->
           <div>
             <label class="pb-label" for="assignment-title">
-              <span data-i18n="paperbridge:create.step2.titleLabel"
+              <span data-i18n="scribbledpage:create.step2.titleLabel"
                 >Assignment Title</span
               >
               <span style="color: var(--pb-danger)">&thinsp;*</span>
@@ -443,19 +416,19 @@
               type="text"
               class="pb-input"
               placeholder="e.g. EX10 Relays Note Catcher"
-              data-i18n-placeholder="paperbridge:create.step2.titlePlaceholder"
+              data-i18n-placeholder="scribbledpage:create.step2.titlePlaceholder"
             />
           </div>
 
           <!-- Class label -->
           <div>
             <label class="pb-label" for="class-label">
-              <span data-i18n="paperbridge:create.step2.classLabel"
+              <span data-i18n="scribbledpage:create.step2.classLabel"
                 >Class / Period</span
               >
               <span
                 style="color: var(--pb-text-3); font-weight: 400"
-                data-i18n="paperbridge:create.step2.optional"
+                data-i18n="scribbledpage:create.step2.optional"
               >
                 (optional)</span
               >
@@ -465,7 +438,7 @@
               type="text"
               class="pb-input"
               placeholder="e.g. Period 4"
-              data-i18n-placeholder="paperbridge:create.step2.classPlaceholder"
+              data-i18n-placeholder="scribbledpage:create.step2.classPlaceholder"
             />
           </div>
 
@@ -473,7 +446,7 @@
           <div>
             <label
               class="pb-label"
-              data-i18n="paperbridge:create.step2.qrModeLabel"
+              data-i18n="scribbledpage:create.step2.qrModeLabel"
               >QR Mode</label
             >
             <div
@@ -524,7 +497,7 @@
                         font-size: 0.8125rem;
                         color: var(--pb-text-1);
                       "
-                      data-i18n="paperbridge:create.step2.modeAnonymousTitle"
+                      data-i18n="scribbledpage:create.step2.modeAnonymousTitle"
                       >Anonymous Packet</span
                     >
                   </div>
@@ -534,7 +507,7 @@
                       color: var(--pb-text-2);
                       line-height: 1.5;
                     "
-                    data-i18n="paperbridge:create.step2.modeAnonymousDesc"
+                    data-i18n="scribbledpage:create.step2.modeAnonymousDesc"
                   >
                     Each copy gets a unique packet ID. Pages from multiple
                     students can be scanned together.
@@ -580,7 +553,7 @@
                         font-size: 0.8125rem;
                         color: var(--pb-text-1);
                       "
-                      data-i18n="paperbridge:create.step2.modeGenericTitle"
+                      data-i18n="scribbledpage:create.step2.modeGenericTitle"
                       >Generic Assignment</span
                     >
                   </div>
@@ -590,7 +563,7 @@
                       color: var(--pb-text-2);
                       line-height: 1.5;
                     "
-                    data-i18n="paperbridge:create.step2.modeGenericDesc"
+                    data-i18n="scribbledpage:create.step2.modeGenericDesc"
                   >
                     Every copy has the same QR code. Good for note catchers and
                     informal work.
@@ -605,7 +578,7 @@
             <label
               class="pb-label"
               for="packet-count"
-              data-i18n="paperbridge:create.step2.packetCountLabel"
+              data-i18n="scribbledpage:create.step2.packetCountLabel"
               >Packets to generate</label
             >
             <div style="display: flex; align-items: center; gap: 1rem">
@@ -623,7 +596,7 @@
                   font-size: 0.75rem;
                   line-height: 1.5;
                 "
-                data-i18n="paperbridge:create.step2.packetCountHint"
+                data-i18n="scribbledpage:create.step2.packetCountHint"
               >
                 One PDF per student. Print and distribute one packet each.
               </p>
@@ -644,7 +617,7 @@
               <label
                 class="pb-label"
                 style="margin: 0"
-                data-i18n="paperbridge:create.step2.placementLabel"
+                data-i18n="scribbledpage:create.step2.placementLabel"
                 >QR Code Placement</label
               >
               <button
@@ -657,7 +630,7 @@
                   text-decoration: underline;
                   text-underline-offset: 2px;
                 "
-                data-i18n="paperbridge:create.step2.placementApplyAll"
+                data-i18n="scribbledpage:create.step2.placementApplyAll"
               >
                 Apply page 1 position to all
               </button>
@@ -669,7 +642,7 @@
                 margin-bottom: 1rem;
                 line-height: 1.5;
               "
-              data-i18n="paperbridge:create.step2.placementHint"
+              data-i18n="scribbledpage:create.step2.placementHint"
             >
               Drag the QR marker on each thumbnail to reposition. Default is
               top-right with a 0.5&quot; print-safe margin.
@@ -695,7 +668,7 @@
           <button
             id="step2-back"
             class="pb-btn pb-btn-secondary"
-            data-i18n="paperbridge:create.step2.back"
+            data-i18n="scribbledpage:create.step2.back"
           >
             <svg
               width="14"
@@ -714,7 +687,7 @@
           <button
             id="step2-next"
             class="pb-btn pb-btn-primary"
-            data-i18n="paperbridge:create.step2.generate"
+            data-i18n="scribbledpage:create.step2.generate"
           >
             Generate Packets
             <svg
@@ -738,7 +711,7 @@
         <h1
           class="pb-heading-lg"
           style="margin-bottom: 0.5rem"
-          data-i18n="paperbridge:create.step3.heading"
+          data-i18n="scribbledpage:create.step3.heading"
         >
           Download packets
         </h1>
@@ -749,7 +722,7 @@
             margin-bottom: 1.75rem;
             line-height: 1.6;
           "
-          data-i18n="paperbridge:create.step3.description"
+          data-i18n="scribbledpage:create.step3.description"
         >
           Each packet PDF is QR-stamped and ready to print.
         </p>
@@ -768,7 +741,7 @@
             <span
               style="color: var(--pb-text-2); font-size: 0.875rem"
               id="progress-label"
-              data-i18n="paperbridge:create.step3.generating"
+              data-i18n="scribbledpage:create.step3.generating"
               >Generating packets…</span
             >
           </div>
@@ -815,7 +788,7 @@
                   color: var(--pb-text-2);
                   margin-top: 0.2rem;
                 "
-                data-i18n="paperbridge:create.step3.savedNote"
+                data-i18n="scribbledpage:create.step3.savedNote"
               >
                 Assignment saved to your dashboard.
               </p>
@@ -854,12 +827,12 @@
               <span
                 class="pb-download-card-title"
                 id="download-zip-label"
-                data-i18n="paperbridge:create.step3.downloadZipTitle"
+                data-i18n="scribbledpage:create.step3.downloadZipTitle"
                 >Download ZIP</span
               >
               <span
                 class="pb-download-card-sub"
-                data-i18n="paperbridge:create.step3.downloadZipSub"
+                data-i18n="scribbledpage:create.step3.downloadZipSub"
                 >All packets in one file</span
               >
             </button>
@@ -885,12 +858,12 @@
               <span
                 class="pb-download-card-title"
                 id="download-combined-label"
-                data-i18n="paperbridge:create.step3.combinedTitle"
+                data-i18n="scribbledpage:create.step3.combinedTitle"
                 >Combined PDF</span
               >
               <span
                 class="pb-download-card-sub"
-                data-i18n="paperbridge:create.step3.combinedSub"
+                data-i18n="scribbledpage:create.step3.combinedSub"
                 >All packets, one print job</span
               >
             </button>
@@ -904,7 +877,7 @@
                 font-size: 0.75rem;
                 margin-bottom: 0.5rem;
               "
-              data-i18n="paperbridge:create.step3.individualLabel"
+              data-i18n="scribbledpage:create.step3.individualLabel"
             >
               Or download individual packets:
             </p>
@@ -927,7 +900,7 @@
             <button
               id="step3-new"
               class="pb-btn pb-btn-ghost"
-              data-i18n="paperbridge:create.step3.newAssignment"
+              data-i18n="scribbledpage:create.step3.newAssignment"
             >
               <svg
                 width="14"
@@ -946,7 +919,7 @@
             <a
               href="index.html"
               class="pb-btn pb-btn-secondary"
-              data-i18n="paperbridge:create.step3.backToDashboard"
+              data-i18n="scribbledpage:create.step3.backToDashboard"
             >
               Dashboard
             </a>
@@ -999,7 +972,7 @@
 
     <script
       type="module"
-      src="/src/js/paperbridge/create-assignment.ts"
+      src="/src/js/scribbledpage/create-assignment.ts"
     ></script>
   </body>
 </html>
