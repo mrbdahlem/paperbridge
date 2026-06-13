@@ -182,6 +182,8 @@ describe('assignment API persistence adapter', () => {
   it('deletes through the durable API when available', async () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock.mockResolvedValueOnce(jsonResponse({ ok: true }));
+    saveAssignment(makeAssignment());
+    savePackets([makePacket()]);
 
     await removeAssignment('assignment_1');
 
@@ -189,6 +191,8 @@ describe('assignment API persistence adapter', () => {
       '/api/assignments/assignment_1',
       expect.objectContaining({ method: 'DELETE' })
     );
+    expect(getAssignments()).toEqual([]);
+    expect(getPackets()).toEqual([]);
   });
 
   it('falls back to local delete on network failure', async () => {

@@ -187,7 +187,10 @@ export async function removeAssignment(id: string): Promise<void> {
     { method: 'DELETE' }
   );
 
-  if (response.ok) return;
+  if (response.ok) {
+    deleteAssignment(id);
+    return;
+  }
   if (response.unavailable || response.status === 404) {
     deleteAssignment(id);
     return;
